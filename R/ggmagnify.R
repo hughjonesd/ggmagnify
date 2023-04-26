@@ -83,7 +83,8 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' @param shadow Logical. Draw a shadow behind the inset? Requires the `ggfx` package.
 #' @param shadow_args List of arguments to pass to [ggfx::with_shadow()].
 #' @param blank Character vector of theme elements to blank out in the inset.
-#'   Use [inset_blanks(elems)] to add `elems` to the default list.
+#'   Use [`inset_blanks(elems)`][inset_blanks()] to add `elems` to the
+#'   default list.
 #'
 #' @details
 #' If `compose` is `FALSE`, the returned `GgMagnify` object includes the
@@ -95,7 +96,7 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' * `proj`, a layer representing the projection lines.
 #'
 #' You can modify these, e.g. by adding themes to the inset. Call
-#' [compose(ggm, plot)] to add the object to the plot.
+#' [`compose(ggm, plot)`][compose()] to add the object to the plot.
 #'
 #' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
 #' in the main plot.
@@ -112,7 +113,24 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'
 #' ggmagnify(ggp,
 #'           xlim = c(1.5, 2.5), ylim = c(60, 65),
-#'          inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+#'           inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+#'
+#' ggmagnify(ggp,
+#'           xlim = c(1.5, 2.5), ylim = c(60, 65),
+#'           inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+#'           colour = "red")
+#'
+#' ggmagnify(ggp,
+#'           xlim = c(1.5, 2.5), ylim = c(60, 65),
+#'           inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+#'           axes = TRUE, border = FALSE)
+#'
+#' if (requireNamespace("ggfx", quietly = TRUE)) {
+#'   ggmagnify(ggp,
+#'             xlim = c(1.5, 2.5), ylim = c(60, 65),
+#'             inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+#'             shadow = TRUE)
+#' }
 ggmagnify <- function (
     plot,
     xlim,

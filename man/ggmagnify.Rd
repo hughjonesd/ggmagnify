@@ -82,7 +82,8 @@ not the outer plot.}
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 
 \item{blank}{Character vector of theme elements to blank out in the inset.
-Use \link{inset_blanks(elems)} to add \code{elems} to the default list.}
+Use \code{\link[=inset_blanks]{inset_blanks(elems)}} to add \code{elems} to the
+default list.}
 }
 \value{
 The modified \code{plot} if \code{compose} is \code{TRUE}. Otherwise, a \code{GgMagnify}
@@ -105,7 +106,7 @@ following list components:
 }
 
 You can modify these, e.g. by adding themes to the inset. Call
-\link{compose(ggm, plot)} to add the object to the plot.
+\code{\link[=compose]{compose(ggm, plot)}} to add the object to the plot.
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
@@ -116,5 +117,22 @@ ggp <- ggplot(diamonds, aes(carat, depth, color = cut)) + geom_point()
 
 ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
-         inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+          colour = "red")
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+          axes = TRUE, border = FALSE)
+
+if (requireNamespace("ggfx", quietly = TRUE)) {
+  ggmagnify(ggp,
+            xlim = c(1.5, 2.5), ylim = c(60, 65),
+            inset_xlim = c(2, 5), inset_ylim = c(40, 55),
+            shadow = TRUE)
+}
 }

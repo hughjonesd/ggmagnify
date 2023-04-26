@@ -4,6 +4,8 @@
 # ggmagnify
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ggmagnify creates a magnified inset of part of a

@@ -10,7 +10,7 @@ Language: en
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    ggplot2
+    ggplot2 (>= 3.4.0)
 Suggests: 
     ggfx
 URL: https://github.com/hughjonesd/ggmagnify
