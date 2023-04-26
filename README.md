@@ -74,6 +74,24 @@ ggmagnify(ggp,
 
 <img src="man/figures/README-example-axes-1.png" width="100%" />
 
+## Inset outside the plot region
+
+``` r
+
+ggp_noclip <- ggp + 
+              coord_cartesian(xlim = c(0, 5), ylim = c(40, 80), clip = "off") +
+              theme(legend.justification = c(0, 1))
+
+ggmagnify(ggp_noclip,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2.6, 7.6), inset_ylim = c(40, 55),
+          shadow = TRUE)
+#> Coordinate system already present. Adding new coordinate system, which will
+#> replace the existing one.
+```
+
+<img src="man/figures/README-example-noclip-1.png" width="100%" />
+
 ## Advanced usage: tweaking the inset
 
 ``` r
