@@ -13,7 +13,7 @@ ggmagnify(
   zoom,
   border = TRUE,
   target = TRUE,
-  proj = TRUE,
+  proj = c("facing", "corresponding", "single", "none"),
   shadow = FALSE,
   compose = TRUE,
   axes = FALSE,
@@ -34,7 +34,6 @@ ggmagnify(
   target_linetype = linetype,
   target_colour = colour,
   target_alpha = alpha,
-  proj_style = c("facing", "corresponding"),
   shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   blank = inset_blanks(axes = axes)
 )
@@ -55,7 +54,9 @@ and \code{inset_ylim[2]}.}
 
 \item{target}{Logical. Draw a border around the target area?}
 
-\item{proj}{Logical. Draw projection lines from the target area to the inset?}
+\item{proj}{String. What style of projection lines to draw? \code{"facing"} (the
+default), \code{"corresponding"}, \code{"single"} or \code{"none"}. Can be abbreviated.
+See below.}
 
 \item{shadow}{Logical. Draw a shadow behind the inset? Requires
 the \code{ggfx} package.}
@@ -81,12 +82,6 @@ for projection lines.}
 
 \item{target_linewidth, target_linetype, target_colour, target_alpha}{Parameters for target border.}
 
-\item{proj_style}{String. \code{"facing"} sometimes draws lines between
-the nearest corners of the target and the inset.
-\code{"corresponding"} always projects each corner of the target to the
-corresponding corner of the inset. You can abbreviate these to \code{"f"}
-or \code{"c"}.}
-
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 
 \item{blank}{Character vector of theme elements to blank out in the inset.
@@ -104,6 +99,15 @@ target are drawn. If the \code{ggfx} package is installed, a drop shadow can be
 added.
 }
 \details{
+\subsection{Projection lines.}{
+
+\code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
+corners of the target to the corners of the inset. \code{"corresponding"} always
+projects each corner of the target to the same corner of the inset.
+\code{"facing"} sometimes draws lines between facing corners, when this looks
+cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
+\code{"none"} draws no lines.
+
 If \code{compose} is \code{FALSE}, the returned \code{GgMagnify} object includes the
 following list components:
 \itemize{
@@ -118,6 +122,8 @@ You can modify these, e.g. by adding themes to the inset. Call
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
+}
+
 \subsection{Limitations}{
 
 It won't work with facets, or with non-cartesian coordinates.

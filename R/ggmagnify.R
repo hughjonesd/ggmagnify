@@ -58,14 +58,11 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   and `inset_ylim[2]`.
 #' @param border Logical. Draw a border around the inset?
 #' @param target Logical. Draw a border around the target area?
-#' @param proj Logical. Draw projection lines from the target area to the inset?
+#' @param proj String. What style of projection lines to draw? `"facing"` (the
+#'   default), `"corresponding"`, `"single"` or `"none"`. Can be abbreviated.
+#'   See below.
 #' @param shadow Logical. Draw a shadow behind the inset? Requires
 #'   the `ggfx` package.
-#' @param proj_style String. `"facing"` sometimes draws lines between
-#'   the nearest corners of the target and the inset.
-#'   `"corresponding"` always projects each corner of the target to the
-#'   corresponding corner of the inset. You can abbreviate these to `"f"`
-#'   or `"c"`.
 #' @param compose Logical. If `TRUE`, the new elements are added to the ggplot object.
 #'   If `FALSE`, they are returned in a `GgMagnify` object, see below.
 #' @param axes Logical. Draw axes in the inset?
@@ -87,6 +84,16 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   to the default list.
 #'
 #' @details
+#'
+#' ## Projection lines.
+#'
+#' `proj = "corresponding"` or `"facing"` draws projection lines from the
+#' corners of the target to the corners of the inset. `"corresponding"` always
+#' projects each corner of the target to the same corner of the inset.
+#' `"facing"` sometimes draws lines between facing corners, when this looks
+#' cleaner. `"single"` draws a single line from the midpoint of facing sides.
+#' `"none"` draws no lines.
+#'
 #' If `compose` is `FALSE`, the returned `GgMagnify` object includes the
 #' following list components:
 #'
@@ -146,7 +153,7 @@ ggmagnify <- function (
     zoom,
     border = TRUE,
     target = TRUE,
-    proj  = TRUE,
+    proj   = c("facing", "corresponding", "single", "none"),
     shadow = FALSE,
     compose = TRUE,
     axes = FALSE,
@@ -167,7 +174,6 @@ ggmagnify <- function (
     target_linetype = linetype,
     target_colour = colour,
     target_alpha = alpha,
-    proj_style = c("facing", "corresponding"),
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
     blank = inset_blanks(axes = axes)
 ) {
@@ -187,7 +193,7 @@ ggmagnify <- function (
     inset_ymax <- inset_ymin + diff(ylim) * zoom[2]
   }
 
-  proj_style <- match.arg(proj_style)
+  proj <- match.arg(proj)
   # == Create the inset ggplot =================================================
 
   suppressWarnings({
@@ -234,61 +240,80 @@ ggmagnify <- function (
   }
 
   # == Create projection lines =================================================
-  proj <- if (! proj) {
-    NULL
+  if (proj == "none") {
+    proj_layer <- NULL
   } else {
-    # which of the four lines connecting the four corners can we draw?
-    can_top_left  <- sign(xmin - inset_xmin) == sign(ymax - inset_ymax)
-    can_bot_right <- sign(xmax - inset_xmax) == sign(ymin - inset_ymin)
-    can_bot_left  <- sign(xmin - inset_xmin) != sign(ymin - inset_ymin)
-    can_top_right <- sign(xmax - inset_xmax) != sign(ymax - inset_ymax)
-    can_proj <- c(can_bot_left, can_top_left, can_bot_right, can_top_right)
+    if (proj %in% c("corresponding", "facing")) {
+      # which of the four lines connecting the four corners can we draw?
+      can_top_left  <- sign(xmin - inset_xmin) == sign(ymax - inset_ymax)
+      can_bot_right <- sign(xmax - inset_xmax) == sign(ymin - inset_ymin)
+      can_bot_left  <- sign(xmin - inset_xmin) != sign(ymin - inset_ymin)
+      can_top_right <- sign(xmax - inset_xmax) != sign(ymax - inset_ymax)
+      can_proj <- c(can_bot_left, can_top_left, can_bot_right, can_top_right)
 
-    proj_x    <- c(xmin, xmin, xmax, xmax)
-    proj_y    <- c(ymin, ymax, ymin, ymax)
-    proj_xend <- c(inset_xmin, inset_xmin, inset_xmax, inset_xmax)
-    proj_yend <- c(inset_ymin, inset_ymax, inset_ymin, inset_ymax)
+      proj_x    <- c(xmin, xmin, xmax, xmax)
+      proj_y    <- c(ymin, ymax, ymin, ymax)
+      proj_xend <- c(inset_xmin, inset_xmin, inset_xmax, inset_xmax)
+      proj_yend <- c(inset_ymin, inset_ymax, inset_ymin, inset_ymax)
 
-    if (proj_style == "facing") {
-      # If we can project on two adjacent corners, then we have the option
-      # of joining corners to their "facing" rather than "corresponding" corner.
-      # The "corresponding" corner looks a bit weird.
-      # We only do this if there's no overlap (one min is bigger than other max)
-      adjacent_horiz <- (can_top_left && can_top_right) ||
-                        (can_bot_left && can_bot_right)
-      adjacent_vert <-  (can_top_right && can_bot_right)  ||
-                        (can_top_left  && can_bot_left)
+      if (proj == "facing") {
+        # If we can project on two adjacent corners, then we have the option
+        # of joining corners to their "facing" rather than "corresponding" corner.
+        # The "corresponding" corner looks a bit weird.
+        # We only do this if there's no overlap (one min is bigger than other max)
+        adjacent_horiz <- (can_top_left && can_top_right) ||
+                          (can_bot_left && can_bot_right)
+        adjacent_vert <-  (can_top_right && can_bot_right)  ||
+                          (can_top_left  && can_bot_left)
 
-      if (adjacent_horiz) {
-        if (inset_ymin > ymax) {
-          # "always project the top of the target to the bottom of the inset"
-          proj_y <- rep(ymax, 4)
-          proj_yend <- rep(inset_ymin, 4)
-        } else if (inset_ymax < ymin) {
-          proj_y <- rep(ymin, 4)
-          proj_yend <- rep(inset_ymax, 4)
+        if (adjacent_horiz) {
+          if (inset_ymin > ymax) {
+            # "always project the top of the target to the bottom of the inset"
+            proj_y <- rep(ymax, 4)
+            proj_yend <- rep(inset_ymin, 4)
+          } else if (inset_ymax < ymin) {
+            proj_y <- rep(ymin, 4)
+            proj_yend <- rep(inset_ymax, 4)
+          }
+        }
+        if (adjacent_vert) {
+          if (inset_xmin > xmax) {
+            proj_x <- rep(xmax, 4)
+            proj_xend <- rep(inset_xmin, 4)
+          } else if (inset_xmax < xmin) {
+            proj_x <- rep(xmin, 4)
+            proj_xend <- rep(inset_xmax, 4)
+          }
         }
       }
-      if (adjacent_vert) {
-        if (inset_xmin > xmax) {
-          proj_x <- rep(xmax, 4)
-          proj_xend <- rep(inset_xmin, 4)
-        } else if (inset_xmax < xmin) {
-          proj_x <- rep(xmin, 4)
-          proj_xend <- rep(inset_xmax, 4)
-        }
-      }
-    }
+
+  } else if (proj == "single") {
+    # t r b l midpoints of the target, opposite side of the inset:
+    proj_x    <- c(mean(xlim), xmax, mean(xlim), xmin)
+    proj_y    <- c(ymax, mean(ylim), ymin, mean(ylim))
+    proj_xend <- c(mean(inset_xlim), inset_xmin, mean(inset_xlim), inset_xmax)
+    proj_yend <- c(inset_ymin, mean(inset_ylim), inset_ymax, mean(inset_ylim))
+
+    gaps <- c(inset_ymin - ymax, # top (of target, bottom of inset)
+              inset_xmin - xmax, # right
+              ymin - inset_ymax, # bottom
+              xmin - inset_xmax) # left
+
+    # We try to pick the "biggest" gap to make the line angle least acute.
+    # We don't know the dimensions of the plot; we guess by using the
+    # inset (theorizing it will have "sensible" dimensions). This is hacky...
+    gaps <- gaps/c(diff(inset_ylim), diff(inset_xlim), diff(inset_ylim), diff(inset_xlim))
+    can_proj <- which.max(gaps)
+  }
 
     proj_x    <- proj_x[can_proj]
     proj_y    <- proj_y[can_proj]
     proj_xend <- proj_xend[can_proj]
     proj_yend <- proj_yend[can_proj]
-
-    ggplot2::annotate("segment", x = proj_x, y = proj_y, xend = proj_xend,
-                      yend = proj_yend, colour = proj_colour,
-                      alpha = proj_alpha, linewidth = proj_linewidth,
-                      linetype = proj_linetype)
+    proj_layer <- ggplot2::annotate("segment", x = proj_x, y = proj_y, xend = proj_xend,
+                                    yend = proj_yend, colour = proj_colour,
+                                    alpha = proj_alpha, linewidth = proj_linewidth,
+                                    linetype = proj_linetype)
   }
 
   # == Put the result together =================================================
@@ -296,7 +321,7 @@ ggmagnify <- function (
               inset = inset,
               border = border,
               target = target,
-              proj = proj,
+              proj = proj_layer,
               inset_xmin = inset_xmin,
               inset_xmax = inset_xmax,
               inset_ymin = inset_ymin,
@@ -324,14 +349,17 @@ ggmagnify <- function (
 compose <- function (x, plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
-  if (x$shadow) {
-    inset <- do.call(ggfx::with_shadow, c(list(x = inset), x$shadow_args))
-  }
+  shadow <- if (x$shadow) {
+              do.call(ggfx::with_shadow,
+                      c(list(x = inset, stack = FALSE), x$shadow_args))
+            } else {
+              NULL
+            }
   inset <- ggplot2::annotation_custom(inset,
                                   xmin = x$inset_xmin, xmax = x$inset_xmax,
                                   ymin = x$inset_ymin, ymax = x$inset_ymax)
 
-  plot + x$target + inset + x$border + x$proj
+  plot + x$target + shadow + x$proj + inset + x$border
 }
 
 
