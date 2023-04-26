@@ -1,10 +1,5 @@
 
 
-`%||%` <- function (x, y) {
-    if (is.null(x)) y else x
-}
-
-
 #' Default elements to blank in the ggmagnify inset
 #'
 #' @param ... Character vector of extra elements to blank.
@@ -132,6 +127,8 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'             inset_xlim = c(2, 5), inset_ylim = c(40, 55),
 #'             shadow = TRUE)
 #' }
+#'
+#' @example man/R/advanced-example.R
 ggmagnify <- function (
     plot,
     xlim,
@@ -282,7 +279,7 @@ ggmagnify <- function (
 #' @return The modified plot.
 #' @export
 #'
-#' @examples
+#' @example man/R/advanced-example.R
 compose <- function (x, plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
@@ -294,4 +291,9 @@ compose <- function (x, plot) {
                                   ymin = x$inset_ymin, ymax = x$inset_ymax)
 
   plot + x$target + x$proj + inset + x$border
+}
+
+
+`%||%` <- function (x, y) {
+    if (is.null(x)) y else x
 }
