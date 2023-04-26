@@ -40,7 +40,6 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 # TODO
 # - maybe have an "expansion" factor which expands the target area from the
 #   centre? A fudge to play with
-# - package up
 # - think about specifying inset position. Cf. legend
 
 #' Add a magnified inset plot to a ggplot object
@@ -96,6 +95,10 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'
 #' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
 #' in the main plot.
+#'
+#' ## Limitations
+#'
+#' It won't work with facets, or with non-cartesian coordinates.
 #'
 #' @return
 #' The modified `plot` if `compose` is `TRUE`. Otherwise, a `GgMagnify`
@@ -238,6 +241,35 @@ ggmagnify <- function (
     proj_y    <- c(ymin, ymax, ymin, ymax)
     proj_xend <- c(inset_xmin, inset_xmin, inset_xmax, inset_xmax)
     proj_yend <- c(inset_ymin, inset_ymax, inset_ymin, inset_ymax)
+
+    # If we can project on two adjacent corners, then we have the option
+    # of joining corners to their "facing" rather than "corresponding" corner.
+    # The "corresponding" corner looks a bit weird.
+    # We only do this if there's no overlap (one min is bigger than other max)
+    adjacent_horiz <- (can_top_left && can_top_right) ||
+                      (can_bot_left && can_bot_right)
+    adjacent_vert <-  (can_top_right && can_bot_right)  ||
+                      (can_top_left  && can_bot_left)
+
+    if (adjacent_horiz) {
+      if (inset_ymin > ymax) {
+        # "always project the top of the target to the bottom of the inset"
+        proj_y <- rep(ymax, 4)
+        proj_yend <- rep(inset_ymin, 4)
+      } else if (inset_ymax < ymin) {
+        proj_y <- rep(ymin, 4)
+        proj_yend <- rep(inset_ymax, 4)
+      }
+    }
+    if (adjacent_vert) {
+      if (inset_xmin > xmax) {
+        proj_x <- rep(xmax, 4)
+        proj_xend <- rep(inset_xmin, 4)
+      } else if (inset_xmax < xmin) {
+        proj_x <- rep(xmin, 4)
+        proj_xend <- rep(inset_xmax, 4)
+      }
+    }
 
     proj_x    <- proj_x[can_proj]
     proj_y    <- proj_y[can_proj]

@@ -95,6 +95,7 @@ ggmagnify(ggp_noclip,
 ## Advanced usage: tweaking the inset
 
 ```{r example-advanced}
+
 ggm <- ggmagnify(ggp, xlim = c(1.5, 2.5), ylim = c(60, 65),
            inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
            compose = FALSE) 

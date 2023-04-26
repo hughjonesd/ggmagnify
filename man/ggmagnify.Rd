@@ -111,6 +111,10 @@ You can modify these, e.g. by adding themes to the inset. Call
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
+\subsection{Limitations}{
+
+It won't work with facets, or with non-cartesian coordinates.
+}
 }
 \examples{
 library(ggplot2)
