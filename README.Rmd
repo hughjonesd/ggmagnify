@@ -54,3 +54,43 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
 ```
+
+## Colours and lines
+
+```{r example-colours}
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
+          colour = "red", proj_linetype = 1)
+```
+
+
+## Axes
+
+```{r example-axes}
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
+          axes = TRUE, border = FALSE)
+```
+
+
+## Advanced usage: tweaking the inset
+
+```{r example-advanced}
+ggm <- ggmagnify(ggp, xlim = c(1.5, 2.5), ylim = c(60, 65),
+           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
+           compose = FALSE) 
+
+# modify the inset like a ggplot object:
+ggm$inset <- ggm$inset + 
+               theme_classic() + 
+               inset_theme(axes = TRUE) + 
+               theme(plot.margin = margin(10, 12, 10, 10))
+
+compose(ggm, ggp)
+ 
+
+```
