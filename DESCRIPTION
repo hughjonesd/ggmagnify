@@ -13,3 +13,5 @@ Imports:
     ggplot2
 Suggests: 
     ggfx
+URL: https://github.com/hughjonesd/ggmagnify
+BugReports: https://github.com/hughjonesd/ggmagnify/issues
