@@ -1,7 +1,7 @@
 
-
-```{r}
 # Advanced usage
+
+library(ggplot2)
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
          geom_contour_filled(aes(z = density)) +
@@ -16,7 +16,7 @@ shadow_args <- list(
 
 ggm <- ggmagnify(booms,
                  xlim = c(80, 92), ylim = c(4, 4.8),
-                 inset_xlim = c(71, 94), inset_ylim = c(1.7, 3.2),
+                 inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
                  shadow = TRUE, shadow_args = shadow_args,
                  compose = FALSE, colour = "white")
 
@@ -27,4 +27,3 @@ ggm$inset <- ggm$inset +
 
 
 compose(ggm, booms)
-```

@@ -18,6 +18,33 @@ The modified plot.
 Compose a GgMagnify object with its ggplot
 }
 \examples{
-```{r child = "man/Rmd/advanced-example.Rmd"}
-```
+
+# Advanced usage
+
+library(ggplot2)
+
+booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
+         geom_contour_filled(aes(z = density)) +
+         scale_fill_viridis_d(option = "B") 
+
+shadow_args <- list(
+  colour = alpha("grey80", 0.8),
+  x_offset = 0,
+  y_offset = 0,
+  sigma = 10
+)
+
+ggm <- ggmagnify(booms,
+                 xlim = c(80, 92), ylim = c(4, 4.8),
+                 inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
+                 shadow = TRUE, shadow_args = shadow_args,
+                 compose = FALSE, colour = "white")
+
+# modify the inset like a ggplot object:
+ggm$inset <- ggm$inset +
+             geom_point(data = faithful, color = "white", alpha = 0.7,
+                        size = 2)
+
+
+compose(ggm, booms)
 }

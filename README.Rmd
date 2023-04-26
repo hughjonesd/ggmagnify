@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+knitr::read_chunk("man/R/advanced-example.R", labels = "example-advanced")
 ```
 
 # ggmagnify
@@ -106,5 +107,5 @@ ggmagnify(ggp_noclip,
 
 ## Advanced usage: tweaking the inset
 
-```{r example-advanced, child = "man/Rmd/advanced-example.Rmd"}
+```{r example-advanced}
 ```

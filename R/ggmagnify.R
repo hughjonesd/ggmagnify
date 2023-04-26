@@ -136,8 +136,7 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'             shadow = TRUE)
 #' }
 #'
-#' ```{r child = "man/Rmd/advanced-example.Rmd"}
-#' ```
+#' @example man/R/advanced-example.R
 ggmagnify <- function (
     plot,
     xlim,
@@ -321,9 +320,7 @@ ggmagnify <- function (
 #' @return The modified plot.
 #' @export
 #'
-#' @examples
-#' ```{r child = "man/Rmd/advanced-example.Rmd"}
-#' ```
+#' @example man/R/advanced-example.R
 compose <- function (x, plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
