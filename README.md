@@ -84,7 +84,7 @@ ggp_noclip <- ggp +
 
 ggmagnify(ggp_noclip,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2.6, 7.6), inset_ylim = c(40, 55),
+          inset_xlim = c(2.6, 6), inset_ylim = c(40, 55),
           shadow = TRUE)
 #> Coordinate system already present. Adding new coordinate system, which will
 #> replace the existing one.
