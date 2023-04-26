@@ -68,7 +68,8 @@ ggmagnify(ggp,
 ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
-          colour = "red", proj_linetype = 1)
+          proj = "single",
+          colour = "grey20", proj_linetype = 1, linewidth = 0.8)
 ```
 
 <img src="man/figures/README-example-colours-1.png" width="100%" />
@@ -112,7 +113,7 @@ library(ggplot2)
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
          geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B") 
+         scale_fill_viridis_d(option = "B")
 
 shadow_args <- list(
   colour = alpha("grey80", 0.8),
@@ -129,8 +130,8 @@ ggm <- ggmagnify(booms,
 
 # modify the inset like a ggplot object:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "white", alpha = 0.7,
-                        size = 2)
+             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
+                        size = 2, shape = "circle filled")
 
 
 compose(ggm, booms)

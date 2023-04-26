@@ -76,7 +76,8 @@ ggmagnify(ggp,
 ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
-          colour = "red", proj_linetype = 1)
+          proj = "single",
+          colour = "grey20", proj_linetype = 1, linewidth = 0.8)
 ```
 
 

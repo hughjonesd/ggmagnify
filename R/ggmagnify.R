@@ -350,14 +350,18 @@ compose <- function (x, plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
   shadow <- if (x$shadow) {
-              do.call(ggfx::with_shadow,
-                      c(list(x = inset, stack = FALSE), x$shadow_args))
+              shadow <- do.call(ggfx::with_shadow,
+                                c(list(x = inset, stack = FALSE), x$shadow_args))
+              ggplot2::annotation_custom(shadow, xmin = x$inset_xmin,
+                                         xmax = x$inset_xmax,
+                                         ymin = x$inset_ymin,
+                                         ymax = x$inset_ymax)
             } else {
               NULL
             }
   inset <- ggplot2::annotation_custom(inset,
-                                  xmin = x$inset_xmin, xmax = x$inset_xmax,
-                                  ymin = x$inset_ymin, ymax = x$inset_ymax)
+                                      xmin = x$inset_xmin, xmax = x$inset_xmax,
+                                      ymin = x$inset_ymin, ymax = x$inset_ymax)
 
   plot + x$target + shadow + x$proj + inset + x$border
 }
