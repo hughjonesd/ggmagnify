@@ -3,3 +3,4 @@
 export(compose)
 export(ggmagnify)
 export(inset_blanks)
+export(inset_theme)

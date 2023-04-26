@@ -1,5 +1,5 @@
 Package: ggmagnify
-Title: What the Package Does (One Line, Title Case)
+Title: Create a Magnified Inset of Part of a "ggplot" Object
 Version: 0.0.0.9000
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", role = c("aut", "cre"))
