@@ -1,0 +1,263 @@
+
+
+`%||%` <- function (x, y) {
+    if (is.null(x)) y else x
+}
+
+
+#' Default elements to blank in the ggmagnify inset
+#'
+#' @param ... Character vector of extra elements to blank.
+#' @param axes Logical. `TRUE` if the inset will include axes.
+#'
+#' @return A character vector.
+#' @export
+inset_blanks <- function (..., axes) {
+  res <- c("plot.title", "plot.subtitle", "plot.caption", "plot.tag",
+              "axis.title", ...)
+  blank_axes <- ! axes
+  if (blank_axes) res <- c(res, "axis.text", "axis.ticks", "axis.line")
+
+  res
+}
+
+
+# TODO
+# - maybe have an "expansion" factor which expands the target area from the
+#   centre? A fudge to play with
+# - package up
+# - think about specifying inset position. Cf. legend
+
+#' Add a magnified inset plot to a ggplot object
+#'
+#' `ggmagnify()` magnifies a target area of your plot and adds it as an inset on
+#' top of the original plot. Optional projection lines and borders around the
+#' target are drawn. If the `ggfx` package is installed, a drop shadow can be
+#' added.
+#'
+#' @param plot A ggplot object.
+#' @param xlim,ylim Limits of the area to magnify. Length 2 numeric.
+#' @param inset_xlim,inset_ylim Position of the inset in the main graph.
+#'   Length 2 numeric.
+#' @param zoom How much to magnify the inset by. Numeric. Specify two numbers
+#'   for separate horizontal and vertical zoom. Optional: overrides `inset_xlim[2]`
+#'   and `inset_ylim[2]`.
+#' @param border Logical. Draw a border around the inset?
+#' @param target Logical. Draw a border around the target area?
+#' @param proj Logical. Draw projection lines from the target area to the inset?
+#' @param compose Logical. If `TRUE`, the new elements are added to the ggplot object.
+#'   If `FALSE`, they are returned in a `GgMagnify` object, see below.
+#' @param axes Logical. Draw axes in the inset?
+#' @param linewidth,linetype,colour,alpha Parameters for inset border, target border,
+#'   and projection lines.
+#' @param inset_linewidth,inset_linetype,inset_colour,inset_alpha Parameters
+#'   for inset border.
+#' @param proj_linewidth,proj_linetype,proj_colour,proj_alpha Parameters
+#'   for projection lines.
+#' @param target_linewidth,target_linetype,target_colour,target_alpha
+#'  Parameters for target border.
+#' @param margin Plot margin of inset. Can be a single number in "pt"
+#'   units, a length 4 numeric (top, right, bottom, left), or a
+#'   [ggplot2::margin()] object. Note that this is on the scale of the inset plot,
+#'   not the outer plot.
+#' @param shadow Logical. Draw a shadow behind the inset? Requires the `ggfx` package.
+#' @param shadow_args List of arguments to pass to [ggfx::with_shadow()].
+#' @param blank Character vector of theme elements to blank out in the inset.
+#'   Use [inset_blanks(elems)] to add `elems` to the default list.
+#'
+#' @details
+#' If `compose` is `FALSE`, the returned `GgMagnify` object includes the
+#' following list components:
+#'
+#' * `inset`, a ggplot object representing the inset.
+#' * `border`, a layer representing the inset border.
+#' * `target`, a layer representing the target border.
+#' * `proj`, a layer representing the projection lines.
+#'
+#' You can modify these, e.g. by adding themes to the inset. Call
+#' [compose(ggm, plot)] to add the object to the plot.
+#'
+#' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
+#' in the main plot.
+#'
+#' @return
+#' The modified `plot` if `compose` is `TRUE`. Otherwise, a `GgMagnify`
+#' object.
+#'
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' ggp <- ggplot(diamonds, aes(carat, depth, color = cut)) + geom_point()
+#'
+#' ggmagnify(ggp,
+#'           xlim = c(1.5, 2.5), ylim = c(60, 65),
+#'          inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+ggmagnify <- function (
+    plot,
+    xlim,
+    ylim,
+    inset_xlim,
+    inset_ylim,
+    zoom,
+    border = TRUE,
+    target = TRUE,
+    proj  = TRUE,
+    compose = TRUE,
+    axes = FALSE,
+    linewidth = 0.5,
+    linetype = 1,
+    colour = "black",
+    alpha = 1,
+    inset_linewidth = linewidth,
+    inset_linetype = linetype,
+    inset_colour = colour,
+    inset_alpha = alpha,
+    proj_linewidth = linewidth,
+    proj_linetype = "dashed",
+    proj_colour = colour,
+    proj_alpha = alpha,
+    target_linewidth = linewidth,
+    target_linetype = linetype,
+    target_colour = colour,
+    target_alpha = alpha,
+    margin = if (axes) 10 else 0,
+    shadow = FALSE,
+    shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
+    blank = inset_blanks(axes = axes)
+) {
+  xmin <- min(xlim)
+  xmax <- max(xlim)
+  ymin <- min(ylim)
+  ymax <- max(ylim)
+
+  inset_xmin <- min(inset_xlim)
+  inset_xmax <- max(inset_xlim)
+  inset_ymin <- min(inset_ylim)
+  inset_ymax <- max(inset_ylim)
+
+  if (! missing(zoom)) {
+    if (length(zoom) < 2) zoom[2] <- zoom[1]
+    inset_xmax <- inset_xmin + diff(xlim) * zoom[1]
+    inset_ymax <- inset_ymin + diff(ylim) * zoom[2]
+  }
+
+  # == Create the inset ggplot =================================================
+
+  suppressWarnings({
+    inset <- plot + ggplot2::coord_cartesian(xlim = xlim, ylim = ylim,
+                                             expand = FALSE)
+  })
+
+  blank_elements <- lapply(blank, function (x) {
+    ggplot2::element_blank()
+  })
+  names(blank_elements) <- blank
+  blank_elements[["legend.position"]] <- "none"
+  blank_theme <- do.call(ggplot2::theme, blank_elements)
+
+  if (! inherits(margin, "unit")) {
+    if (length(margin) == 1) margin <- rep(margin, 4)
+    margin <- grid::unit(margin, "pt")
+  }
+
+  inset <- inset +
+           blank_theme +
+           ggplot2::theme(plot.margin = margin)
+
+  if (! axes) {
+    inset <- inset + ggplot2::theme(axis.ticks.length = grid::unit(0, "pt"))
+  }
+
+  # == Create target border ====================================================
+  target <- if (! target) {
+    NULL
+  } else {
+    ggplot2::annotate("rect", xmin = xmin, xmax = xmax, ymin = ymin,
+                       ymax = ymax, linetype = target_linetype,
+                       linewidth = target_linewidth,
+                       colour = ggplot2::alpha(target_colour, target_alpha),
+                       fill = NA)
+  }
+
+  # == Create inset border
+
+  border <- if (! border) {
+    NULL
+  } else {
+      ggplot2::annotate("rect", xmin = inset_xmin, xmax = inset_xmax,
+                        ymin = inset_ymin, ymax = inset_ymax,
+                        linetype = inset_linetype, linewidth = inset_linewidth,
+                        colour = ggplot2::alpha(inset_colour, inset_alpha),
+                        fill = NA)
+  }
+
+  # == Create projection lines =================================================
+  proj <- if (! proj) {
+    NULL
+  } else {
+    # which of the four lines connecting the four corners can we draw?
+    can_top_left  <- sign(xmin - inset_xmin) == sign(ymax - inset_ymax)
+    can_bot_right <- sign(xmax - inset_xmax) == sign(ymin - inset_ymin)
+    can_bot_left  <- sign(xmin - inset_xmin) != sign(ymin - inset_ymin)
+    can_top_right <- sign(xmax - inset_xmax) != sign(ymax - inset_ymax)
+    can_proj <- c(can_bot_left, can_top_left, can_bot_right, can_top_right)
+
+    proj_x    <- c(xmin, xmin, xmax, xmax)
+    proj_y    <- c(ymin, ymax, ymin, ymax)
+    proj_xend <- c(inset_xmin, inset_xmin, inset_xmax, inset_xmax)
+    proj_yend <- c(inset_ymin, inset_ymax, inset_ymin, inset_ymax)
+
+    proj_x    <- proj_x[can_proj]
+    proj_y    <- proj_y[can_proj]
+    proj_xend <- proj_xend[can_proj]
+    proj_yend <- proj_yend[can_proj]
+
+    ggplot2::annotate("segment", x = proj_x, y = proj_y, xend = proj_xend,
+                      yend = proj_yend, colour = proj_colour,
+                      alpha = proj_alpha, linewidth = proj_linewidth,
+                      linetype = proj_linetype)
+  }
+
+  # == Put the result together =================================================
+  result <- list(
+              inset = inset,
+              border = border,
+              target = target,
+              proj = proj,
+              inset_xmin = inset_xmin,
+              inset_xmax = inset_xmax,
+              inset_ymin = inset_ymin,
+              inset_ymax = inset_ymax,
+              shadow = shadow,
+              shadow_args = shadow_args
+            )
+  class(result) <- "GgMagnify"
+
+  if (compose) result <- compose(result, plot)
+
+  result
+}
+
+
+#' Compose a GgMagnify object with its ggplot
+#'
+#' @param x A GgMagnify object.
+#' @param plot A ggplot object.
+#'
+#' @return The modified plot.
+#' @export
+#'
+#' @examples
+compose <- function (x, plot) {
+  inset <- x$inset
+  inset <- ggplot2::ggplotGrob(inset)
+  if (x$shadow) {
+    inset <- do.call(ggfx::with_shadow, c(list(x = inset), x$shadow_args))
+  }
+  inset <- ggplot2::annotation_custom(inset,
+                                  xmin = x$inset_xmin, xmax = x$inset_xmax,
+                                  ymin = x$inset_ymin, ymax = x$inset_ymax)
+
+  plot + x$target + x$proj + inset + x$border
+}
