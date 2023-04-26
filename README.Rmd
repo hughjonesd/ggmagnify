@@ -45,6 +45,17 @@ ggmagnify(ggp,
           inset_xlim = c(2, 5), inset_ylim = c(40, 55))
 ```
 
+
+## Positioning
+
+```{r example-position}
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(3.5, 5), inset_ylim = c(45, 70))
+```
+
+
 ## Inset with shadow
 
 ```{r example-shadow}
@@ -55,6 +66,7 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
 ```
+
 
 ## Colours and lines
 
@@ -94,19 +106,5 @@ ggmagnify(ggp_noclip,
 
 ## Advanced usage: tweaking the inset
 
-```{r example-advanced}
-
-ggm <- ggmagnify(ggp, xlim = c(1.5, 2.5), ylim = c(60, 65),
-           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
-           compose = FALSE) 
-
-# modify the inset like a ggplot object:
-ggm$inset <- ggm$inset + 
-               theme_classic() + 
-               inset_theme(axes = TRUE) + 
-               theme(plot.margin = margin(10, 12, 10, 10))
-
-compose(ggm, ggp)
- 
-
+```{r example-advanced, child = "man/Rmd/advanced-example.Rmd"}
 ```

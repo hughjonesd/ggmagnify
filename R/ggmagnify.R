@@ -61,6 +61,11 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' @param proj Logical. Draw projection lines from the target area to the inset?
 #' @param shadow Logical. Draw a shadow behind the inset? Requires
 #'   the `ggfx` package.
+#' @param proj_style String. `"facing"` sometimes draws lines between
+#'   the nearest corners of the target and the inset.
+#'   `"corresponding"` always projects each corner of the target to the
+#'   corresponding corner of the inset. You can abbreviate these to `"f"`
+#'   or `"c"`.
 #' @param compose Logical. If `TRUE`, the new elements are added to the ggplot object.
 #'   If `FALSE`, they are returned in a `GgMagnify` object, see below.
 #' @param axes Logical. Draw axes in the inset?
@@ -131,7 +136,8 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'             shadow = TRUE)
 #' }
 #'
-#' @example man/R/advanced-example.R
+#' ```{r child = "man/Rmd/advanced-example.Rmd"}
+#' ```
 ggmagnify <- function (
     plot,
     xlim,
@@ -162,6 +168,7 @@ ggmagnify <- function (
     target_linetype = linetype,
     target_colour = colour,
     target_alpha = alpha,
+    proj_style = c("facing", "corresponding"),
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
     blank = inset_blanks(axes = axes)
 ) {
@@ -181,6 +188,7 @@ ggmagnify <- function (
     inset_ymax <- inset_ymin + diff(ylim) * zoom[2]
   }
 
+  proj_style <- match.arg(proj_style)
   # == Create the inset ggplot =================================================
 
   suppressWarnings({
@@ -242,32 +250,34 @@ ggmagnify <- function (
     proj_xend <- c(inset_xmin, inset_xmin, inset_xmax, inset_xmax)
     proj_yend <- c(inset_ymin, inset_ymax, inset_ymin, inset_ymax)
 
-    # If we can project on two adjacent corners, then we have the option
-    # of joining corners to their "facing" rather than "corresponding" corner.
-    # The "corresponding" corner looks a bit weird.
-    # We only do this if there's no overlap (one min is bigger than other max)
-    adjacent_horiz <- (can_top_left && can_top_right) ||
-                      (can_bot_left && can_bot_right)
-    adjacent_vert <-  (can_top_right && can_bot_right)  ||
-                      (can_top_left  && can_bot_left)
+    if (proj_style == "facing") {
+      # If we can project on two adjacent corners, then we have the option
+      # of joining corners to their "facing" rather than "corresponding" corner.
+      # The "corresponding" corner looks a bit weird.
+      # We only do this if there's no overlap (one min is bigger than other max)
+      adjacent_horiz <- (can_top_left && can_top_right) ||
+                        (can_bot_left && can_bot_right)
+      adjacent_vert <-  (can_top_right && can_bot_right)  ||
+                        (can_top_left  && can_bot_left)
 
-    if (adjacent_horiz) {
-      if (inset_ymin > ymax) {
-        # "always project the top of the target to the bottom of the inset"
-        proj_y <- rep(ymax, 4)
-        proj_yend <- rep(inset_ymin, 4)
-      } else if (inset_ymax < ymin) {
-        proj_y <- rep(ymin, 4)
-        proj_yend <- rep(inset_ymax, 4)
+      if (adjacent_horiz) {
+        if (inset_ymin > ymax) {
+          # "always project the top of the target to the bottom of the inset"
+          proj_y <- rep(ymax, 4)
+          proj_yend <- rep(inset_ymin, 4)
+        } else if (inset_ymax < ymin) {
+          proj_y <- rep(ymin, 4)
+          proj_yend <- rep(inset_ymax, 4)
+        }
       }
-    }
-    if (adjacent_vert) {
-      if (inset_xmin > xmax) {
-        proj_x <- rep(xmax, 4)
-        proj_xend <- rep(inset_xmin, 4)
-      } else if (inset_xmax < xmin) {
-        proj_x <- rep(xmin, 4)
-        proj_xend <- rep(inset_xmax, 4)
+      if (adjacent_vert) {
+        if (inset_xmin > xmax) {
+          proj_x <- rep(xmax, 4)
+          proj_xend <- rep(inset_xmin, 4)
+        } else if (inset_xmax < xmin) {
+          proj_x <- rep(xmin, 4)
+          proj_xend <- rep(inset_xmax, 4)
+        }
       }
     }
 
@@ -311,7 +321,9 @@ ggmagnify <- function (
 #' @return The modified plot.
 #' @export
 #'
-#' @example man/R/advanced-example.R
+#' @examples
+#' ```{r child = "man/Rmd/advanced-example.Rmd"}
+#' ```
 compose <- function (x, plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
@@ -322,7 +334,7 @@ compose <- function (x, plot) {
                                   xmin = x$inset_xmin, xmax = x$inset_xmax,
                                   ymin = x$inset_ymin, ymax = x$inset_ymax)
 
-  plot + x$target + x$proj + inset + x$border
+  plot + x$target + inset + x$border + x$proj
 }
 
 

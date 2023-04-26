@@ -34,6 +34,7 @@ ggmagnify(
   target_linetype = linetype,
   target_colour = colour,
   target_alpha = alpha,
+  proj_style = c("facing", "corresponding"),
   shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   blank = inset_blanks(axes = axes)
 )
@@ -79,6 +80,12 @@ for inset border.}
 for projection lines.}
 
 \item{target_linewidth, target_linetype, target_colour, target_alpha}{Parameters for target border.}
+
+\item{proj_style}{String. \code{"facing"} sometimes draws lines between
+the nearest corners of the target and the inset.
+\code{"corresponding"} always projects each corner of the target to the
+corresponding corner of the inset. You can abbreviate these to \code{"f"}
+or \code{"c"}.}
 
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 
@@ -141,22 +148,6 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
             shadow = TRUE)
 }
 
-
-# Advanced usage
-
-library(ggplot2)
-
-ggp <- ggplot(diamonds, aes(carat, depth, color = cut)) + geom_point()
-
-ggm <- ggmagnify(ggp, xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55),
-          compose = FALSE)
-
-# modify the inset like a ggplot object:
-ggm$inset <- ggm$inset +
-               theme_classic() +
-               inset_theme(axes = TRUE) +
-               theme(plot.margin = margin(10, 12, 10, 10))
-
-compose(ggm, ggp)
+```{r child = "man/Rmd/advanced-example.Rmd"}
+```
 }
