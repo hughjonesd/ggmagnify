@@ -65,9 +65,15 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' @param border Logical. Draw a border around the inset?
 #' @param target Logical. Draw a border around the target area?
 #' @param proj Logical. Draw projection lines from the target area to the inset?
+#' @param shadow Logical. Draw a shadow behind the inset? Requires
+#'   the `ggfx` package.
 #' @param compose Logical. If `TRUE`, the new elements are added to the ggplot object.
 #'   If `FALSE`, they are returned in a `GgMagnify` object, see below.
 #' @param axes Logical. Draw axes in the inset?
+#' @param margin Plot margin of inset. Can be a single number in "pt"
+#'   units, a length 4 numeric (top, right, bottom, left), or a
+#'   [ggplot2::margin()] object. Note that this is on the scale of the
+#'   inset plot, not the outer plot.
 #' @param linewidth,linetype,colour,alpha Parameters for inset border, target border,
 #'   and projection lines.
 #' @param inset_linewidth,inset_linetype,inset_colour,inset_alpha Parameters
@@ -76,15 +82,10 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   for projection lines.
 #' @param target_linewidth,target_linetype,target_colour,target_alpha
 #'  Parameters for target border.
-#' @param margin Plot margin of inset. Can be a single number in "pt"
-#'   units, a length 4 numeric (top, right, bottom, left), or a
-#'   [ggplot2::margin()] object. Note that this is on the scale of the inset plot,
-#'   not the outer plot.
-#' @param shadow Logical. Draw a shadow behind the inset? Requires the `ggfx` package.
 #' @param shadow_args List of arguments to pass to [ggfx::with_shadow()].
 #' @param blank Character vector of theme elements to blank out in the inset.
-#'   Use [`inset_blanks(elems)`][inset_blanks()] to add `elems` to the
-#'   default list.
+#'   Use [`inset_blanks(elems, axes = axes)`][inset_blanks()] to add `elems`
+#'   to the default list.
 #'
 #' @details
 #' If `compose` is `FALSE`, the returned `GgMagnify` object includes the
@@ -141,8 +142,10 @@ ggmagnify <- function (
     border = TRUE,
     target = TRUE,
     proj  = TRUE,
+    shadow = FALSE,
     compose = TRUE,
     axes = FALSE,
+    margin = if (axes) 10 else 0,
     linewidth = 0.5,
     linetype = 1,
     colour = "black",
@@ -159,8 +162,6 @@ ggmagnify <- function (
     target_linetype = linetype,
     target_colour = colour,
     target_alpha = alpha,
-    margin = if (axes) 10 else 0,
-    shadow = FALSE,
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
     blank = inset_blanks(axes = axes)
 ) {

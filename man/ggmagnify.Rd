@@ -14,8 +14,10 @@ ggmagnify(
   border = TRUE,
   target = TRUE,
   proj = TRUE,
+  shadow = FALSE,
   compose = TRUE,
   axes = FALSE,
+  margin = if (axes) 10 else 0,
   linewidth = 0.5,
   linetype = 1,
   colour = "black",
@@ -32,8 +34,6 @@ ggmagnify(
   target_linetype = linetype,
   target_colour = colour,
   target_alpha = alpha,
-  margin = if (axes) 10 else 0,
-  shadow = FALSE,
   shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   blank = inset_blanks(axes = axes)
 )
@@ -56,10 +56,18 @@ and \code{inset_ylim[2]}.}
 
 \item{proj}{Logical. Draw projection lines from the target area to the inset?}
 
+\item{shadow}{Logical. Draw a shadow behind the inset? Requires
+the \code{ggfx} package.}
+
 \item{compose}{Logical. If \code{TRUE}, the new elements are added to the ggplot object.
 If \code{FALSE}, they are returned in a \code{GgMagnify} object, see below.}
 
 \item{axes}{Logical. Draw axes in the inset?}
+
+\item{margin}{Plot margin of inset. Can be a single number in "pt"
+units, a length 4 numeric (top, right, bottom, left), or a
+\code{\link[ggplot2:element]{ggplot2::margin()}} object. Note that this is on the scale of the
+inset plot, not the outer plot.}
 
 \item{linewidth, linetype, colour, alpha}{Parameters for inset border, target border,
 and projection lines.}
@@ -72,18 +80,11 @@ for projection lines.}
 
 \item{target_linewidth, target_linetype, target_colour, target_alpha}{Parameters for target border.}
 
-\item{margin}{Plot margin of inset. Can be a single number in "pt"
-units, a length 4 numeric (top, right, bottom, left), or a
-\code{\link[ggplot2:element]{ggplot2::margin()}} object. Note that this is on the scale of the inset plot,
-not the outer plot.}
-
-\item{shadow}{Logical. Draw a shadow behind the inset? Requires the \code{ggfx} package.}
-
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 
 \item{blank}{Character vector of theme elements to blank out in the inset.
-Use \code{\link[=inset_blanks]{inset_blanks(elems)}} to add \code{elems} to the
-default list.}
+Use \code{\link[=inset_blanks]{inset_blanks(elems, axes = axes)}} to add \code{elems}
+to the default list.}
 }
 \value{
 The modified \code{plot} if \code{compose} is \code{TRUE}. Otherwise, a \code{GgMagnify}
