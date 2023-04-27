@@ -2,6 +2,7 @@
 
 S3method("+",GgMagnify)
 S3method(chooseOpsMethod,GgMagnify)
+S3method(grid::grid.draw,GgMagnify)
 S3method(print,GgMagnify)
 export(ggmagnify)
 export(inset_blanks)

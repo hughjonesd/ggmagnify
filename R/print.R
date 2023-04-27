@@ -29,3 +29,9 @@ print.GgMagnify <- function (x, ...) {
 
   return(invisible(oldx))
 }
+
+
+#' @exportS3Method grid::grid.draw GgMagnify
+grid.draw.GgMagnify <- function (x, recording = TRUE) {
+  print(x)
+}
