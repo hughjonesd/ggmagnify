@@ -201,7 +201,7 @@ ggmagnify <- function (
   proj <- match.arg(proj)
   # == Create the inset ggplot =================================================
 
-  suppressWarnings({
+  suppressMessages({
     inset <- plot + inset_coord
   })
 
