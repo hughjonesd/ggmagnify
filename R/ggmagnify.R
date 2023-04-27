@@ -124,21 +124,26 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'
 #' @export
 #'
-#' @examples
+#' @doctest
 #' library(ggplot2)
+#'
+#' @expect silent()
 #' ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
 #'   geom_line()
 #'
+#' @expect silent()
 #' ggmagnify(ggp,
 #'   xlim = c(0, 5), ylim = c(25, 75),
 #'   inset_xlim = c(0, 10), inset_ylim = c(200, 400))
 #'
+#' @expect silent()
 #' ggmagnify(ggp,
 #'   xlim = c(0, 5), ylim = c(25, 75),
 #'   inset_xlim = c(0, 10), inset_ylim = c(200, 400),
 #'   axes = TRUE)
 #'
 #' if (requireNamespace("ggfx", quietly = TRUE)) {
+#' @expect silent()
 #' ggmagnify(ggp,
 #'   xlim = c(0, 5), ylim = c(25, 75),
 #'   inset_xlim = c(0, 10), inset_ylim = c(200, 400),

@@ -138,26 +138,6 @@ you'll need to use \code{inset_coord}. If it doesn't, file an issue.
 }
 }
 \examples{
-library(ggplot2)
-ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
-  geom_line()
-
-ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400))
-
-ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
-  axes = TRUE)
-
-if (requireNamespace("ggfx", quietly = TRUE)) {
-ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
-  shadow = TRUE)
-}
-
 
 # Advanced usage
 
@@ -207,5 +187,24 @@ if (requireNamespace("sf", quietly = TRUE)) {
             inset_coord = coord_sf(default_crs = sf::st_crs(4326),
                                     xlim = xlim, ylim = ylim))
 
+}
+}
+\examples{
+library(ggplot2)
+ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
+  geom_line()
+ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(25, 75),
+  inset_xlim = c(0, 10), inset_ylim = c(200, 400))
+ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(25, 75),
+  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+  axes = TRUE)
+
+if (requireNamespace("ggfx", quietly = TRUE)) {
+ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(25, 75),
+  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+  shadow = TRUE)
 }
 }

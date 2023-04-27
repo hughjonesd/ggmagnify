@@ -7,7 +7,8 @@ Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, roclets = c("collate", "rd", "namespace", 
+              "doctest::dt_roclet")) 
 RoxygenNote: 7.2.3
 Imports: 
     ggplot2 (>= 3.4.0)
