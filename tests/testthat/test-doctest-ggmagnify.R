@@ -4,12 +4,13 @@
 test_that("Doctest: ggmagnify", {
   # Created from @doctest for `ggmagnify`
   # Source file: R/ggmagnify.R
-  # Source line: 127
+  # Source line: 91
   library(ggplot2)
   expect_silent(ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
     geom_line())
   expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(25, 75), inset_xlim = c(0, 10),
   inset_ylim = c(200, 400)))
+  expect_snapshot_file(ggsave("ggmagnify-ex-1.png"))
   expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(25, 75), inset_xlim = c(0, 10),
   inset_ylim = c(200, 400), axes = TRUE))
   if (requireNamespace("ggfx", quietly = TRUE)) {

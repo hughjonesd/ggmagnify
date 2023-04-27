@@ -143,6 +143,7 @@ ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
 ggmagnify(ggp,
   xlim = c(0, 5), ylim = c(25, 75),
   inset_xlim = c(0, 10), inset_ylim = c(200, 400))
+
 ggmagnify(ggp,
   xlim = c(0, 5), ylim = c(25, 75),
   inset_xlim = c(0, 10), inset_ylim = c(200, 400),

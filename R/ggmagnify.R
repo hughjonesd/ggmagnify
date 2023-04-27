@@ -100,6 +100,8 @@
 #'   xlim = c(0, 5), ylim = c(25, 75),
 #'   inset_xlim = c(0, 10), inset_ylim = c(200, 400))
 #'
+#' @expectRaw snapshot_file(ggsave("ggmagnify-ex-1.png"))
+#'
 #' @expect silent()
 #' ggmagnify(ggp,
 #'   xlim = c(0, 5), ylim = c(25, 75),
