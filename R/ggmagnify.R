@@ -146,6 +146,7 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' }
 #'
 #' @example man/R/advanced-example.R
+#' @example man/R/map-example.R
 ggmagnify <- function (
     plot,
     xlim,
