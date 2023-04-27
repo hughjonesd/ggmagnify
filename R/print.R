@@ -7,6 +7,25 @@
 #' @return The GgMagnify object, invisibly.
 #' @export
 print.GgMagnify <- function (x, ...) {
+  print(compose(x)) # for some reason NextMethod didn't work here (but may now?)
+
+  invisible(x)
+}
+
+
+#' @exportS3Method grid::grid.draw GgMagnify
+grid.draw.GgMagnify <- function (x, recording = TRUE) {
+  print(x)
+}
+
+
+#' Compose a GgMagnify object into a single ggplot
+#'
+#' @param x A GgMagnify object
+#'
+#' @return A ggplot
+#' @export
+compose <- function (x) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
   shadow <- if (x$shadow) {
@@ -23,15 +42,5 @@ print.GgMagnify <- function (x, ...) {
                                       xmin = x$inset_xmin, xmax = x$inset_xmax,
                                       ymin = x$inset_ymin, ymax = x$inset_ymax)
 
-  oldx <- x
-  x <- x$plot + x$target + shadow + x$proj + inset + x$border
-  print(x) # for some reason NextMethod doesn't work here
-
-  return(invisible(oldx))
-}
-
-
-#' @exportS3Method grid::grid.draw GgMagnify
-grid.draw.GgMagnify <- function (x, recording = TRUE) {
-  print(x)
+  x$plot + x$target + shadow + x$proj + inset + x$border
 }
