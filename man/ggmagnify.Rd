@@ -90,8 +90,9 @@ Use \code{\link[=inset_blanks]{inset_blanks(elems, axes = axes)}} to add \code{e
 to the default list.}
 
 \item{inset_coord}{Result of a call to a \code{ggplot2::coord_} function to use
-for the inset. Overrides \code{inset_xlim} and \code{inset_ylim}. Use this
-for plotting non-standard objects such as maps.}
+for the inset. Use this for plotting non-standard objects such as maps.
+Overrides \code{xlim} and \code{ylim}, but note you should still provide these
+separately.}
 }
 \value{
 The modified \code{plot} if \code{compose} is \code{TRUE}. Otherwise, a \code{GgMagnify}
@@ -131,7 +132,9 @@ in the main plot.
 
 \subsection{Limitations}{
 
-It won't work with facets, or with non-cartesian coordinates.
+It won't work with facets. It may work with non-standard coordinates,
+so long as they understand \code{x} and \code{y} aesthetics -
+you'll need to use \code{inset_coord}. If it doesn't, file an issue.
 }
 }
 \examples{

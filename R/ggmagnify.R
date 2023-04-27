@@ -83,8 +83,9 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   Use [`inset_blanks(elems, axes = axes)`][inset_blanks()] to add `elems`
 #'   to the default list.
 #' @param inset_coord Result of a call to a `ggplot2::coord_` function to use
-#'   for the inset. Overrides `inset_xlim` and `inset_ylim`. Use this
-#'   for plotting non-standard objects such as maps.
+#'   for the inset. Use this for plotting non-standard objects such as maps.
+#'   Overrides `xlim` and `ylim`, but note you should still provide these
+#'   separately.
 #'
 #' @details
 #'
@@ -113,7 +114,9 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'
 #' ## Limitations
 #'
-#' It won't work with facets, or with non-cartesian coordinates.
+#' It won't work with facets. It may work with non-standard coordinates,
+#' so long as they understand `x` and `y` aesthetics -
+#' you'll need to use `inset_coord`. If it doesn't, file an issue.
 #'
 #' @return
 #' The modified `plot` if `compose` is `TRUE`. Otherwise, a `GgMagnify`

@@ -52,7 +52,7 @@ ggmagnify(ggp,
 
 ``` r
 
-requireNamespace("ggfx", quietly = TRUE)
+library(ggfx)
 
 ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
@@ -98,11 +98,34 @@ ggmagnify(ggp_noclip,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2.6, 6), inset_ylim = c(40, 55),
           shadow = TRUE)
-#> Coordinate system already present. Adding new coordinate system, which will
-#> replace the existing one.
 ```
 
 <img src="man/figures/README-example-noclip-1.png" width="100%" />
+
+## Maps (experimental)
+
+I mean, it’s all experimental, but maps are *really* experimental.
+
+``` r
+
+library(sf)
+#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
+
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+ggp <- ggplot(nc) + geom_sf(aes(fill = AREA)) +
+       coord_sf(default_crs = sf::st_crs(4326))
+
+xlim <- c(-79, -77)
+ylim <- c(34.5, 35)
+
+ggmagnify(ggp, xlim = xlim, ylim = ylim,
+          inset_xlim = c(-84, -80), inset_ylim = c(34.25, 35.25),
+          inset_coord = coord_sf(default_crs = sf::st_crs(4326),
+                                  xlim = xlim, ylim = ylim), 
+          shadow = TRUE)
+```
+
+<img src="man/figures/README-example-map-1.png" width="100%" />
 
 ## Advanced usage: tweaking the inset
 

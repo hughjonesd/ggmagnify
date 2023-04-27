@@ -15,7 +15,8 @@ test_that("ggmagnify works with maps", {
     ggmagnify(ggp, xlim = xlim, ylim = ylim,
               inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
               inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                      xlim = xlim, ylim = ylim)),
-    regexp = NA
+                                      xlim = xlim, ylim = ylim),
+              shadow = TRUE)
+    , regexp = NA
   )
 })
