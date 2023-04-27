@@ -4,7 +4,11 @@
 \alias{inset_theme}
 \title{Create a theme suitable for an inset ggplot}
 \usage{
-inset_theme(blank = inset_blanks(axes = axes), axes)
+inset_theme(
+  blank = inset_blanks(axes = axes),
+  axes,
+  margin = if (axes) 10 else 0
+)
 }
 \arguments{
 \item{blank}{Character vector of extra elements to blank.
@@ -12,6 +16,11 @@ See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
 
 \item{axes}{Logical: will the inset have axes? Ignored if \code{blank} is
 set.}
+
+\item{margin}{Plot margin of inset. Can be a single number in "pt"
+units, a length 4 numeric (top, right, bottom, left), or a
+\code{\link[ggplot2:element]{ggplot2::margin()}} object. Note that this is on the scale of the
+inset plot, not the outer plot.}
 }
 \value{
 A ggplot theme object

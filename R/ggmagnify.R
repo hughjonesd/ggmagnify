@@ -96,23 +96,23 @@
 #'   geom_line()
 #'
 #' @expect silent()
-#' ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(25, 75),
-#'   inset_xlim = c(0, 10), inset_ylim = c(200, 400))
+#' ggm <- ggmagnify(ggp,
+#'   xlim = c(0, 5), ylim = c(30, 80),
+#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350))
 #'
 #' @expectRaw snapshot_file(ggsave("ggmagnify-ex-1.png"))
 #'
 #' @expect silent()
 #' ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(25, 75),
-#'   inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+#'   xlim = c(0, 5), ylim = c(30, 80),
+#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350),
 #'   axes = TRUE)
 #'
 #' if (requireNamespace("ggfx", quietly = TRUE)) {
 #' @expect silent()
 #' ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(25, 75),
-#'   inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+#'   xlim = c(0, 5), ylim = c(30, 80),
+#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350),
 #'   shadow = TRUE)
 #' }
 #'
@@ -169,28 +169,19 @@ ggmagnify <- function (
   }
 
   proj <- match.arg(proj)
+
   # == Create the inset ggplot =================================================
 
   suppressMessages({
     inset <- plot + inset_coord
   })
 
-  blank_theme <- inset_theme(blank, axes = NULL)
+  blank_theme <- inset_theme(blank, axes = axes, margin = margin)
 
-  if (! inherits(margin, "unit")) {
-    if (length(margin) == 1) margin <- rep(margin, 4)
-    margin <- grid::unit(margin, "pt")
-  }
+  inset <- inset + blank_theme
 
-  inset <- inset +
-           blank_theme +
-           ggplot2::theme(plot.margin = margin)
+  # == Create the target border ================================================
 
-  if (! axes) {
-    inset <- inset + ggplot2::theme(axis.ticks.length = grid::unit(0, "pt"))
-  }
-
-  # == Create target border ====================================================
   target <- if (! target) {
     NULL
   } else {
@@ -201,7 +192,7 @@ ggmagnify <- function (
                        fill = NA)
   }
 
-  # == Create inset border
+  # == Create the inset border =================================================
 
   border <- if (! border) {
     NULL
@@ -217,7 +208,7 @@ ggmagnify <- function (
   if (proj == "none") {
     proj_layer <- NULL
   } else {
-    if (proj %in% c("corresponding", "facing")) {
+    if (proj %in% c("auto", "corresponding", "facing")) {
       # which of the four lines connecting the four corners can we draw?
       can_top_left  <- sign(xmin - inset_xmin) == sign(ymax - inset_ymax)
       can_bot_right <- sign(xmax - inset_xmax) == sign(ymin - inset_ymin)
