@@ -48,19 +48,6 @@ ggmagnify(ggp,
 
 <img src="man/figures/README-example-position-1.png" width="100%" />
 
-## Inset with shadow
-
-``` r
-
-library(ggfx)
-
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
-```
-
-<img src="man/figures/README-example-shadow-1.png" width="100%" />
-
 ## Colours and lines
 
 ``` r
@@ -69,7 +56,7 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
           proj = "single",
-          colour = "grey20", proj_linetype = 1, linewidth = 0.8)
+          colour = "red", proj_linetype = 1, linewidth = 0.8)
 ```
 
 <img src="man/figures/README-example-colours-1.png" width="100%" />
@@ -85,6 +72,19 @@ ggmagnify(ggp,
 ```
 
 <img src="man/figures/README-example-axes-1.png" width="100%" />
+
+## Inset with shadow
+
+``` r
+
+library(ggfx)
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
+```
+
+<img src="man/figures/README-example-shadow-1.png" width="100%" />
 
 ## Inset outside the plot region
 

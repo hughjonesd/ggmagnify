@@ -58,18 +58,6 @@ ggmagnify(ggp,
 ```
 
 
-## Inset with shadow
-
-```{r example-shadow}
-
-library(ggfx)
-
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
-```
-
-
 ## Colours and lines
 
 ```{r example-colours}
@@ -78,7 +66,7 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
           proj = "single",
-          colour = "grey20", proj_linetype = 1, linewidth = 0.8)
+          colour = "red", proj_linetype = 1, linewidth = 0.8)
 ```
 
 
@@ -90,6 +78,18 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
           axes = TRUE, border = FALSE)
+```
+
+
+## Inset with shadow
+
+```{r example-shadow}
+
+library(ggfx)
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
 ```
 
 

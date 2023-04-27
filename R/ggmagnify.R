@@ -69,9 +69,10 @@
 #' * `target`, a layer representing the target border.
 #' * `proj`, a layer representing the projection lines.
 #'
-#' You can modify the original plot by adding layers etc. just as if
-#' it were a ggplot object. You can modify the inset by adding layers to
-#' `x$inset`. See [+.GgMagnify()].
+#' You can modify the inset by adding layers to
+#' `x$inset`,  the original plot by adding to `x$plot`,
+#' or both together by adding to the returned object directly.
+#' See [+.GgMagnify()].
 #'
 #' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
 #' in the main plot.

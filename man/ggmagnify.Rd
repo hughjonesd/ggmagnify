@@ -120,9 +120,10 @@ following list components:
 \item \code{proj}, a layer representing the projection lines.
 }
 
-You can modify the original plot by adding layers etc. just as if
-it were a ggplot object. You can modify the inset by adding layers to
-\code{x$inset}. See \code{\link[=+.GgMagnify]{+.GgMagnify()}}.
+You can modify the inset by adding layers to
+\code{x$inset},  the original plot by adding to \code{x$plot},
+or both together by adding to the returned object directly.
+See \code{\link[=+.GgMagnify]{+.GgMagnify()}}.
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
