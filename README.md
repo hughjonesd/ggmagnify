@@ -192,3 +192,29 @@ if (getRversion() >= "4.3.0") {
 ```
 
 <img src="man/figures/README-example-advanced-3.png" width="100%" />
+
+## Advanced usage: multiple insets
+
+Use compose to add multiple GgMagnify objects to the original plot in
+turn:
+
+``` r
+ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + 
+       geom_point()
+
+ggm1 <- ggmagnify(ggp, 
+                  xlim = c(3.5, 4), ylim = c(5, 5.5),
+                  inset_xlim = c(4, 5), inset_ylim = c(7, 8),
+                  shadow = TRUE) 
+
+ggm2 <- ggmagnify(ggp, 
+                  xlim = c(3, 3.5), ylim = c(6.5, 7.5),
+                  inset_xlim = c(2.2, 3.2), inset_ylim = c(4.2, 6.2),
+                  shadow = TRUE)
+
+ggp <- compose( ggm1, ggp)
+ggp <- compose( ggm2, ggp)
+ggp
+```
+
+<img src="man/figures/README-example-multiple-1.png" width="100%" />
