@@ -25,7 +25,7 @@ library(ggplot2)
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
          geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B") 
+         scale_fill_viridis_d(option = "B")
 
 shadow_args <- list(
   colour = alpha("grey80", 0.8),
@@ -42,8 +42,8 @@ ggm <- ggmagnify(booms,
 
 # modify the inset like a ggplot object:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "white", alpha = 0.7,
-                        size = 2)
+             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
+                        size = 2, shape = "circle filled")
 
 
 compose(ggm, booms)

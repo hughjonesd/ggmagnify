@@ -35,7 +35,8 @@ ggmagnify(
   target_colour = colour,
   target_alpha = alpha,
   shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
-  blank = inset_blanks(axes = axes)
+  blank = inset_blanks(axes = axes),
+  inset_coord = ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
 )
 }
 \arguments{
@@ -87,6 +88,10 @@ for projection lines.}
 \item{blank}{Character vector of theme elements to blank out in the inset.
 Use \code{\link[=inset_blanks]{inset_blanks(elems, axes = axes)}} to add \code{elems}
 to the default list.}
+
+\item{inset_coord}{Result of a call to a \code{ggplot2::coord_} function to use
+for the inset. Overrides \code{inset_xlim} and \code{inset_ylim}. Use this
+for plotting non-standard objects such as maps.}
 }
 \value{
 The modified \code{plot} if \code{compose} is \code{TRUE}. Otherwise, a \code{GgMagnify}
@@ -161,7 +166,7 @@ library(ggplot2)
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
          geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B") 
+         scale_fill_viridis_d(option = "B")
 
 shadow_args <- list(
   colour = alpha("grey80", 0.8),
@@ -178,8 +183,8 @@ ggm <- ggmagnify(booms,
 
 # modify the inset like a ggplot object:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "white", alpha = 0.7,
-                        size = 2)
+             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
+                        size = 2, shape = "circle filled")
 
 
 compose(ggm, booms)

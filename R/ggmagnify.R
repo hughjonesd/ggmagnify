@@ -82,6 +82,9 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' @param blank Character vector of theme elements to blank out in the inset.
 #'   Use [`inset_blanks(elems, axes = axes)`][inset_blanks()] to add `elems`
 #'   to the default list.
+#' @param inset_coord Result of a call to a `ggplot2::coord_` function to use
+#'   for the inset. Overrides `inset_xlim` and `inset_ylim`. Use this
+#'   for plotting non-standard objects such as maps.
 #'
 #' @details
 #'
@@ -175,7 +178,9 @@ ggmagnify <- function (
     target_colour = colour,
     target_alpha = alpha,
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
-    blank = inset_blanks(axes = axes)
+    blank = inset_blanks(axes = axes),
+    inset_coord = ggplot2::coord_cartesian(xlim = xlim, ylim = ylim,
+                                           expand = FALSE)
 ) {
   xmin <- min(xlim)
   xmax <- max(xlim)
@@ -197,8 +202,7 @@ ggmagnify <- function (
   # == Create the inset ggplot =================================================
 
   suppressWarnings({
-    inset <- plot + ggplot2::coord_cartesian(xlim = xlim, ylim = ylim,
-                                             expand = FALSE)
+    inset <- plot + inset_coord
   })
 
   blank_theme <- inset_theme(blank, axes = NULL)
