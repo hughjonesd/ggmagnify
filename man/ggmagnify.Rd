@@ -15,7 +15,6 @@ ggmagnify(
   target = TRUE,
   proj = c("facing", "corresponding", "single", "none"),
   shadow = FALSE,
-  compose = TRUE,
   axes = FALSE,
   margin = if (axes) 10 else 0,
   linewidth = 0.5,
@@ -60,9 +59,7 @@ default), \code{"corresponding"}, \code{"single"} or \code{"none"}. Can be abbre
 See below.}
 
 \item{shadow}{Logical. Draw a shadow behind the inset? Requires
-the \code{ggfx} package.}
-
-\item{compose}{Logical. If \code{TRUE}, the new elements are added to the ggplot object.
+the \code{ggfx} package.
 If \code{FALSE}, they are returned in a \code{GgMagnify} object, see below.}
 
 \item{axes}{Logical. Draw axes in the inset?}
@@ -95,8 +92,7 @@ Overrides \code{xlim} and \code{ylim}, but note you should still provide these
 separately.}
 }
 \value{
-The modified \code{plot} if \code{compose} is \code{TRUE}. Otherwise, a \code{GgMagnify}
-object.
+A \code{GgMagnify} object. You can print this by evaluating it at the command line.
 }
 \description{
 \code{ggmagnify()} magnifies a target area of your plot and adds it as an inset on
@@ -114,17 +110,20 @@ projects each corner of the target to the same corner of the inset.
 cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 \code{"none"} draws no lines.
 
-If \code{compose} is \code{FALSE}, the returned \code{GgMagnify} object includes the
+The returned \code{GgMagnify} object includes the
 following list components:
 \itemize{
+\item \code{plot}, the original ggplot object.
 \item \code{inset}, a ggplot object representing the inset.
 \item \code{border}, a layer representing the inset border.
 \item \code{target}, a layer representing the target border.
 \item \code{proj}, a layer representing the projection lines.
 }
 
-You can modify these, e.g. by adding themes to the inset. Call
-\code{\link[=compose]{compose(ggm, plot)}} to add the object to the plot.
+You can modify the inset by adding layers to
+\code{x$inset},  the original plot by adding to \code{x$plot},
+or both together by adding to the returned object directly.
+See \code{\link[=+.GgMagnify]{+.GgMagnify()}}.
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
@@ -175,15 +174,24 @@ ggm <- ggmagnify(booms,
                  xlim = c(80, 92), ylim = c(4, 4.8),
                  inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
                  shadow = TRUE, shadow_args = shadow_args,
-                 compose = FALSE, colour = "white")
+                 colour = "white")
 
-# modify the inset like a ggplot object:
+# modify the inset only:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
-                        size = 2, shape = "circle filled")
+             geom_point(data = faithful, color = "red", fill = "white",
+                        alpha = 0.7, size = 2, shape = "circle filled")
 
+ggm
 
-compose(ggm, booms)
+# modify the original plot only:
+
+ggm$plot <- ggm$plot + scale_fill_grey()
+
+ggm
+
+# modify both:
+
+ggm + scale_fill_viridis_d(option = "C")
 
 # Using maps
 #

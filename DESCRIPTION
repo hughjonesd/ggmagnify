@@ -3,7 +3,8 @@ Title: Create a Magnified Inset of Part of a "ggplot" Object
 Version: 0.0.0.9000
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Creates a magnified inset of a ggplot, with projection lines and
+  borders around the target area and inset, plus optional shadow.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en

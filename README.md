@@ -48,19 +48,6 @@ ggmagnify(ggp,
 
 <img src="man/figures/README-example-position-1.png" width="100%" />
 
-## Inset with shadow
-
-``` r
-
-library(ggfx)
-
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
-```
-
-<img src="man/figures/README-example-shadow-1.png" width="100%" />
-
 ## Colours and lines
 
 ``` r
@@ -69,7 +56,7 @@ ggmagnify(ggp,
           xlim = c(1.5, 2.5), ylim = c(60, 65),
           inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
           proj = "single",
-          colour = "grey20", proj_linetype = 1, linewidth = 0.8)
+          colour = "red", proj_linetype = 1, linewidth = 0.8)
 ```
 
 <img src="man/figures/README-example-colours-1.png" width="100%" />
@@ -85,6 +72,19 @@ ggmagnify(ggp,
 ```
 
 <img src="man/figures/README-example-axes-1.png" width="100%" />
+
+## Inset with shadow
+
+``` r
+
+library(ggfx)
+
+ggmagnify(ggp,
+          xlim = c(1.5, 2.5), ylim = c(60, 65),
+          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
+```
+
+<img src="man/figures/README-example-shadow-1.png" width="100%" />
 
 ## Inset outside the plot region
 
@@ -107,27 +107,31 @@ ggmagnify(ggp_noclip,
 I mean, it’s all experimental, but maps are *really* experimental.
 
 ``` r
+# Using maps
+#
+if (requireNamespace("sf", quietly = TRUE)) {
+  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
 
-library(sf)
-#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
+  ggp <- ggplot(nc) +
+    geom_sf(aes(fill = AREA)) +
+    coord_sf(default_crs = sf::st_crs(4326))
 
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
-ggp <- ggplot(nc) + geom_sf(aes(fill = AREA)) +
-       coord_sf(default_crs = sf::st_crs(4326))
+  xlim <- c(-79, -77)
+  ylim <- c(34.5, 35)
 
-xlim <- c(-79, -77)
-ylim <- c(34.5, 35)
+  # Specify xlim and ylim, but also manually specify the coordinate
+  # system for the inset:
+  ggmagnify(ggp, xlim = xlim, ylim = ylim,
+            inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
+            inset_coord = coord_sf(default_crs = sf::st_crs(4326),
+                                    xlim = xlim, ylim = ylim))
 
-ggmagnify(ggp, xlim = xlim, ylim = ylim,
-          inset_xlim = c(-84, -80), inset_ylim = c(34.25, 35.25),
-          inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                  xlim = xlim, ylim = ylim), 
-          shadow = TRUE)
+}
 ```
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
 
-## Advanced usage: tweaking the inset
+## Advanced usage: adding layers to the inset, original plot, or both
 
 ``` r
 # Advanced usage
@@ -149,15 +153,40 @@ ggm <- ggmagnify(booms,
                  xlim = c(80, 92), ylim = c(4, 4.8),
                  inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
                  shadow = TRUE, shadow_args = shadow_args,
-                 compose = FALSE, colour = "white")
+                 colour = "white")
 
-# modify the inset like a ggplot object:
+# modify the inset only:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
-                        size = 2, shape = "circle filled")
+             geom_point(data = faithful, color = "red", fill = "white",
+                        alpha = 0.7, size = 2, shape = "circle filled")
 
-
-compose(ggm, booms)
+ggm
 ```
 
 <img src="man/figures/README-example-advanced-1.png" width="100%" />
+
+``` r
+
+# modify the original plot only:
+
+ggm$plot <- ggm$plot + scale_fill_grey()
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+
+ggm
+```
+
+<img src="man/figures/README-example-advanced-2.png" width="100%" />
+
+``` r
+
+# modify both:
+
+ggm + scale_fill_viridis_d(option = "C")
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+```
+
+<img src="man/figures/README-example-advanced-3.png" width="100%" />
