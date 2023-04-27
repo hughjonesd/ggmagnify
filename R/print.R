@@ -21,11 +21,12 @@ grid.draw.GgMagnify <- function (x, recording = TRUE) {
 
 #' Compose a GgMagnify object into a single ggplot
 #'
-#' @param x A GgMagnify object
+#' @param x A GgMagnify object.
+#' @param plot A ggplot object, by default the original plot.
 #'
 #' @return A ggplot
 #' @export
-compose <- function (x) {
+compose <- function (x, plot = x$plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)
   shadow <- if (x$shadow) {
@@ -42,5 +43,5 @@ compose <- function (x) {
                                       xmin = x$inset_xmin, xmax = x$inset_xmax,
                                       ymin = x$inset_ymin, ymax = x$inset_ymax)
 
-  x$plot + x$target + shadow + x$proj + inset + x$border
+  plot + x$target + shadow + x$proj + inset + x$border
 }

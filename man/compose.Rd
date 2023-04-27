@@ -4,10 +4,12 @@
 \alias{compose}
 \title{Compose a GgMagnify object into a single ggplot}
 \usage{
-compose(x)
+compose(x, plot = x$plot)
 }
 \arguments{
-\item{x}{A GgMagnify object}
+\item{x}{A GgMagnify object.}
+
+\item{plot}{A ggplot object, by default the original plot.}
 }
 \value{
 A ggplot
