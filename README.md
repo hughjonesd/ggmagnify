@@ -180,9 +180,11 @@ ggm
 
 ``` r
 
-# modify both:
+# modify both. NB: this only works with the latest R:
 
-ggm + scale_fill_viridis_d(option = "C")
+if (getRversion() >= "4.3.0") {
+  ggm + scale_fill_viridis_d(option = "C")
+}
 #> Scale for fill is already present.
 #> Adding another scale for fill, which will replace the existing scale.
 #> Scale for fill is already present.
