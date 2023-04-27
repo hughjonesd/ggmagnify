@@ -150,8 +150,8 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   shadow = TRUE)
 #' }
 #'
-#' @example man/R/advanced-example.R
-#' @example man/R/map-example.R
+#' @doctestExample man/R/advanced-example.R
+#' @doctestExample man/R/map-example.R
 ggmagnify <- function (
     plot,
     xlim,
