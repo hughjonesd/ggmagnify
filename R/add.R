@@ -16,8 +16,7 @@
   e1
 }
 
-
-#' @export
+#' @rawNamespace if (getRversion() >= "4.3.0") S3Method(chooseOpsMethod, GgMagnify)
 chooseOpsMethod.GgMagnify <- function(x, y, mx, my, cl, reverse) {
   TRUE
 }
