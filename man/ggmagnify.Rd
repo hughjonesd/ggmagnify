@@ -140,19 +140,19 @@ you'll need to use \code{inset_coord}. If it doesn't, file an issue.
 library(ggplot2)
 ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
   geom_line()
-ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400))
+ggm <- ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350))
 
 ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
   axes = TRUE)
 
 if (requireNamespace("ggfx", quietly = TRUE)) {
 ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(25, 75),
-  inset_xlim = c(0, 10), inset_ylim = c(200, 400),
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
   shadow = TRUE)
 }
 
@@ -190,9 +190,11 @@ ggm$plot <- ggm$plot + scale_fill_grey()
 
 ggm
 
-# modify both:
+# modify both. NB: this only works with the latest R:
 
-ggm + scale_fill_viridis_d(option = "C")
+if (getRversion() >= "4.3.0") {
+  ggm + scale_fill_viridis_d(option = "C")
+}
 
 # Using maps
 #

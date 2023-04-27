@@ -2,6 +2,7 @@
 #' Add layer to a GgMagnify object
 #'
 #' This adds the layer to *both* the original plot, *and* the inset.
+#' It requires R 4.3.0 or higher.
 #'
 #' @param e1 A GgMagnify object
 #' @param e2 A layer, theme, etc.

@@ -16,6 +16,7 @@ The modified object
 }
 \description{
 This adds the layer to \emph{both} the original plot, \emph{and} the inset.
+It requires R 4.3.0 or higher.
 }
 \examples{
 
@@ -53,7 +54,9 @@ ggm$plot <- ggm$plot + scale_fill_grey()
 
 ggm
 
-# modify both:
+# modify both. NB: this only works with the latest R:
 
-ggm + scale_fill_viridis_d(option = "C")
+if (getRversion() >= "4.3.0") {
+  ggm + scale_fill_viridis_d(option = "C")
+}
 }

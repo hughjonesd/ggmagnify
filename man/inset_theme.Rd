@@ -14,8 +14,7 @@ inset_theme(
 \item{blank}{Character vector of extra elements to blank.
 See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
 
-\item{axes}{Logical: will the inset have axes? Ignored if \code{blank} is
-set.}
+\item{axes}{Logical: will the inset have axes?}
 
 \item{margin}{Plot margin of inset. Can be a single number in "pt"
 units, a length 4 numeric (top, right, bottom, left), or a
