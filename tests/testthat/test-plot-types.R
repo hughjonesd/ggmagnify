@@ -4,9 +4,9 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species))
 
 xlim <- c(3, 3.5)
-ylim <- c(6, 7)
-inset_xlim <- c(2, 3)
-inset_ylim <- c(4.5, 5.5)
+ylim <- c(6.5, 7.5)
+inset_xlim <- c(2.2, 3.2)
+inset_ylim <- c(4.2, 6.2)
 
 
 test_that("geom_point", {
@@ -25,7 +25,7 @@ test_that("geom_point", {
 
 
 test_that("geom_smooth", {
-  ggp <- ggp + geom_smooth(method = "lm", formula = y ~ x)
+  ggp <- ggp + geom_point() + geom_smooth(method = "lm", formula = y ~ x)
   expect_silent(
     ggm <- ggmagnify(ggp, xlim = xlim, ylim = ylim,
                      inset_xlim = inset_xlim, inset_ylim = inset_ylim)
@@ -54,9 +54,26 @@ test_that("geom_line", {
 })
 
 
+
+test_that("geom_density2d", {
+  ggp <- ggp + geom_point() + geom_density2d()
+  expect_silent(
+    ggm <- ggmagnify(ggp, xlim = xlim, ylim = ylim,
+                     inset_xlim = inset_xlim, inset_ylim = inset_ylim)
+  )
+  expect_silent(
+    print(ggm)
+  )
+  expect_snapshot_file(
+    ggsave("test-geom_density2d.png", ggm, width = 7, height = 7)
+  )
+})
+
+
+
 test_that("geom_boxplot", {
   ggp <- ggplot(iris, aes(Species, Sepal.Length, color = Species)) +
-    geom_boxplot()
+    geom_point() + geom_boxplot()
   expect_silent(
     ggm <- ggmagnify(ggp, xlim = c(1.75, 2.25), ylim = ylim,
                      inset_xlim = c(0.5, 1.5), inset_ylim = c(7, 8))
@@ -72,7 +89,7 @@ test_that("geom_boxplot", {
 
 test_that("geom_violin", {
   ggp <- ggplot(iris, aes(Species, Sepal.Length, color = Species)) +
-    geom_violin()
+    geom_point() + geom_violin(fill = NA)
   expect_silent(
     ggm <- ggmagnify(ggp, xlim = c(1.75, 2.25), ylim = ylim,
                      inset_xlim = c(0.5, 1.5), inset_ylim = c(7, 8))
@@ -84,7 +101,6 @@ test_that("geom_violin", {
     ggsave("test-geom_violin.png", ggm, width = 7, height = 7)
   )
 })
-
 
 
 test_that("geom_density", {
@@ -101,3 +117,10 @@ test_that("geom_density", {
     ggsave("test-geom_density.png", ggm, width = 7, height = 7)
   )
 })
+
+
+
+
+detritus <- list.files(pattern = "test-geom.*png")
+file.remove(detritus)
+
