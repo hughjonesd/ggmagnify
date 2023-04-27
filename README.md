@@ -131,7 +131,7 @@ if (requireNamespace("sf", quietly = TRUE)) {
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
 
-## Advanced usage: tweaking the inset
+## Advanced usage: adding layers to the inset, original plot, or both
 
 ``` r
 # Advanced usage
@@ -155,7 +155,7 @@ ggm <- ggmagnify(booms,
                  shadow = TRUE, shadow_args = shadow_args,
                  colour = "white")
 
-# modify the inset like a ggplot object:
+# modify the inset only:
 ggm$inset <- ggm$inset +
              geom_point(data = faithful, color = "red", fill = "white",
                         alpha = 0.7, size = 2, shape = "circle filled")
@@ -164,3 +164,29 @@ ggm
 ```
 
 <img src="man/figures/README-example-advanced-1.png" width="100%" />
+
+``` r
+
+# modify the original plot only:
+
+ggm$plot <- ggm$plot + scale_fill_grey()
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+
+ggm
+```
+
+<img src="man/figures/README-example-advanced-2.png" width="100%" />
+
+``` r
+
+# modify both:
+
+ggm + scale_fill_viridis_d(option = "C")
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
+```
+
+<img src="man/figures/README-example-advanced-3.png" width="100%" />
