@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 knitr::read_chunk("man/R/advanced-example.R", labels = "example-advanced")
+knitr::read_chunk("man/R/map-example.R", labels = "example-map")
 ```
 
 # ggmagnify
@@ -111,25 +112,9 @@ ggmagnify(ggp_noclip,
 I mean, it's all experimental, but maps are *really* experimental.
 
 ```{r example-map}
-
-library(sf)
-
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
-ggp <- ggplot(nc) + geom_sf(aes(fill = AREA)) +
-       coord_sf(default_crs = sf::st_crs(4326))
-
-xlim <- c(-79, -77)
-ylim <- c(34.5, 35)
-
-ggmagnify(ggp, xlim = xlim, ylim = ylim,
-          inset_xlim = c(-84, -80), inset_ylim = c(34.25, 35.25),
-          inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                  xlim = xlim, ylim = ylim), 
-          shadow = TRUE)
- 
 ```
 
-## Advanced usage: tweaking the inset
+## Advanced usage: adding layers to the inset, original plot, or both
 
 ```{r example-advanced}
 ```

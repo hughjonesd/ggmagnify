@@ -107,22 +107,26 @@ ggmagnify(ggp_noclip,
 I mean, it’s all experimental, but maps are *really* experimental.
 
 ``` r
+# Using maps
+#
+if (requireNamespace("sf", quietly = TRUE)) {
+  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
 
-library(sf)
-#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
+  ggp <- ggplot(nc) +
+    geom_sf(aes(fill = AREA)) +
+    coord_sf(default_crs = sf::st_crs(4326))
 
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
-ggp <- ggplot(nc) + geom_sf(aes(fill = AREA)) +
-       coord_sf(default_crs = sf::st_crs(4326))
+  xlim <- c(-79, -77)
+  ylim <- c(34.5, 35)
 
-xlim <- c(-79, -77)
-ylim <- c(34.5, 35)
+  # Specify xlim and ylim, but also manually specify the coordinate
+  # system for the inset:
+  ggmagnify(ggp, xlim = xlim, ylim = ylim,
+            inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
+            inset_coord = coord_sf(default_crs = sf::st_crs(4326),
+                                    xlim = xlim, ylim = ylim))
 
-ggmagnify(ggp, xlim = xlim, ylim = ylim,
-          inset_xlim = c(-84, -80), inset_ylim = c(34.25, 35.25),
-          inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                  xlim = xlim, ylim = ylim), 
-          shadow = TRUE)
+}
 ```
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
@@ -149,15 +153,14 @@ ggm <- ggmagnify(booms,
                  xlim = c(80, 92), ylim = c(4, 4.8),
                  inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
                  shadow = TRUE, shadow_args = shadow_args,
-                 compose = FALSE, colour = "white")
+                 colour = "white")
 
 # modify the inset like a ggplot object:
 ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7,
-                        size = 2, shape = "circle filled")
+             geom_point(data = faithful, color = "red", fill = "white",
+                        alpha = 0.7, size = 2, shape = "circle filled")
 
-
-compose(ggm, booms)
+ggm
 ```
 
 <img src="man/figures/README-example-advanced-1.png" width="100%" />

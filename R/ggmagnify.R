@@ -1,42 +1,5 @@
 
 
-#' Default elements to blank in the ggmagnify inset
-#'
-#' @param ... Character vector of extra elements to blank.
-#' @param axes Logical. `TRUE` if the inset will include axes.
-#'
-#' @return A character vector.
-#' @export
-inset_blanks <- function (..., axes) {
-  res <- c("plot.title", "plot.subtitle", "plot.caption", "plot.tag",
-              "axis.title", ...)
-  blank_axes <- ! axes
-  if (blank_axes) res <- c(res, "axis.text", "axis.ticks", "axis.line")
-
-  res
-}
-
-
-#' Create a theme suitable for an inset ggplot
-#'
-#' @param blank Character vector of extra elements to blank.
-#'   See [ggplot2::theme()].
-#' @param axes Logical: will the inset have axes? Ignored if `blank` is
-#'   set.
-#'
-#' @return A ggplot theme object
-#' @export
-inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
-  blank_elements <- lapply(blank, function (x) {
-    ggplot2::element_blank()
-  })
-  names(blank_elements) <- blank
-  blank_elements[["legend.position"]] <- "none"
-  thm <- do.call(ggplot2::theme, blank_elements)
-
-  thm
-}
-
 # TODO
 # - maybe have an "expansion" factor which expands the target area from the
 #   centre? A fudge to play with
@@ -63,7 +26,6 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #'   See below.
 #' @param shadow Logical. Draw a shadow behind the inset? Requires
 #'   the `ggfx` package.
-#' @param compose Logical. If `TRUE`, the new elements are added to the ggplot object.
 #'   If `FALSE`, they are returned in a `GgMagnify` object, see below.
 #' @param axes Logical. Draw axes in the inset?
 #' @param margin Plot margin of inset. Can be a single number in "pt"
@@ -98,16 +60,18 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
 #' `"none"` draws no lines.
 #'
-#' If `compose` is `FALSE`, the returned `GgMagnify` object includes the
+#' The returned `GgMagnify` object includes the
 #' following list components:
 #'
+#' * `plot`, the original ggplot object.
 #' * `inset`, a ggplot object representing the inset.
 #' * `border`, a layer representing the inset border.
 #' * `target`, a layer representing the target border.
 #' * `proj`, a layer representing the projection lines.
 #'
-#' You can modify these, e.g. by adding themes to the inset. Call
-#' [`compose(ggm, plot)`][compose()] to add the object to the plot.
+#' You can modify the original plot by adding layers etc. just as if
+#' it were a ggplot object. You can modify the inset by adding layers to
+#' `x$inset`. See [+.GgMagnify()].
 #'
 #' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
 #' in the main plot.
@@ -119,8 +83,7 @@ inset_theme <- function (blank = inset_blanks(axes = axes), axes) {
 #' you'll need to use `inset_coord`. If it doesn't, file an issue.
 #'
 #' @return
-#' The modified `plot` if `compose` is `TRUE`. Otherwise, a `GgMagnify`
-#' object.
+#' A `GgMagnify` object. You can print this by evaluating it at the command line.
 #'
 #' @export
 #'
@@ -158,7 +121,6 @@ ggmagnify <- function (
     target = TRUE,
     proj   = c("facing", "corresponding", "single", "none"),
     shadow = FALSE,
-    compose = TRUE,
     axes = FALSE,
     margin = if (axes) 10 else 0,
     linewidth = 0.5,
@@ -322,6 +284,7 @@ ggmagnify <- function (
 
   # == Put the result together =================================================
   result <- list(
+              plot = plot,
               inset = inset,
               border = border,
               target = target,
@@ -335,39 +298,7 @@ ggmagnify <- function (
             )
   class(result) <- "GgMagnify"
 
-  if (compose) result <- compose(result, plot)
-
   result
-}
-
-
-#' Compose a GgMagnify object with its ggplot
-#'
-#' @param x A GgMagnify object.
-#' @param plot A ggplot object.
-#'
-#' @return The modified plot.
-#' @export
-#'
-#' @example man/R/advanced-example.R
-compose <- function (x, plot) {
-  inset <- x$inset
-  inset <- ggplot2::ggplotGrob(inset)
-  shadow <- if (x$shadow) {
-              shadow <- do.call(ggfx::with_shadow,
-                                c(list(x = inset, stack = FALSE), x$shadow_args))
-              ggplot2::annotation_custom(shadow, xmin = x$inset_xmin,
-                                         xmax = x$inset_xmax,
-                                         ymin = x$inset_ymin,
-                                         ymax = x$inset_ymax)
-            } else {
-              NULL
-            }
-  inset <- ggplot2::annotation_custom(inset,
-                                      xmin = x$inset_xmin, xmax = x$inset_xmax,
-                                      ymin = x$inset_ymin, ymax = x$inset_ymax)
-
-  plot + x$target + shadow + x$proj + inset + x$border
 }
 
 
