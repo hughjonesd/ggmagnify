@@ -1,9 +1,31 @@
 
 
 # TODO
-# - maybe have an "expansion" factor which expands the target area from the
-#   centre? A fudge to play with
 # - think about specifying inset position. Cf. legend
+#   - If you use grid package, you can specify coordinates in "npc" units.
+#   - Quick example:
+#
+#   seekViewport("panel....blah") # plot panel
+#   v <- viewport(xscale = xlim_of_plot, yscale = ylim_of_plot)
+#   pushViewport(v)
+#   grid.draw(ggplotGrob(your_inset), x, y, height, width, units = "native")
+#
+#   - better would be to find the actual viewport and its scale
+#     but currentViewport |> str() doesn't contain this info...
+#   - The problem is that annotation_custom() works on ggplot scales;
+#   it also provides a Layer object which presumably plays nicely with
+#   ggplot in other ways.
+#   - You could directly just plot the grob in the print method; but I
+#   think it's risky...! Doubtless at some point that's what happens...!
+#   - perhaps a better approach is to find the xlim and ylim of the
+#     plot panel using ggplot_build()
+#     As of v 3.4.2, this can be done with
+#
+#     ggplot_build(ggp)$layout$panel_params[[1]]$x.range and y.range
+#
+#     But note, this has changed before!
+#   - Not sure it is worthwhile introducing fragile code just to
+#     save people effort that they will have to make anyway in the end!
 
 #' Add a magnified inset plot to a ggplot object
 #'
@@ -44,6 +66,9 @@
 #' @param blank Character vector of theme elements to blank out in the inset.
 #'   Use [`inset_blanks(elems, axes = axes)`][inset_blanks()] to add `elems`
 #'   to the default list.
+#' @param inset_expand Logical. Expand the inset's view of the target? See
+#'   [ggplot2::coord_cartesian()]. Note that this does not expand the inset's
+#'   dimensions in the main plot.
 #' @param inset_coord Result of a call to a `ggplot2::coord_` function to use
 #'   for the inset. Use this for plotting non-standard objects such as maps.
 #'   Overrides `xlim` and `ylim`, but note you should still provide these
@@ -149,8 +174,9 @@ ggmagnify <- function (
     target_alpha = alpha,
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
     blank = inset_blanks(axes = axes),
+    inset_expand = FALSE,
     inset_coord = ggplot2::coord_cartesian(xlim = xlim, ylim = ylim,
-                                           expand = FALSE)
+                                           expand = inset_expand)
 ) {
   xmin <- min(xlim)
   xmax <- max(xlim)
