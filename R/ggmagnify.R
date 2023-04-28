@@ -121,6 +121,9 @@
 #' so long as they understand `x` and `y` aesthetics -
 #' you'll need to use `inset_coord`. If it doesn't, file an issue.
 #'
+#' Plots with a transparent background will give surprising shadows. Try
+#' adding `theme(plot.background = "white")` to the original or the inset.
+#'
 #' @return
 #' A `GgMagnify` object. You can print this by evaluating it at the command line.
 #'
