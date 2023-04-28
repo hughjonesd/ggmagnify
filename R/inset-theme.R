@@ -48,7 +48,11 @@ inset_theme <- function (
   thm <- thm + ggplot2::theme(plot.margin = margin)
 
   if (! axes) {
-    thm <- thm + ggplot2::theme(axis.ticks.length = grid::unit(0, "pt"))
+    thm <- thm + ggplot2::theme(
+      axis.ticks.length   = grid::unit(0, "pt"),
+      axis.ticks.length.x = grid::unit(0, "pt"),
+      axis.ticks.length.y = grid::unit(0, "pt")
+    )
   }
 
   thm
