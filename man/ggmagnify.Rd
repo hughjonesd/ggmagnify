@@ -35,7 +35,7 @@ ggmagnify(
   target_alpha = alpha,
   shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   blank = inset_blanks(axes = axes),
-  inset_expand = FALSE,
+  inset_expand = axes,
   inset_coord = ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = inset_expand)
 )
 }
@@ -139,5 +139,86 @@ in the main plot.
 It won't work with facets. It may work with non-standard coordinates,
 so long as they understand \code{x} and \code{y} aesthetics -
 you'll need to use \code{inset_coord}. If it doesn't, file an issue.
+}
+}
+\examples{
+library(ggplot2)
+ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
+  geom_line()
+ggm <- ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350))
+
+ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+  axes = TRUE)
+
+if (requireNamespace("ggfx", quietly = TRUE)) {
+ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+  shadow = TRUE)
+}
+
+# Advanced usage
+
+library(ggplot2)
+
+booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
+         geom_contour_filled(aes(z = density)) +
+         scale_fill_viridis_d(option = "B")
+
+shadow_args <- list(
+  colour = alpha("grey80", 0.8),
+  x_offset = 0,
+  y_offset = 0,
+  sigma = 10
+)
+
+ggm <- ggmagnify(booms,
+                 xlim = c(80, 92), ylim = c(4, 4.8),
+                 inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
+                 shadow = TRUE, shadow_args = shadow_args,
+                 colour = "white")
+
+# modify the inset only:
+ggm$inset <- ggm$inset +
+             geom_point(data = faithful, color = "red", fill = "white",
+                        alpha = 0.7, size = 2, shape = "circle filled")
+
+ggm
+
+# modify the original plot only:
+
+ggm$plot <- ggm$plot + scale_fill_grey()
+
+ggm
+
+# modify both. NB: this only works with the latest R:
+
+if (getRversion() >= "4.3.0") {
+  ggm + scale_fill_viridis_d(option = "C")
+}
+
+# Using maps
+#
+if (requireNamespace("sf", quietly = TRUE)) {
+  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+  ggp <- ggplot(nc) +
+    geom_sf(aes(fill = AREA)) +
+    coord_sf(default_crs = sf::st_crs(4326))
+
+  xlim <- c(-79, -77)
+  ylim <- c(34.5, 35)
+
+  # Specify xlim and ylim, but also manually specify the coordinate
+  # system for the inset:
+  ggmagnify(ggp, xlim = xlim, ylim = ylim,
+            inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
+            inset_coord = coord_sf(default_crs = sf::st_crs(4326),
+                                    xlim = xlim, ylim = ylim))
+
 }
 }
