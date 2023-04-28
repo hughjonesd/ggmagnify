@@ -88,6 +88,22 @@ ggmagnify(ggp,
 
 <img src="man/figures/README-example-shadow-1.png" width="100%" />
 
+## Saving your plot
+
+Use `compose()` to turn your GgMagnify object into a ggplot:
+
+``` r
+ggm <- ggmagnify(ggp,
+                 xlim = c(1.5, 2.5), ylim = c(60, 65),
+                 inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+
+# This is a hack, which may work if you're lucky:
+ggsave("filename.png", ggm) 
+
+# This will correctly respect theme settings:
+ggsave("filename.png", compose(ggm)) 
+```
+
 ## Inset outside the plot region
 
 ``` r

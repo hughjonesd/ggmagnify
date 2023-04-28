@@ -32,9 +32,9 @@
 #
 # - Create a proper Geom? Then we'd get facetting...
 #   - the geom still needs to know all the existing geoms of the ggplot,
-#     so would have to pass in a ggplot object, as now. 
+#     so would have to pass in a ggplot object, as now.
 #   - then the ggplot_grob() created has to respect facetting somehow...
-#     probably has to happen in draw_panel(). So there, you'd put in 
+#     probably has to happen in draw_panel(). So there, you'd put in
 #     the "normal" geoms like the target borders & zoom lines; and the shadow;
 #     then you'd have to change the original ggplot's object to only use
 #     the passed-in data for that facet... and create a ggplot_grob().
@@ -89,7 +89,7 @@
 #'
 #' @details
 #'
-#' ## Projection lines.
+#' ## Projection lines
 #'
 #' `proj = "corresponding"` or `"facing"` draws projection lines from the
 #' corners of the target to the corners of the inset. `"corresponding"` always
@@ -97,6 +97,8 @@
 #' `"facing"` sometimes draws lines between facing corners, when this looks
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
 #' `"none"` draws no lines.
+#'
+#' ## `GgMagnify` objects
 #'
 #' The returned `GgMagnify` object includes the
 #' following list components:
@@ -112,6 +114,16 @@
 #' or both together by adding to the returned object directly.
 #' See [+.GgMagnify()].
 #'
+#' ## Tips
+#'
+#' To save to a file, use [compose()] to recreate the ggplot object including
+#' the new inset:
+#'
+#' ```r
+#' ggm <- ggmagnify(ggp, ...)
+#' ggsave("filename.png", compose(ggm))
+#' ```
+#'
 #' To create an inset outside the plot area, set `coord_cartesian(clip = "off")`
 #' in the main plot.
 #'
@@ -122,8 +134,9 @@
 #' you'll need to use `inset_coord`. If it doesn't, file an issue.
 #'
 #' Plots with a transparent background will give surprising shadows. Try
-#' adding `theme(plot.background = element_rect(fill = "white"))` to the 
+#' adding `theme(plot.background = element_rect(fill = "white"))` to the
 #' original or the inset.
+#'
 #'
 #' @return
 #' A `GgMagnify` object. You can print this by evaluating it at the command line.
@@ -133,29 +146,26 @@
 #' @doctest
 #' library(ggplot2)
 #'
-#' @expect silent()
 #' ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
 #'   geom_line()
 #'
 #' @expect silent()
-#' ggm <- ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(30, 80),
-#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350))
-#'
-#' @expectRaw snapshot_file(ggsave("ggmagnify-ex-1.png", width = 7, height = 7))
+#' ggmagnify(ggp,
+#'           xlim = c(0, 5), ylim = c(30, 80),
+#'           inset_xlim = c(0, 15), inset_ylim = c(200, 350))
 #'
 #' @expect silent()
 #' ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(30, 80),
-#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350),
-#'   axes = TRUE)
+#'           xlim = c(0, 5), ylim = c(30, 80),
+#'           inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+#'           axes = TRUE)
 #'
 #' if (requireNamespace("ggfx", quietly = TRUE)) {
 #' @expect silent()
 #' ggmagnify(ggp,
-#'   xlim = c(0, 5), ylim = c(30, 80),
-#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350),
-#'   shadow = TRUE)
+#'           xlim = c(0, 5), ylim = c(30, 80),
+#'           inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+#'           shadow = TRUE)
 #' }
 #'
 #' @doctestExample man/R/advanced-example.R

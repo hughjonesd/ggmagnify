@@ -106,7 +106,7 @@ target are drawn. If the \code{ggfx} package is installed, a drop shadow can be
 added.
 }
 \details{
-\subsection{Projection lines.}{
+\subsection{Projection lines}{
 
 \code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
 corners of the target to the corners of the inset. \code{"corresponding"} always
@@ -114,6 +114,9 @@ projects each corner of the target to the same corner of the inset.
 \code{"facing"} sometimes draws lines between facing corners, when this looks
 cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 \code{"none"} draws no lines.
+}
+
+\subsection{\code{GgMagnify} objects}{
 
 The returned \code{GgMagnify} object includes the
 following list components:
@@ -129,6 +132,16 @@ You can modify the inset by adding layers to
 \code{x$inset},  the original plot by adding to \code{x$plot},
 or both together by adding to the returned object directly.
 See \code{\link[=+.GgMagnify]{+.GgMagnify()}}.
+}
+
+\subsection{Tips}{
+
+To save to a file, use \code{\link[=compose]{compose()}} to recreate the ggplot object including
+the new inset:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{ggm <- ggmagnify(ggp, ...)
+ggsave("filename.png", compose(ggm))
+}\if{html}{\out{</div>}}
 
 To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
 in the main plot.
@@ -147,22 +160,22 @@ original or the inset.
 }
 \examples{
 library(ggplot2)
+
 ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
   geom_line()
-ggm <- ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(30, 80),
-  inset_xlim = c(0, 15), inset_ylim = c(200, 350))
-
 ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(30, 80),
-  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
-  axes = TRUE)
+          xlim = c(0, 5), ylim = c(30, 80),
+          inset_xlim = c(0, 15), inset_ylim = c(200, 350))
+ggmagnify(ggp,
+          xlim = c(0, 5), ylim = c(30, 80),
+          inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+          axes = TRUE)
 
 if (requireNamespace("ggfx", quietly = TRUE)) {
 ggmagnify(ggp,
-  xlim = c(0, 5), ylim = c(30, 80),
-  inset_xlim = c(0, 15), inset_ylim = c(200, 350),
-  shadow = TRUE)
+          xlim = c(0, 5), ylim = c(30, 80),
+          inset_xlim = c(0, 15), inset_ylim = c(200, 350),
+          shadow = TRUE)
 }
 
 # Advanced usage

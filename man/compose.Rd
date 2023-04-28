@@ -15,5 +15,18 @@ compose(x, plot = x$plot)
 A ggplot
 }
 \description{
-Compose a GgMagnify object into a single ggplot
+Use this when you want to save the result of \code{\link[=ggmagnify]{ggmagnify()}} to a file.
+}
+\examples{
+library(ggplot2)
+ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
+  geom_line()
+
+ggm <- ggmagnify(ggp,
+  xlim = c(0, 5), ylim = c(30, 80),
+  inset_xlim = c(0, 15), inset_ylim = c(200, 350))
+compose(ggm)
+\dontrun{
+  ggsave("filename.png", compose(ggm))
+}
 }

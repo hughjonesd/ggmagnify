@@ -21,11 +21,30 @@ grid.draw.GgMagnify <- function (x, recording = TRUE) {
 
 #' Compose a GgMagnify object into a single ggplot
 #'
+#' Use this when you want to save the result of [ggmagnify()] to a file.
+#'
 #' @param x A GgMagnify object.
 #' @param plot A ggplot object, by default the original plot.
 #'
 #' @return A ggplot
 #' @export
+#'
+#' @doctest
+#' library(ggplot2)
+#' ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) +
+#'   geom_line()
+#'
+#' ggm <- ggmagnify(ggp,
+#'   xlim = c(0, 5), ylim = c(30, 80),
+#'   inset_xlim = c(0, 15), inset_ylim = c(200, 350))
+#'
+#' @expect silent()
+#' compose(ggm)
+#'
+#' @omit
+#' \dontrun{
+#'   ggsave("filename.png", compose(ggm))
+#' }
 compose <- function (x, plot = x$plot) {
   inset <- x$inset
   inset <- ggplot2::ggplotGrob(inset)

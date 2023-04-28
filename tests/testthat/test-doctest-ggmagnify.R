@@ -4,18 +4,16 @@
 test_that("Doctest: ggmagnify", {
   # Created from @doctest for `ggmagnify`
   # Source file: R/ggmagnify.R
-  # Source line: 133
+  # Source line: 146
   library(ggplot2)
-  expect_silent(ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick,
-    color = Diet)) + geom_line())
-  expect_silent(ggm <- ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80),
-  inset_xlim = c(0, 15), inset_ylim = c(200, 350)))
-  expect_snapshot_file(ggsave("ggmagnify-ex-1.png", width = 7, height = 7))
-  expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0,
-    15), inset_ylim = c(200, 350), axes = TRUE))
+  ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) + geom_line()
+  expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
+  inset_ylim = c(200, 350)))
+  expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
+  inset_ylim = c(200, 350), axes = TRUE))
   if (requireNamespace("ggfx", quietly = TRUE)) {
-    expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(
-      0, 15), inset_ylim = c(200, 350), shadow = TRUE))
+    expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
+    inset_ylim = c(200, 350), shadow = TRUE))
   }
 })
 
