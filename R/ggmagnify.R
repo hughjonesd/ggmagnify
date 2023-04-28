@@ -26,6 +26,9 @@
 #     But note, this has changed before!
 #   - Not sure it is worthwhile introducing fragile code just to
 #     save people effort that they will have to make anyway in the end!
+#
+# - Do we need a switch for `target`? When would it make sense not to
+#   draw a border around target? Only if you do something manually....
 
 #' Add a magnified inset plot to a ggplot object
 #'
@@ -174,7 +177,7 @@ ggmagnify <- function (
     target_alpha = alpha,
     shadow_args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
     blank = inset_blanks(axes = axes),
-    inset_expand = FALSE,
+    inset_expand = axes,
     inset_coord = ggplot2::coord_cartesian(xlim = xlim, ylim = ylim,
                                            expand = inset_expand)
 ) {
