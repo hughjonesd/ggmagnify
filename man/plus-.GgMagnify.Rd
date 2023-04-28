@@ -54,9 +54,8 @@ ggm$plot <- ggm$plot + scale_fill_grey()
 
 ggm
 
-# modify both. NB: this only works with the latest R:
+# modify both:
 
-if (getRversion() >= "4.3.0") {
-  ggm + scale_fill_viridis_d(option = "C")
-}
+ggm + scale_fill_viridis_d(option = "C")
+
 }
