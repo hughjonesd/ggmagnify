@@ -2,7 +2,7 @@
 % Please edit documentation in R/add.R
 \name{+.GgMagnify}
 \alias{+.GgMagnify}
-\title{Add layer or theme to a GgMagnify object}
+\title{Add layer to a GgMagnify object}
 \usage{
 \method{+}{GgMagnify}(e1, e2)
 }
@@ -15,7 +15,8 @@
 The modified object
 }
 \description{
-This adds to \emph{both} the original plot, \emph{and} the inset.
+This adds the layer to \emph{both} the original plot, \emph{and} the inset.
+It requires R 4.3.0 or higher.
 }
 \examples{
 
