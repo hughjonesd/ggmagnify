@@ -32,9 +32,9 @@
 #
 # - Create a proper Geom? Then we'd get facetting...
 #   - the geom still needs to know all the existing geoms of the ggplot,
-#     so would have to pass in a ggplot object, as now.
+#     so would have to pass in a ggplot object, as now. 
 #   - then the ggplot_grob() created has to respect facetting somehow...
-#     probably has to happen in draw_panel(). So there, you'd put in
+#     probably has to happen in draw_panel(). So there, you'd put in 
 #     the "normal" geoms like the target borders & zoom lines; and the shadow;
 #     then you'd have to change the original ggplot's object to only use
 #     the passed-in data for that facet... and create a ggplot_grob().
@@ -337,7 +337,7 @@ ggmagnify <- function (
               shadow = shadow,
               shadow_args = shadow_args
             )
-  class(result) <- c("GgMagnify", class(plot))
+  class(result) <- "GgMagnify"
 
   result
 }

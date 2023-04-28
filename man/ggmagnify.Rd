@@ -198,10 +198,11 @@ ggm$plot <- ggm$plot + scale_fill_grey()
 
 ggm
 
-# modify both:
+# modify both. NB: this only works with the latest R:
 
-ggm + scale_fill_viridis_d(option = "C")
-
+if (getRversion() >= "4.3.0") {
+  ggm + scale_fill_viridis_d(option = "C")
+}
 
 # Using maps
 #
