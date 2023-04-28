@@ -220,3 +220,35 @@ ggp
 ```
 
 <img src="man/figures/README-example-multiple-1.png" width="100%" />
+
+## Advanced usage: keeping grid lines the same
+
+To make sure the inset uses the same grid lines as the main graph, set
+`breaks` in `scale_x` and `scale_y`:
+
+``` r
+ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + 
+       geom_point() +
+       theme(panel.grid = element_line("grey70"))
+
+# different grid lines:
+ggmagnify(ggp, 
+          xlim = c(3.5, 4), ylim = c(5, 5.5),
+          inset_xlim = c(4, 5) - 0.1, inset_ylim = c(6, 7) - 0.1) 
+```
+
+<img src="man/figures/README-example-gridlines-1.png" width="100%" />
+
+``` r
+
+# fix the grid lines:
+ggp <- ggp +
+       scale_x_continuous(breaks = seq(2, 5, .5)) + 
+       scale_y_continuous(breaks = seq(5, 8))
+
+ggmagnify(ggp, 
+          xlim = c(3.5, 4), ylim = c(5, 5.5),
+          inset_xlim = c(4, 5) - 0.1, inset_ylim = c(6, 7) - 0.1) 
+```
+
+<img src="man/figures/README-example-gridlines-2.png" width="100%" />
