@@ -29,6 +29,16 @@
 #
 # - Do we need a switch for `target`? When would it make sense not to
 #   draw a border around target? Only if you do something manually....
+#
+# - Create a proper Geom? Then we'd get facetting...
+#   - the geom still needs to know all the existing geoms of the ggplot,
+#     so would have to pass in a ggplot object, as now. 
+#   - then the ggplot_grob() created has to respect facetting somehow...
+#     probably has to happen in draw_panel(). So there, you'd put in 
+#     the "normal" geoms like the target borders & zoom lines; and the shadow;
+#     then you'd have to change the original ggplot's object to only use
+#     the passed-in data for that facet... and create a ggplot_grob().
+#     Quite cheeky...! You'd have to add `facet_null()` too.
 
 #' Add a magnified inset plot to a ggplot object
 #'

@@ -8,9 +8,13 @@
 #' @export
 inset_blanks <- function (..., axes) {
   res <- c("plot.title", "plot.subtitle", "plot.caption", "plot.tag",
-              "axis.title", ...)
+              "axis.title", "axis.title.x", "axis.title.y", ...)
   blank_axes <- ! axes
-  if (blank_axes) res <- c(res, "axis.text", "axis.ticks", "axis.line")
+  if (blank_axes) {
+    axis_bits <- c(outer(c("axis.text", "axis.ticks", "axis.line"),
+                       c("", ".x", ".y"), paste0))
+    res <- c(res, axis_bits)
+  }
 
   res
 }
