@@ -4,7 +4,7 @@
 test_that("Doctest: ggmagnify", {
   # Created from @doctest for `ggmagnify`
   # Source file: R/ggmagnify.R
-  # Source line: 132
+  # Source line: 133
   library(ggplot2)
   expect_silent(ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick,
     color = Diet)) + geom_line())

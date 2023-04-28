@@ -141,7 +141,8 @@ so long as they understand \code{x} and \code{y} aesthetics -
 you'll need to use \code{inset_coord}. If it doesn't, file an issue.
 
 Plots with a transparent background will give surprising shadows. Try
-adding \code{theme(plot.background = "white")} to the original or the inset.
+adding \code{theme(plot.background = element_rect(fill = "white"))} to the
+original or the inset.
 }
 }
 \examples{
