@@ -21,7 +21,7 @@ test_param <- function (name, ...) {
     )
     skip_on_ci()
     filename <- paste0("test-params-", name, ".png")
-    expect_snapshot_file(ggsave(filename, ggm, width = 7, height = 7))
+    expect_snapshot_file(ggsave(filename, ggm, width = 5, height = 5))
   })
 }
 

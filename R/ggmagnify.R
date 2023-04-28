@@ -223,15 +223,15 @@ ggmagnify <- function (
 
   # == Create the inset border =================================================
 
-  border <- if (! border) {
-    NULL
-  } else {
-      ggplot2::annotate("rect", xmin = inset_xmin, xmax = inset_xmax,
-                        ymin = inset_ymin, ymax = inset_ymax,
-                        linetype = inset_linetype, linewidth = inset_linewidth,
-                        colour = ggplot2::alpha(inset_colour, inset_alpha),
-                        fill = NA)
-  }
+  # not printing a border at all does weird things, so as a hack
+  # we just print an invisible one
+  border_colour <- if (! border) NA else ggplot2::alpha(inset_colour,
+                                                        inset_alpha)
+  border <- ggplot2::annotate("rect", xmin = inset_xmin, xmax = inset_xmax,
+                              ymin = inset_ymin, ymax = inset_ymax,
+                              linetype = inset_linetype,
+                              linewidth = inset_linewidth,
+                              colour = border_colour, fill = NA)
 
   # == Create projection lines =================================================
   if (proj == "none") {
