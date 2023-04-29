@@ -12,7 +12,8 @@ Roxygen: list(markdown = TRUE, roclets = c("collate", "rd", "namespace",
               "doctest::dt_roclet")) 
 RoxygenNote: 7.2.3
 Imports: 
-    ggplot2 (>= 3.4.0)
+    ggplot2 (>= 3.4.0),
+    grid
 Suggests: 
     doctest (>= 0.2.0.9000),
     ggfx,
