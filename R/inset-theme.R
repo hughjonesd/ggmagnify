@@ -8,7 +8,12 @@
 #' @export
 inset_blanks <- function (..., axes) {
   res <- c("plot.title", "plot.subtitle", "plot.caption", "plot.tag",
-              "axis.title", "axis.title.x", "axis.title.y", ...)
+              "axis.title", "axis.title.x", "axis.title.y",
+              "strip.background", "strip.background.x", "strip.background.y",
+              "strip.text", "strip.text.x", "strip.text.y",
+              "strip.text.x.bottom", "strip.text.x.top",
+              "strip.text.y.left", "strip.text.y.right",
+           ...)
   blank_axes <- ! axes
   if (blank_axes) {
     axis_bits <- c(outer(c("axis.text", "axis.ticks", "axis.line"),
