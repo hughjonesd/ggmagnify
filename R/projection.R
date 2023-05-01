@@ -4,24 +4,13 @@
 calculate_proj_segments <- function(proj, shape,
                                     xmin, xmax, ymin, ymax,
                                     to_xmin, to_xmax, to_ymin, to_ymax) {
+  shape <- structure(list(), class = shape)
+  UseMethod("calculate_proj_segments", shape)
 
-  if (shape == "rect") {
-    calculate_proj_segments_rect(proj,
-                                 xmin, xmax, ymin, ymax,
-                                 to_xmin, to_xmax, to_ymin, to_ymax)
-  } else {
-    x <- (xmin + xmax)/2
-    y <- (ymin + ymax)/2
-    to_x <- (to_xmin + to_xmax)/2
-    to_y <- (to_ymin + to_ymax)/2
-    r <- min(xmax - xmin, ymax - ymin)
-    to_r <- min(to_xmax - to_xmin, to_ymax - to_ymin)
-    calculate_proj_segments_circle(proj, x, y, r, to_x, to_y, to_r)
-  }
 }
 
 
-calculate_proj_segments_rect <- function(proj,
+calculate_proj_segments.rect <- function(proj, shape,
                                     xmin, xmax, ymin, ymax,
                                     to_xmin, to_xmax, to_ymin, to_ymax) {
   x <- (xmin + xmax)/2
@@ -101,38 +90,57 @@ calculate_proj_segments_rect <- function(proj,
 }
 
 
-calculate_proj_segments_circle <- function (proj, x, y, r, to_x, to_y, to_r) {
-  dx <- to_x - x
-  dy <- to_y - y
 
-  # if proj not "single", take 90deg to this angle. shift out by +-r from
-  # (x,y) and +- to_r from (to_x, to_y)
-  # if proj "single" shift forward by r from (x,y) and backward by to_r from (to_x, to_y)
+calculate_proj_segments.ellipse <- function(proj, shape,
+                                 xmin, xmax, ymin, ymax,
+                                 to_xmin, to_xmax, to_ymin, to_ymax) {
+  e1 <- ellipse_points(data.frame(xmin, xmax, ymin, ymax))
+  e2 <- ellipse_points(data.frame(xmin = to_xmin, xmax = to_xmax,
+                                  ymin = to_ymin, ymax = to_ymax))
 
-   # go up by r at angle of angle. What is r_x and r_y?
-    # r_x^2 + r_y^2 = r^2
-    # r_y/r_x = dy/dx
-    # r_y = dy/dx * r_x
-    # r_x^2 + r_x^2 * (dy/dx)^2 = r^2
-    # r_x^2 * (1 + (dy/dx)^2) = r^2
-    # r_x^2 = r^2/((1 + (dy/dx)^2)
-    # r_x = r/sqrt(1+(dy/dx)^2)
-  r_x <- r/sqrt(1 + (dy/dx)^2)
-  r_y <- dy/dx * r_x
-  to_r_x <- to_r/sqrt(1 + (dy/dx)^2)
-  to_r_y <- dy/dx * to_r_x
-  if (proj == "single") {
-    x <- x + r_x
-    y <- y + r_y
-    xend <- to_x - to_r_x
-    yend <- to_y - to_r_y
-  } else {
-    # x<- x + r_y, y <- y - r_x
-    x <- x + c(-1,1) * r_y
-    y <- y + c(1, -1) * r_x
-    xend <- to_x + c(-1, 1) * to_r_y
-    yend <- to_y + c(1, -1) * to_r_x
+  dydx <- function (ell) {
+    dy <- c(NA, diff(ell$y))
+    dy[1] <- ell$y[1] - ell$y[length(ell$y)]
+    dx <- c(NA, diff(ell$x))
+    dx[1] <- ell$x[1] - ell$x[length(ell$x)]
+    atan(dy/dx)
   }
 
-  data.frame(x = x, y = y, xend = xend, yend = yend)
+  e1$dydx <- dydx(e1)
+  e2$dydx <- dydx(e2)
+
+  # we look for a "top point" and a "bottom point" on either side of the line
+  # between the two points
+  midpoint1 <- c((xmin + xmax)/2, (ymin + ymax)/2)
+  midpoint2 <- c((to_xmin + to_xmax)/2, (to_ymin + to_ymax)/2)
+  midpoint_vec <- midpoint2 - midpoint1
+
+  # avoid division by 0 in the below
+  j <- 1
+  if (midpoint_vec[1] == 0) j <- 2
+  k <- 3 - j
+  above_midpoint_vec <- function(pt) {
+    scaled_vec <- midpoint1 + midpoint_vec * (pt[j] - midpoint1[j])/midpoint_vec[j]
+    pt[k] > scaled_vec[k]
+  }
+
+  e1$above <- apply(e1[c("x", "y")], 1, above_midpoint_vec)
+  e2$above <- apply(e2[c("x", "y")], 1, above_midpoint_vec)
+
+  find_tangent <- function (e1, e2) {
+    e2 <- e2[c("x", "y", "dydx")]
+    closest <- sapply(e1$dydx, function (x) which.min(abs(x - e2$dydx)))
+
+    names(e2) <- c("xend", "yend", "dydx2")
+    res <- cbind(e1[c("x", "y", "dydx")], e2[closest, ])
+
+    res$dydx_slope <- with(res, atan((yend - y)/(xend - x)))
+    slope_diffs <- with(res, abs(dydx_slope - dydx) + abs(dydx_slope - dydx2))
+    res[which.min(slope_diffs), ]
+  }
+
+  tangent_above <- find_tangent(e1[e1$above,], e2[e2$above,])
+  tangent_below <- find_tangent(e1[!e1$above,], e2[!e2$above,])
+
+  rbind(tangent_above, tangent_below)
 }

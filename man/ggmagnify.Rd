@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggmagnify.R
 \name{ggmagnify}
 \alias{ggmagnify}
-\title{Add a magnified inset plot to a ggplot object}
+\title{Deprecated}
 \usage{
 ggmagnify(
   plot,
@@ -47,28 +47,19 @@ ggmagnify(
 \item{inset_xlim, inset_ylim}{Position of the inset in the main graph.
 Length 2 numeric.}
 
-\item{zoom}{How much to magnify the inset by. Numeric. Specify two numbers
-for separate horizontal and vertical zoom. Optional: overrides \code{inset_xlim[2]}
-and \code{inset_ylim[2]}.}
+\item{zoom}{How much to magnify the inset by.}
 
 \item{border}{Logical. Draw a border around the inset?}
 
 \item{target}{Logical. Draw a border around the target area?}
 
-\item{proj}{String. What style of projection lines to draw? \code{"facing"} (the
-default), \code{"corresponding"}, \code{"single"} or \code{"none"}. Can be abbreviated.
-See below.}
+\item{proj}{String. What style of projection lines to draw?}
 
-\item{shadow}{Logical. Draw a shadow behind the inset? Requires
-the \code{ggfx} package.
-If \code{FALSE}, they are returned in a \code{GgMagnify} object, see below.}
+\item{shadow}{Logical. Draw a shadow behind the inset?}
 
 \item{axes}{Logical. Draw axes in the inset?}
 
-\item{margin}{Plot margin of inset. Can be a single number in "pt"
-units, a length 4 numeric (top, right, bottom, left), or a
-\code{\link[ggplot2:element]{ggplot2::margin()}} object. Note that this is on the scale of the
-inset plot, not the outer plot.}
+\item{margin}{Plot margin of inset.}
 
 \item{linewidth, linetype, colour, alpha}{Parameters for inset border, target border,
 and projection lines.}
@@ -83,81 +74,20 @@ for projection lines.}
 
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 
-\item{blank}{Character vector of theme elements to blank out in the inset.
-Use \code{\link[=inset_blanks]{inset_blanks(elems, axes = axes)}} to add \code{elems}
-to the default list.}
+\item{blank}{Character vector of theme elements to blank out in the inset.}
 
-\item{inset_expand}{Logical. Expand the inset's view of the target? See
-\code{\link[ggplot2:coord_cartesian]{ggplot2::coord_cartesian()}}. Note that this does not expand the inset's
-dimensions in the main plot.}
+\item{inset_expand}{Logical. Expand the inset's view of the target?}
 
 \item{inset_coord}{Result of a call to a \code{ggplot2::coord_} function to use
-for the inset. Use this for plotting non-standard objects such as maps.
-Overrides \code{xlim} and \code{ylim}, but note you should still provide these
-separately.}
+for the inset.}
 }
 \value{
-A \code{GgMagnify} object. You can print this by evaluating it at the command line.
+A \code{GgMagnify} object.
 }
 \description{
-\code{ggmagnify()} magnifies a target area of your plot and adds it as an inset on
-top of the original plot. Optional projection lines and borders around the
-target are drawn. If the \code{ggfx} package is installed, a drop shadow can be
-added.
+\code{ggmagnify()} is deprecated. Use \code{\link[=geom_magnify]{geom_magnify()}} instead.
 }
-\details{
-\subsection{Projection lines}{
-
-\code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
-corners of the target to the corners of the inset. \code{"corresponding"} always
-projects each corner of the target to the same corner of the inset.
-\code{"facing"} sometimes draws lines between facing corners, when this looks
-cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
-\code{"none"} draws no lines.
-}
-
-\subsection{\code{GgMagnify} objects}{
-
-The returned \code{GgMagnify} object includes the
-following list components:
-\itemize{
-\item \code{plot}, the original ggplot object.
-\item \code{inset}, a ggplot object representing the inset.
-\item \code{border}, a layer representing the inset border.
-\item \code{target}, a layer representing the target border.
-\item \code{proj}, a layer representing the projection lines.
-}
-
-You can modify the inset by adding layers to
-\code{x$inset},  the original plot by adding to \code{x$plot},
-or both together by adding to the returned object directly.
-See \code{\link[=+.GgMagnify]{+.GgMagnify()}}.
-}
-
-\subsection{Tips}{
-
-To save to a file, use \code{\link[=compose]{compose()}} to recreate the ggplot object including
-the new inset:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{ggm <- ggmagnify(ggp, ...)
-ggsave("filename.png", compose(ggm))
-}\if{html}{\out{</div>}}
-
-To create an inset outside the plot area, set \code{coord_cartesian(clip = "off")}
-in the main plot.
-}
-
-\subsection{Limitations}{
-
-It won't work with facets. It may work with non-standard coordinates,
-so long as they understand \code{x} and \code{y} aesthetics -
-you'll need to use \code{inset_coord}. If it doesn't, file an issue.
-
-Plots with a transparent background will give surprising shadows. Try
-adding \code{theme(plot.background = element_rect(fill = "white"))} to the
-original or the inset.
-}
-}
+\keyword{internal}
 \examples{
 library(ggplot2)
 
@@ -176,66 +106,5 @@ ggmagnify(ggp,
           xlim = c(0, 5), ylim = c(30, 80),
           inset_xlim = c(0, 15), inset_ylim = c(200, 350),
           shadow = TRUE)
-}
-
-# Advanced usage
-
-library(ggplot2)
-
-booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
-         geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B")
-
-shadow_args <- list(
-  colour = alpha("grey80", 0.8),
-  x_offset = 0,
-  y_offset = 0,
-  sigma = 10
-)
-
-ggm <- ggmagnify(booms,
-                 xlim = c(80, 92), ylim = c(4, 4.8),
-                 inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
-                 shadow = TRUE, shadow_args = shadow_args,
-                 colour = "white")
-
-# modify the inset only:
-ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "red", fill = "white",
-                        alpha = 0.7, size = 2, shape = "circle filled")
-
-ggm
-
-# modify the original plot only:
-
-ggm$plot <- ggm$plot + scale_fill_grey()
-
-ggm
-
-# modify both. NB: this only works with the latest R:
-
-if (getRversion() >= "4.3.0") {
-  ggm + scale_fill_viridis_d(option = "C")
-}
-
-# Using maps
-#
-if (requireNamespace("sf", quietly = TRUE)) {
-  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
-
-  ggp <- ggplot(nc) +
-    geom_sf(aes(fill = AREA)) +
-    coord_sf(default_crs = sf::st_crs(4326))
-
-  xlim <- c(-79, -77)
-  ylim <- c(34.5, 35)
-
-  # Specify xlim and ylim, but also manually specify the coordinate
-  # system for the inset:
-  ggmagnify(ggp, xlim = xlim, ylim = ylim,
-            inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
-            inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                    xlim = xlim, ylim = ylim))
-
 }
 }

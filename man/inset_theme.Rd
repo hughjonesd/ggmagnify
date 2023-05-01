@@ -16,10 +16,7 @@ See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
 
 \item{axes}{Logical: will the inset have axes?}
 
-\item{margin}{Plot margin of inset. Can be a single number in "pt"
-units, a length 4 numeric (top, right, bottom, left), or a
-\code{\link[ggplot2:element]{ggplot2::margin()}} object. Note that this is on the scale of the
-inset plot, not the outer plot.}
+\item{margin}{Plot margin of inset.}
 }
 \value{
 A ggplot theme object

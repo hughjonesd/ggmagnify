@@ -13,8 +13,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 ggmagnify creates a magnified inset of part of a
 [ggplot](https://ggplot2.tidyverse.org/) object. Borders can be drawn
 around the target area and the inset, along with projection lines from
-one to the other. If the `ggfx` package is installed, the inset can have
-a drop shadow.
+one to the other. The inset can have a drop shadow. The magnified area
+can be a rectangle or an ellipse.
 
 You can install the development version of ggmagnify from
 [GitHub](https://github.com/) with:
@@ -30,35 +30,35 @@ remotes::install_github("hughjonesd/ggmagnify")
 library(ggplot2)
 library(ggmagnify)
 
-ggp <- ggplot(diamonds, aes(carat, depth, color = cut)) + geom_point()
+ggp <- ggplot(dv, aes(Position, NegLogP, color = cut)) + 
+  geom_point(color = "darkblue", alpha = 0.8, size = 0.8) +
+  labs(title = "GWAS p-values for cognitive function",
+       subtitle = "Davies et al. (2018).")
 
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55))
+
+ggp + 
+  geom_magnify(x = 98500000, width = 2e6, y = 22, height = 12,
+               to_x = 2e08, to_y = 18, magnify = c(20, 1.5))
 ```
 
 <img src="man/figures/README-example-basic-1.png" width="100%" />
-
-## Positioning
-
-``` r
-
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(3.5, 5), inset_ylim = c(45, 70))
-```
-
-<img src="man/figures/README-example-position-1.png" width="100%" />
 
 ## Colours and lines
 
 ``` r
 
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
-          proj = "single",
-          colour = "red", proj_linetype = 1, linewidth = 0.8)
+x <- 98500000
+width <- 2e6
+y <- 22
+height <- 12
+to_x <- 2.2e08
+to_y <- 18
+magnify <- c(20, 1.5)
+
+ggp + 
+  geom_magnify(x = x, width = width, y = y, height = height,
+               to_x = to_x, to_y = to_y, magnify = magnify,
+               colour = "red", linewidth = 0.5, proj.linetype = 3)
 ```
 
 <img src="man/figures/README-example-colours-1.png" width="100%" />
@@ -67,10 +67,11 @@ ggmagnify(ggp,
 
 ``` r
 
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), 
-          axes = TRUE, border = FALSE)
+ggp + 
+  scale_x_continuous(labels = NULL) + 
+  geom_magnify(x = x, width = width, y = y, height = height,
+               to_x = to_x, to_y = to_y, magnify = c(20, 1.5),
+               axes = TRUE)
 ```
 
 <img src="man/figures/README-example-axes-1.png" width="100%" />
@@ -79,178 +80,152 @@ ggmagnify(ggp,
 
 ``` r
 
-library(ggfx)
+loadNamespace("ggfx")
+#> <environment: namespace:ggfx>
 
-ggmagnify(ggp,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2, 5), inset_ylim = c(40, 55), shadow = TRUE)
+ggp + 
+  geom_magnify(x = x, width = width, y = y, height = height,
+               to_x = to_x, to_y = to_y, magnify = magnify,
+               shadow = TRUE)
 ```
 
 <img src="man/figures/README-example-shadow-1.png" width="100%" />
 
-## Saving your plot
+## Ellipse
 
-Use `compose()` to turn your GgMagnify object into a ggplot:
+This requires R \>= 4.2.0 and an appropriate graphics device.
 
 ``` r
-ggm <- ggmagnify(ggp,
-                 xlim = c(1.5, 2.5), ylim = c(60, 65),
-                 inset_xlim = c(2, 5), inset_ylim = c(40, 55))
 
-# This is a hack, which may work if you're lucky:
-ggsave("filename.png", ggm) 
+loadNamespace("ggforce")
+#> <environment: namespace:ggforce>
 
-# This will correctly respect theme settings:
-ggsave("filename.png", compose(ggm)) 
+ggp + 
+  geom_magnify(x = x, width = width, y = y, height = height,
+               to_x = to_x, to_y = to_y, magnify = magnify,
+               shape = "ellipse", shadow = TRUE)
 ```
+
+<img src="man/figures/README-example-ellipse-1.png" width="100%" />
 
 ## Inset outside the plot region
 
 ``` r
 
-ggp_noclip <- ggp + 
-              coord_cartesian(xlim = c(0, 5), ylim = c(40, 80), clip = "off") +
-              theme(legend.justification = c(0, 1))
-
-ggmagnify(ggp_noclip,
-          xlim = c(1.5, 2.5), ylim = c(60, 65),
-          inset_xlim = c(2.6, 6), inset_ylim = c(40, 55),
-          shadow = TRUE)
+ggp + 
+  coord_cartesian(clip = "off") + 
+  theme(plot.margin = ggplot2::margin(10, 60, 10, 10)) +
+  geom_magnify(x = x, width = width, y = y, height = height,
+               to_x = 2.5e08, to_y = to_y, magnify = c(20, 1.5),
+               shadow = TRUE)
 ```
 
 <img src="man/figures/README-example-noclip-1.png" width="100%" />
 
-## Maps (experimental)
+## Faceting (experimental)
 
-I mean, it’s all experimental, but maps are *really* experimental.
+Faceting involves dark magic with ggplot2 internals. Use at your own
+risk!
 
 ``` r
-# Using maps
-#
-if (requireNamespace("sf", quietly = TRUE)) {
-  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+iris$median_sw <- ave(iris$Sepal.Width, iris$Species, FUN = median)
+iris$median_sl <- ave(iris$Sepal.Length, iris$Species, FUN = median)
 
-  ggp <- ggplot(nc) +
-    geom_sf(aes(fill = AREA)) +
-    coord_sf(default_crs = sf::st_crs(4326))
+ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+              geom_point() + xlim(c(2, 6))
 
-  xlim <- c(-79, -77)
-  ylim <- c(34.5, 35)
 
-  # Specify xlim and ylim, but also manually specify the coordinate
-  # system for the inset:
-  ggmagnify(ggp, xlim = xlim, ylim = ylim,
-            inset_xlim = c(-84, -80), inset_ylim = c(34, 35),
-            inset_coord = coord_sf(default_crs = sf::st_crs(4326),
-                                    xlim = xlim, ylim = ylim))
-
-}
+ggpi +
+  facet_wrap(vars(Species)) +
+  geom_magnify(aes(x = median_sw, y = median_sl), 
+               width = 1, height = 1,
+               to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
 ```
 
-<img src="man/figures/README-example-map-1.png" width="100%" />
+<img src="man/figures/README-example-faceting-1.png" width="100%" />
 
-## Advanced usage: adding layers to the inset, original plot, or both
+## Maps (experimental)
+
+Not yet.
+
+## Tips: adding layers to the inset
+
+`geom_magnify()` stores the plot when it is added to it. So, order
+matters:
 
 ``` r
-# Advanced usage
 
-library(ggplot2)
+ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+              geom_point() + xlim(2, 6)
+ggpi + 
+  geom_smooth() + 
+  geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+                  to_x = 5.4, to_y = 5, magnify = 1.4)
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+```
+
+<img src="man/figures/README-example-order-1.png" width="100%" />
+
+``` r
+
+# Print the inset without the smooth:
+ggpi +
+  geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+               to_x = 5.4, to_y = 5, magnify = 1.4) + 
+  geom_smooth()
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+```
+
+<img src="man/figures/README-example-order-2.png" width="100%" />
+
+For complex modifications to the inset, set `plot` explicitly:
+
+``` r
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
          geom_contour_filled(aes(z = density)) +
          scale_fill_viridis_d(option = "B")
 
-shadow_args <- list(
+booms_inset <- booms + 
+  geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7, 
+             size = 2, shape = "circle filled") + 
+  coord_cartesian(expand = FALSE)
+
+shadow.args <- list(
   colour = alpha("grey80", 0.8),
   x_offset = 0,
   y_offset = 0,
   sigma = 10
 )
 
-ggm <- ggmagnify(booms,
-                 xlim = c(80, 92), ylim = c(4, 4.8),
-                 inset_xlim = c(70, 94), inset_ylim = c(1.7, 3.3),
-                 shadow = TRUE, shadow_args = shadow_args,
-                 colour = "white")
-
-# modify the inset only:
-ggm$inset <- ggm$inset +
-             geom_point(data = faithful, color = "red", fill = "white",
-                        alpha = 0.7, size = 2, shape = "circle filled")
-
-ggm
+booms + geom_magnify(x = 84, width = 10, y = 4.4, height = .8,
+                     to_x = 80, to_y = 2.5, magnify = 2,
+                     colour = "white", shape = "ellipse",
+                     shadow = TRUE, shadow.args = shadow.args,
+                     plot = booms_inset)
 ```
 
-<img src="man/figures/README-example-advanced-1.png" width="100%" />
+<img src="man/figures/README-example-advanced-2-1.png" width="100%" />
 
-``` r
-
-# modify the original plot only:
-
-ggm$plot <- ggm$plot + scale_fill_grey()
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
-
-ggm
-```
-
-<img src="man/figures/README-example-advanced-2.png" width="100%" />
-
-``` r
-
-# modify both. NB: this only works with the latest R:
-
-if (getRversion() >= "4.3.0") {
-  ggm + scale_fill_viridis_d(option = "C")
-}
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
-```
-
-<img src="man/figures/README-example-advanced-3.png" width="100%" />
-
-## Advanced usage: multiple insets
-
-Use compose to add multiple GgMagnify objects to the original plot in
-turn:
-
-``` r
-ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + 
-       geom_point()
-
-ggm1 <- ggmagnify(ggp, 
-                  xlim = c(3.5, 4), ylim = c(5, 5.5),
-                  inset_xlim = c(4, 5), inset_ylim = c(7, 8),
-                  shadow = TRUE) 
-
-ggm2 <- ggmagnify(ggp, 
-                  xlim = c(3, 3.5), ylim = c(6.5, 7.5),
-                  inset_xlim = c(2.2, 3.2), inset_ylim = c(4.2, 6.2),
-                  shadow = TRUE)
-
-ggp <- compose( ggm1, ggp)
-ggp <- compose( ggm2, ggp)
-ggp
-```
-
-<img src="man/figures/README-example-multiple-1.png" width="100%" />
-
-## Advanced usage: keeping grid lines the same
+## Tips: keeping grid lines the same
 
 To make sure the inset uses the same grid lines as the main graph, set
 `breaks` in `scale_x` and `scale_y`:
 
 ``` r
-ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + 
-       geom_point() +
-       theme(panel.grid = element_line("grey70"))
+
+ggp2 <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + 
+        geom_point() +
+        theme_classic() + 
+        theme(panel.grid.major = element_line("grey80"),
+              panel.grid.minor = element_line("grey90"))
 
 # different grid lines:
-ggmagnify(ggp, 
-          xlim = c(3.5, 4), ylim = c(5, 5.5),
-          inset_xlim = c(4, 5) - 0.1, inset_ylim = c(6, 7) - 0.1) 
+ggp2 + 
+  geom_magnify(x = 2.75, width = 0.6, y = 6.25, height = 0.6,
+               to_x = 3.8, to_y = 5.5, magnify = 1.8, shadow = TRUE) 
 ```
 
 <img src="man/figures/README-example-gridlines-1.png" width="100%" />
@@ -258,13 +233,52 @@ ggmagnify(ggp,
 ``` r
 
 # fix the grid lines:
-ggp <- ggp +
-       scale_x_continuous(breaks = seq(2, 5, .5)) + 
-       scale_y_continuous(breaks = seq(5, 8))
-
-ggmagnify(ggp, 
-          xlim = c(3.5, 4), ylim = c(5, 5.5),
-          inset_xlim = c(4, 5) - 0.1, inset_ylim = c(6, 7) - 0.1) 
+ggp2 +
+  scale_x_continuous(breaks = seq(2, 5, 0.5)) + 
+  scale_y_continuous(breaks = seq(5, 8)) + 
+  geom_magnify(x = 2.75, width = 0.6, y = 6.25, height = 0.6,
+               to_x = 3.8, to_y = 5.5, magnify = 1.8, shadow = TRUE) 
 ```
 
 <img src="man/figures/README-example-gridlines-2.png" width="100%" />
+
+## Tips: recomputing data
+
+``` r
+ # Recomputing
+df <- data.frame(x = seq(-5, 5, length = 500), y = 0)
+df$y[abs(df$x) < 1] <- sin(df$x[abs(df$x) < 1])
+df$y <- df$y + rnorm(500, mean = 0, sd = 0.25)
+ggp2 <- ggplot(df, aes(x, y)) + geom_point() + geom_smooth() + ylim(-5, 5)
+
+# The default:
+ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
+                    to_x = 3, to_y = 3, magnify = 1.8)
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+```
+
+<img src="man/figures/README-example-recompute-1.png" width="100%" />
+
+``` r
+
+# Recomputing recalculates the smooth for the inset
+ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
+                    to_x = 3, to_y = 3, magnify = 1.8, recompute = TRUE)
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+#> Warning: Removed 386 rows containing non-finite values (`stat_smooth()`).
+#> Warning: Removed 386 rows containing missing values (`geom_point()`).
+```
+
+<img src="man/figures/README-example-recompute-2.png" width="100%" />
+
+## Source
+
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+independent genetic loci influencing general cognitive function.’ Nature
+Communications
+
+Data was trimmed to remove overlapping points.

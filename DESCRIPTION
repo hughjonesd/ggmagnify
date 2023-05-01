@@ -1,6 +1,7 @@
 Package: ggmagnify
 Title: Create a Magnified Inset of Part of a "ggplot" Object
 Version: 0.0.0.9000
+Author: David Hugh-Jones, ggplot2 team
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", role = c("aut", "cre"))
 Description: Creates a magnified inset of a ggplot, with projection lines and
@@ -11,11 +12,16 @@ Language: en
 Roxygen: list(markdown = TRUE, roclets = c("collate", "rd", "namespace", 
               "doctest::dt_roclet")) 
 RoxygenNote: 7.2.3
-Imports: 
+Depends:
+    R (>= 4.2.0)
+Imports:
+    cli,
     ggplot2 (>= 3.4.0),
-    grid
+    grid,
+    rlang
 Suggests: 
     doctest (>= 0.2.0.9000),
+    ggforce,
     ggfx,
     hexbin,
     sf,

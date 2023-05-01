@@ -12,16 +12,19 @@ geom_magnify(
   ...,
   magnify,
   expand = TRUE,
+  axes = FALSE,
   proj = c("facing", "corresponding", "single"),
-  recalculate = FALSE,
+  shadow = FALSE,
   linetype = 1,
   target.linetype = linetype,
-  proj.linetype = 2,
   inset.linetype = linetype,
+  proj.linetype = 2,
   alpha = 1,
-  linewidth = 0.5,
-  shape = "rect",
+  linewidth = 0.4,
+  shape = c("rect", "ellipse"),
   plot = NULL,
+  shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
+  recompute = FALSE,
   na.rm = FALSE,
   inherit.aes = FALSE
 )
@@ -62,33 +65,67 @@ often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
 
-\item{magnify}{Numeric. How much to magnify the target area? Give a length-2
+\item{magnify}{Numeric. How much to magnify the target area? Give a length 2
 vector for separate x- and y-magnification.}
 
-\item{expand}{Logical. Expand the limits of the target area within the inset
-plot?}
+\item{expand}{Logical. Expand the limits of the target area by a small factor
+in the inset plot. See \link[ggplot2:coord_cartesian]{coord_cartesian()}.}
+
+\item{axes}{Logical. Draw axes in the inset?}
 
 \item{proj}{String. What style of projection lines to draw? \code{"facing"} (the
 default), \code{"corresponding"} or \code{"single"}. Can be abbreviated. See below.}
 
-\item{recalculate}{Logical. If \code{TRUE}, use \code{\link[ggplot2:lims]{ggplot2::lims()}} to replot the
-target area. Statistics, e.g. smoothing lines, will be recalculated using
-only that subset of the data. If \code{FALSE}, use \code{\link[ggplot2:coord_cartesian]{ggplot2::coord_cartesian()}}
-to replot the target area, keeping all the data.}
+\item{shadow}{Logical. Draw a shadow behind the inset plot? Requires the
+"ggfx" package.}
 
 \item{linetype, alpha, linewidth}{Linetype, alpha and linewidth for borders
 and projection lines. Set \code{linetype = 0} for no lines.}
 
-\item{target.linetype}{Linetype for border round the target area.}
+\item{target.linetype, inset.linetype, proj.linetype}{Linetypes
+for specific components.}
 
-\item{proj.linetype}{Linetype for projection lines.}
-
-\item{inset.linetype}{Linetype for border round the inset.}
-
-\item{shape}{Not yet implemented.}
+\item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.
+\verb{"ellipse} requires the "ggforce" package.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
+
+\item{shadow.args}{List. Arguments to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
+
+\item{recompute}{Logical. If \code{TRUE}, use \link[ggplot2:lims]{lims()} to
+replot the inset. Statistics, e.g. smoothing lines, will be
+recomputed using only the data in the target area. If \code{FALSE}, use
+\link[ggplot2:coord_cartesian]{coord_cartesian()} to replot the inset,
+keeping all the data.
+\subsection{Aesthetics}{
+
+geom_magnify understand the following aesthetics (required aesthetics are in
+bold):
+\itemize{
+\item \strong{x}
+\item \strong{y}
+\item \strong{width}
+\item \strong{height}
+\item \strong{to_x}
+\item \strong{to_y}
+\item colour
+}
+
+Normally you'll set these directly in the call to \code{geom_magnify()}, but
+you can use them to change the magnification area, e.g. by facet. \emph{Note:}
+as of today, the code only allows one magnification per panel.
+}
+
+\subsection{Projection lines}{
+
+\code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
+corners of the target to the corners of the inset. \code{"corresponding"} always
+projects each corner of the target to the same corner of the inset.
+\code{"facing"} sometimes draws lines between facing corners, when this looks
+cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
+\code{"none"} draws no lines.
+}}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
@@ -105,30 +142,38 @@ at \verb{(to_x,to_y)}, with \code{width} and \code{height} multiplied by \code{m
 borders are drawn around the target and inset, along with projection lines
 from one to the other.
 }
-\section{Aesthetics}{
-
-geom_magnify understand the following aesthetics (required aesthetics are in
-bold):
-\itemize{
-\item \strong{x}
-\item \strong{y}
-\item \strong{width}
-\item \strong{height}
-\item \strong{to_x}
-\item \strong{to_y}
-\item colour
-}
-}
-
 \examples{
 library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
          geom_point() + xlim(c(2, 6))
-ggp
+
+# Basic magnification
 ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
                    to_x = 5, to_y = 5, magnify = 1.5)
-ggp +
-      facet_wrap(vars(Species)) +
-      geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+
+# Inset axes
+ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+                   to_x = 4, to_y = 5, magnify = c(3, 1.5), axes = TRUE)
+
+# Ellipse magnification
+if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >= 4.2) {
+  ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+                     to_x = 5, to_y = 5, magnify = 1.5, shape = "ellipse")
+}
+
+# Shadow
+if (requireNamespace("ggfx", quietly = TRUE)) {
+  ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+                     to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
+}
+
+# Order matters
+
+# `geom_magnify()` stores the plot when it is added to it:
+ggp + geom_smooth() + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
                    to_x = 5, to_y = 5, magnify = 1.5)
+
+# This will print the inset without the smooth:
+ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
+                   to_x = 5, to_y = 5, magnify = 1.5) + geom_smooth()
 }
