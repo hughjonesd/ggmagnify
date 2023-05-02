@@ -24,6 +24,7 @@ Suggests:
     ggforce,
     ggfx,
     hexbin,
+    rmarkdown,
     sf,
     testthat (>= 3.0.0)
 URL: https://github.com/hughjonesd/ggmagnify
