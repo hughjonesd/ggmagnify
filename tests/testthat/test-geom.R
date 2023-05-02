@@ -30,6 +30,18 @@ test_that("reversed", {
   )
 })
 
+
+test_that("geom_magnify2", {
+  expect_no_error(
+    ggp2 + geom_magnify2(xmin = 2.5, xmax = 3.0, ymin = 5.5, ymax = 6.0,
+                        to_xmin = 3.5, to_xmax = 4.5, to_ymin = 4.5, to_ymax = 5.5)
+  )
+
+  expect_snapshot_file(
+    ggsave("test-geom-magnify2.png", width = 5, height = 5)
+  )
+})
+
 test_that("clipping", {
   ggp2 +
     geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,

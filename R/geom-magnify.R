@@ -5,7 +5,7 @@ NULL
 
 
 # TODO:
-# - add many doctests
+# - make binned & discrete scales work
 # - bugs when you save a geom_magnify() plot to a variable, then add stuff?
 # - magnify should be an aes() if anything should
 #   - but more generally, are there simpler ways to specify stuff?
@@ -132,7 +132,7 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                           magnify,
                           expand = TRUE,
                           axes = FALSE,
-                          proj = c("facing", "corresponding", "single"),
+                          proj = "facing",
                           shadow = FALSE,
                           linetype = 1,
                           target.linetype = linetype,
@@ -140,29 +140,13 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                           proj.linetype = 2,
                           alpha = 1,
                           linewidth = 0.4,
-                          shape = c("rect", "ellipse"),
+                          shape = "rect",
                           plot = NULL,
                           shadow.args = list(sigma = 5, colour = "grey40",
                                              x_offset = 5, y_offset = 5),
                           recompute = FALSE,
                           na.rm = FALSE,
                           inherit.aes = FALSE) {
-  if (! missing(data)) {
-    cli::cli_abort("{.fn geom_magnify} cannot use its own data")
-  }
-
-  proj <- match.arg(proj)
-
-  shape <- match.arg(shape)
-  if (shape == "ellipse") {
-    rlang::check_installed("ggforce")
-  }
-  if (axes && shape == "ellipse") {
-    cli::cli_warn(paste("Setting {.code axes} to {.code FALSE} with",
-                        "{.code shape = \"ellipse\"}"))
-    axes <- FALSE
-  }
-
   if (missing(magnify)) {
     cli::cli_abort("{.f geom_magnify} requires {.code magnify} to be set")
   }
@@ -189,36 +173,79 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
   l
 }
 
+#' @rdname geom_magnify
+#' @details
+#' `geom_magnify2()` is a version of `geom_magnify()` which uses different
+#' aesthetics. Set `xmin`, `xmax`, `ymin`, `ymax` and `to_xmin`, `to_xmax` etc.
+#' to specify the target and inset location.
+#'
+#' @export
+geom_magnify2 <- function (mapping = NULL, data = NULL,  stat = "identity",
+                           position = "identity", ...,
+                           expand = TRUE,
+                           axes = FALSE,
+                           proj = "facing",
+                           shadow = FALSE,
+                           linetype = 1,
+                           target.linetype = linetype,
+                           inset.linetype = linetype,
+                           proj.linetype = 2,
+                           alpha = 1,
+                           linewidth = 0.4,
+                           shape = "rect",
+                           plot = NULL,
+                           shadow.args = list(sigma = 5, colour = "grey40",
+                                              x_offset = 5, y_offset = 5),
+                           recompute = FALSE,
+                           na.rm = FALSE,
+                           inherit.aes = FALSE) {
 
-#' Internals.
+  l <- layer(
+         geom = ggproto(NULL, GeomMagnify2), # we clone because self$plot holds state
+         mapping = mapping, data = data, stat = stat,
+         position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
+         params = list(na.rm = na.rm, expand = expand,
+                       axes = axes,
+                       proj = proj, shadow = shadow,
+                       linewidth = linewidth, linetype = linetype,
+                       target.linetype = target.linetype,
+                       proj.linetype = proj.linetype,
+                       inset.linetype = inset.linetype,
+                       shape = shape, alpha = alpha, plot = plot,
+                       shadow.args = shadow.args, recompute = recompute, ...)
+       )
+  class(l) <- c("GeomMagnifyS3", class(l))
+
+  l
+}
+
+
+
+#' @rdname GeomMagnify
 #' @format NULL
 #' @usage NULL
 #' @export
-GeomMagnify <- ggproto("GeomMagnify", Geom,
-  required_aes = c("x", "y", "height", "width", "to_x", "to_y"),
+GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
+  required_aes = c("xmin", "xmax", "ymin", "ymax",
+                   "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
   default_aes = aes(colour = "black"),
   draw_key = draw_key_blank,
   plot = NULL,
   rename_size = FALSE,
 
-  setup_data = function (self, data, params) {
-    for (v in c("x", "y", "to_x", "to_y", "width", "height")) {
-      data[[v]] <- data[[v]] %||% params[[v]]
+  setup_params = function (data, params) {
+    params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
+    params$shape <- match.arg(params$shape, c("rect", "ellipse"))
+    if (params$shape == "ellipse") {
+      rlang::check_installed("ggforce")
+    }
+    if (params$axes && params$shape == "ellipse") {
+      cli::cli_warn(paste("Setting {.code axes} to {.code FALSE} with",
+                          "{.code shape = \"ellipse\"}"))
+      params$axes <- FALSE
     }
 
-    magnify <- params$magnify
-    magnify_x <- magnify[1]
-    magnify_y <- magnify[2]
-    transform(data,
-              xmin = x - width/2,
-              xmax = x + width/2,
-              ymin = y - height/2,
-              ymax = y + height/2,
-              to_xmin = to_x - width * magnify_x/2,
-              to_xmax = to_x + width * magnify_x/2,
-              to_ymin = to_y - height * magnify_y/2,
-              to_ymax = to_y + height * magnify_y/2
-              )
+    params
   },
 
   draw_panel = function (self, data, panel_params, coord,
@@ -350,6 +377,36 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     grid::gTree(name = paste("ggmagnify", annotation_id()),
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
   },
+)
+
+
+#' Internals
+#'
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomMagnify <- ggproto("GeomMagnify", GeomMagnify2,
+  required_aes = c("x", "y", "height", "width", "to_x", "to_y"),
+
+  setup_data = function (self, data, params) {
+    for (v in c("x", "y", "to_x", "to_y", "width", "height")) {
+      data[[v]] <- data[[v]] %||% params[[v]]
+    }
+
+    magnify <- params$magnify
+    magnify_x <- magnify[1]
+    magnify_y <- magnify[2]
+    transform(data,
+              xmin = x - width/2,
+              xmax = x + width/2,
+              ymin = y - height/2,
+              ymax = y + height/2,
+              to_xmin = to_x - width * magnify_x/2,
+              to_xmax = to_x + width * magnify_x/2,
+              to_ymin = to_y - height * magnify_y/2,
+              to_ymax = to_y + height * magnify_y/2
+              )
+  }
 )
 
 

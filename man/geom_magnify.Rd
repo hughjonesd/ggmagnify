@@ -2,6 +2,7 @@
 % Please edit documentation in R/geom-magnify.R
 \name{geom_magnify}
 \alias{geom_magnify}
+\alias{geom_magnify2}
 \title{Magnified inset of a plot}
 \usage{
 geom_magnify(
@@ -13,7 +14,7 @@ geom_magnify(
   magnify,
   expand = TRUE,
   axes = FALSE,
-  proj = c("facing", "corresponding", "single"),
+  proj = "facing",
   shadow = FALSE,
   linetype = 1,
   target.linetype = linetype,
@@ -21,7 +22,31 @@ geom_magnify(
   proj.linetype = 2,
   alpha = 1,
   linewidth = 0.4,
-  shape = c("rect", "ellipse"),
+  shape = "rect",
+  plot = NULL,
+  shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
+  recompute = FALSE,
+  na.rm = FALSE,
+  inherit.aes = FALSE
+)
+
+geom_magnify2(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
+  ...,
+  expand = TRUE,
+  axes = FALSE,
+  proj = "facing",
+  shadow = FALSE,
+  linetype = 1,
+  target.linetype = linetype,
+  inset.linetype = linetype,
+  proj.linetype = 2,
+  alpha = 1,
+  linewidth = 0.4,
+  shape = "rect",
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
@@ -141,6 +166,11 @@ area is centred at \verb{(x,y)} with \code{width} and \code{height}. The inset i
 at \verb{(to_x,to_y)}, with \code{width} and \code{height} multiplied by \code{magnify}. Optional
 borders are drawn around the target and inset, along with projection lines
 from one to the other.
+}
+\details{
+\code{geom_magnify2()} is a version of \code{geom_magnify()} which uses different
+aesthetics. Set \code{xmin}, \code{xmax}, \code{ymin}, \code{ymax} and \code{to_xmin}, \code{to_xmax} etc.
+to specify the target and inset location.
 }
 \examples{
 library(ggplot2)
