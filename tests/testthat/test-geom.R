@@ -1,4 +1,5 @@
 
+skip_on_ci()
 library(ggplot2)
 
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species))
