@@ -239,7 +239,11 @@ ggp2 +
 df <- data.frame(x = seq(-5, 5, length = 500), y = 0)
 df$y[abs(df$x) < 1] <- sin(df$x[abs(df$x) < 1])
 df$y <- df$y + rnorm(500, mean = 0, sd = 0.25)
-ggp2 <- ggplot(df, aes(x, y)) + geom_point() + geom_smooth() + ylim(-5, 5)
+
+ggp2 <- ggplot(df, aes(x, y)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", formula = y ~ x) + 
+  ylim(-5, 5)
 
 # The default:
 ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,

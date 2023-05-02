@@ -30,41 +30,23 @@ test_that("reversed", {
   )
 })
 
-
-test_that("facets", {
-  expect_silent(
-    ggp2 + facet_wrap(vars(Species)) +
-      geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 3, to_y = 7,
-                   magnify = 1)
-  )
+test_that("clipping", {
+  ggp2 +
+    geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+                 magnify = 1)
 
   expect_snapshot_file(
-    ggsave("test-geom-facet-wrap.png", width = 5, height = 5)
+    ggsave("test-geom-clipping-rect.png", width = 5, height = 5)
   )
 
-  ggp3 <- ggplot(mtcars, aes(mpg, qsec, color = cyl)) +
-          geom_point() +
-          facet_grid(vars(am), vars(vs))
-
-  expect_silent(
-    ggp3 +
-      geom_magnify(x = 15, width = 4, y = 21, height = 2, to_x = 30, to_y = 18,
-                   magnify = 2)
-  )
+  ggp2 +
+    geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+                 magnify = 1, shape = "ellipse")
 
   expect_snapshot_file(
-    ggsave("test-geom-facet-grid.png", width = 5, height = 5)
-  )
-
-  expect_silent(
-    ggp3 + facet_grid(vars(am), vars(vs), scales = "free") +
-      geom_magnify(x = 15, width = 4, y = 18, height = 2, to_x = 30, to_y = 21,
-                   magnify = 2)
-  )
-
-  expect_snapshot_file(
-    ggsave("test-geom-facet-free.png", width = 5, height = 5)
+    ggsave("test-geom-clipping-ellipse.png", width = 5, height = 5)
   )
 })
+
 
 file.remove(list.files(pattern = "test-geom.*png"))

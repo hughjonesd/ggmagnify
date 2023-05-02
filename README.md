@@ -125,7 +125,7 @@ ggp +
 ## Faceting (experimental)
 
 Faceting involves dark magic with ggplot2 internals. Use at your own
-risk!
+risk\!
 
 ``` r
 iris$median_sw <- ave(iris$Sepal.Width, iris$Species, FUN = median)
@@ -249,14 +249,15 @@ ggp2 +
 df <- data.frame(x = seq(-5, 5, length = 500), y = 0)
 df$y[abs(df$x) < 1] <- sin(df$x[abs(df$x) < 1])
 df$y <- df$y + rnorm(500, mean = 0, sd = 0.25)
-ggp2 <- ggplot(df, aes(x, y)) + geom_point() + geom_smooth() + ylim(-5, 5)
+
+ggp2 <- ggplot(df, aes(x, y)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", formula = y ~ x) + 
+  ylim(-5, 5)
 
 # The default:
 ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
                     to_x = 3, to_y = 3, magnify = 1.8)
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 ```
 
 <img src="man/figures/README-example-recompute-1.png" width="100%" />
@@ -266,18 +267,15 @@ ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
 # Recomputing recalculates the smooth for the inset
 ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
                     to_x = 3, to_y = 3, magnify = 1.8, recompute = TRUE)
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> Warning: Removed 380 rows containing non-finite values (`stat_smooth()`).
-#> Warning: Removed 380 rows containing missing values (`geom_point()`).
+#> Warning: Removed 381 rows containing non-finite values (`stat_smooth()`).
+#> Warning: Removed 381 rows containing missing values (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-recompute-2.png" width="100%" />
 
 ## Source
 
-Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
 independent genetic loci influencing general cognitive function.’ Nature
 Communications
 

@@ -325,22 +325,21 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     x_rng <- range(corners_t$x, na.rm = TRUE)
     y_rng <- range(corners_t$y, na.rm = TRUE)
-    if (shape == "ellipse") {
+    mask <- if (shape == "ellipse") {
       ellipse_df <- data.frame(xmin = 0, xmax = 1,
                                ymin = 0, ymax = 1)
       el_pts <- ellipse_points(ellipse_df)
-      vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
-                     height = diff(y_rng), default.units = "native",
-                     # here "native" means native to *this* viewport!
-                     mask = grid::polygonGrob(x = el_pts$x, y = el_pts$y,
-                                              default.units = "native",
-                                              gp = gpar(fill = rgb(0,0,0,1)))
-                     )
+      grid::polygonGrob(x = el_pts$x, y = el_pts$y,
+                        default.units = "native",
+                        gp = gpar(fill = rgb(0,0,0,1)))
     } else {
-      vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
-                     height = diff(y_rng), default.units = "native")
+      grid::rectGrob(default.units = "native",
+                     gp = gpar(fill = rgb(0,0,0,1)))
     }
 
+    vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
+                     height = diff(y_rng), default.units = "native",
+                     mask = mask)
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
 
     if (shadow) {
