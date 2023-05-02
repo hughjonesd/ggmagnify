@@ -6,13 +6,14 @@ test_that("Doctest: geom_magnify", {
   # Source file: R/geom-magnify.R
   # Source line: 90
   library(ggplot2)
-  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() +
-    xlim(c(2, 6))
-  expect_silent(ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 5, to_y = 5,
-    magnify = 1.5))
-  ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 4, to_y = 5, magnify = c(
-    3, 1.5), axes = TRUE)
-  expect_silent(if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >= 4.2) {
+  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+    geom_point() + xlim(c(2, 6))
+  expect_silent(ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 5,
+    to_y = 5, magnify = 1.5))
+  ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 4, to_y = 5,
+    magnify = c(3, 1.5), axes = TRUE)
+  expect_silent(if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >=
+    4.2) {
     ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 5, to_y = 5,
       magnify = 1.5, shape = "ellipse")
   })
@@ -20,8 +21,8 @@ test_that("Doctest: geom_magnify", {
     ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 5, to_y = 5,
       magnify = 1.5, shadow = TRUE)
   })
-  expect_no_error(ggp + geom_smooth() + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-    to_x = 5, to_y = 5, magnify = 1.5))
+  expect_no_error(ggp + geom_smooth() + geom_magnify(x = 3, width = 1, y = 6.5,
+    height = 1, to_x = 5, to_y = 5, magnify = 1.5))
   expect_no_error(ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1, to_x = 5,
     to_y = 5, magnify = 1.5) + geom_smooth())
 })

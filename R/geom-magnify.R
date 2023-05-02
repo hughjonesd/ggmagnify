@@ -258,9 +258,9 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
     # == draw borders around target and inset ==
     target_df <- data.frame(xmin = d1$xmin, xmax = d1$xmax, ymin = d1$ymin,
                             ymax = d1$ymax,
-                            colour = d1$colour, fill = NA,
-                            linewidth = linewidth,
-                            linetype = target.linetype, alpha = alpha)
+                            colour = alpha(d1$colour, alpha), fill = NA,
+                            linewidth = linewidth, alpha = NA,
+                            linetype = target.linetype)
     target_grob <- if (shape == "rect") {
                      GeomRect$draw_panel(target_df, panel_params, coord)
                    } else {
@@ -269,9 +269,9 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
 
     border_df <- data.frame(xmin = d1$to_xmin, xmax = d1$to_xmax, ymin = d1$to_ymin,
                             ymax = d1$to_ymax,
-                            colour = d1$colour, fill = NA,
-                            linewidth = linewidth,
-                            linetype = inset.linetype, alpha = alpha)
+                            colour = alpha(d1$colour, alpha), fill = NA,
+                            linewidth = linewidth, alpha = NA,
+                            linetype = inset.linetype)
     border_grob <- if (shape == "rect") {
                      GeomRect$draw_panel(border_df, panel_params, coord)
                    } else {
@@ -314,9 +314,13 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
                         expand = expand)
     }
 
-    suppressMessages({
-      plot <- plot + new_lims + inset_theme(axes = axes)
-    })
+    rlang::with_options(
+      rlib_warning_verbosity = if (recompute) "quiet" else "default",
+      suppressWarnings(suppressMessages({
+        plot <- plot + new_lims + inset_theme(axes = axes)
+      })),
+    )
+
 
     plot_built <- ggplot_build(plot)
 
