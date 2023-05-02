@@ -269,8 +269,8 @@ ggp2 + geom_magnify(x = 0, width = 2.5, y = 0, height = 2,
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-#> Warning: Removed 386 rows containing non-finite values (`stat_smooth()`).
-#> Warning: Removed 386 rows containing missing values (`geom_point()`).
+#> Warning: Removed 380 rows containing non-finite values (`stat_smooth()`).
+#> Warning: Removed 380 rows containing missing values (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-recompute-2.png" width="100%" />
