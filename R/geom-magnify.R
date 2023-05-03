@@ -5,7 +5,6 @@ NULL
 
 
 # TODO:
-# - coord_sf, coord_fixed and others ***
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
 # - make it work with log scales et al... if you can, ha ha
 # - why isn't geom_abline() working when recompute = FALSE?
@@ -245,7 +244,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                             ymax = d1$ymax,
                             colour = alpha(d1$colour, alpha), fill = NA,
                             linewidth = linewidth, alpha = NA,
-                            linetype = target.linetype)
+                            linetype = target.linetype,
+                            group = 1L) # group = 1 needed for some coord systems
     target_grob <- if (shape == "rect") {
                      GeomRect$draw_panel(target_df, panel_params, coord)
                    } else {
@@ -256,7 +256,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                             ymax = d1$to_ymax,
                             colour = alpha(d1$colour, alpha), fill = NA,
                             linewidth = linewidth, alpha = NA,
-                            linetype = inset.linetype)
+                            linetype = inset.linetype,
+                            group = 1L)
     border_grob <- if (shape == "rect") {
                      GeomRect$draw_panel(border_df, panel_params, coord)
                    } else {
@@ -283,8 +284,10 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     # == draw the magnified plot ========================================
     plot <- plot %||% self$plot
+    # or just coord, unless `plot` might have a different coord
+    plot_coord <- ggplot_build(plot)$layout$coord
+    plot_limits <- plot_coord$limits
 
-    plot_limits <- ggplot_build(plot)$layout$coord$limits
     rev_x <- ! is.null(plot_limits$x) && diff(plot_limits$x) < 0
     rev_y <- ! is.null(plot_limits$y) && diff(plot_limits$y) < 0
     xlim_vals <- c(d1$xmin, d1$xmax)
@@ -292,11 +295,14 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     if (rev_x) xlim_vals <- xlim_vals[2:1]
     if (rev_y) ylim_vals <- ylim_vals[2:1]
 
+    plot_coord <- constructor(plot_coord)
     suppressMessages(
       plot <- if (recompute) {
-        plot + coord_cartesian(expand = expand) + lims(x = xlim_vals, y = ylim_vals)
+        plot + do.call(plot_coord, list(expand = expand)) +
+          lims(x = xlim_vals, y = ylim_vals)
       } else {
-        plot + coord_cartesian(xlim = xlim_vals, ylim = ylim_vals, expand = expand)
+        plot + do.call(plot_coord,
+                       list(xlim = xlim_vals, ylim = ylim_vals, expand = expand))
       }
     )
     plot <- plot + inset_theme(axes = axes)
@@ -401,6 +407,16 @@ annotation_id <- local({
     i
   }
 })
+
+
+constructor <- function (x) {
+  # copypasted from ggplot2 snakeize()
+  x <- class(x)[1]
+  x <- gsub("([A-Za-z])([A-Z])([a-z])", "\\1_\\2\\3", x)
+  x <- gsub(".", "_", x, fixed = TRUE)
+  x <- gsub("([a-z])([A-Z])", "\\1_\\2", x)
+  x <- chartr("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz", x)
+}
 
 
 plot_clone <- function (plot) {

@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   out.width = "100%",
   dev = "ragg_png"
 )
-
+set.seed(103121)
 dv <- vroom::vroom("Davies_NC_2018/Davies2018_subset.txt")
 
 dv$NegLogP <- -log10(dv$`P-value`)
@@ -129,7 +129,20 @@ ggpi +
 
 ## Maps (experimental)
 
-Not yet.
+
+
+```{r example-map}
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+ggpm <- ggplot(nc) +
+          geom_sf(aes(fill = AREA)) +
+          coord_sf(default_crs = sf::st_crs(4326))
+
+ggpm + geom_magnify(from = c(-79, 35, -77, 35.5),
+                    to = c(-84, 34, -80, 35), 
+                    colour = "orange", linewidth = 1, shadow = TRUE, 
+                    )
+```
+
 
 ## Tips and tricks
 

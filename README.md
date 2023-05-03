@@ -121,7 +121,19 @@ ggpi +
 
 ## Maps (experimental)
 
-Not yet.
+``` r
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+ggpm <- ggplot(nc) +
+          geom_sf(aes(fill = AREA)) +
+          coord_sf(default_crs = sf::st_crs(4326))
+
+ggpm + geom_magnify(from = c(-79, 35, -77, 35.5),
+                    to = c(-84, 34, -80, 35), 
+                    colour = "orange", linewidth = 1, shadow = TRUE, 
+                    )
+```
+
+<img src="man/figures/README-example-map-1.png" width="100%" />
 
 ## Tips and tricks
 
@@ -288,7 +300,7 @@ ggp +
                expand = FALSE) +
   labs(title = "Normal data", 
        subtitle = "The distribution gets more uniform as you zoom in")
-#> Warning: Removed 532 rows containing missing values (`geom_point()`).
+#> Warning: Removed 567 rows containing missing values (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-and-so-ad-infinitum-1.png" width="100%" />
