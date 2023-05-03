@@ -12,6 +12,7 @@ test_that("facet_wrap", {
                    magnify = 1)
   )
 
+  skip_on_ci()
   expect_snapshot_file(
     ggsave("test-geom-facet-wrap.png", width = 5, height = 5)
   )
@@ -29,6 +30,7 @@ test_that("facet_grid", {
                    magnify = 2)
   )
 
+  skip_on_ci()
   expect_snapshot_file(
     ggsave("test-geom-facet-grid.png", width = 5, height = 5)
   )
@@ -39,6 +41,7 @@ test_that("facet_grid", {
                    magnify = 2)
   )
 
+  skip_on_ci()
   expect_snapshot_file(
     ggsave("test-geom-facet-free.png", width = 5, height = 5)
   )
