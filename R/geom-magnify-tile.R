@@ -1,3 +1,4 @@
+#' @include geom-magnify.R
 
 #' @rdname geom_magnify
 #' @param magnify Numeric. How much to magnify the target area? Give a length 2

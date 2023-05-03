@@ -31,3 +31,11 @@ BugReports: https://github.com/hughjonesd/ggmagnify/issues
 Config/testthat/edition: 3
 Remotes: 
     hughjonesd/doctest
+Collate: 
+    'add.R'
+    'geom-magnify.R'
+    'geom-magnify-tile.R'
+    'ggmagnify.R'
+    'inset-theme.R'
+    'print.R'
+    'projection.R'
