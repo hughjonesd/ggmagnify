@@ -118,12 +118,12 @@ iris$median_sl <- ave(iris$Sepal.Length, iris$Species, FUN = median)
 ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
               geom_point() + xlim(c(2, 6))
 
-# geom_magnify2 uses x, y, width and height
+# geom_magnify_tile uses x, y, width and height
 ggpi +
   facet_wrap(vars(Species)) +
-  geom_magnify2(aes(x = median_sw, y = median_sl), 
-               width = 1, height = 1,
-               to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
+  geom_magnify_tile(aes(x = median_sw, y = median_sl), 
+                    width = 1, height = 1,
+                    to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
 
 ```
 

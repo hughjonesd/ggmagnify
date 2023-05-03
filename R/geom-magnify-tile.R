@@ -3,31 +3,31 @@
 #' @param magnify Numeric. How much to magnify the target area? Give a length 2
 #'   vector for separate x- and y-magnification.
 #' @details
-#' `geom_magnify2()` is a version of `geom_magnify()` which uses different
+#' `geom_magnify_tile()` is a version of `geom_magnify()` which uses different
 #' aesthetics. Set `x`, `width`, `y`, `height` and `magnify`
 #' to specify the target and inset location.
 #'
 #' @export
-geom_magnify2 <- function (mapping = NULL, data = NULL,  stat = "identity",
-                          position = "identity", ...,
-                          magnify,
-                          expand = TRUE,
-                          axes = "",
-                          proj = "facing",
-                          shadow = FALSE,
-                          linetype = 1,
-                          target.linetype = linetype,
-                          inset.linetype = linetype,
-                          proj.linetype = 2,
-                          alpha = 1,
-                          linewidth = 0.4,
-                          shape = "rect",
-                          plot = NULL,
-                          shadow.args = list(sigma = 5, colour = "grey40",
-                                             x_offset = 5, y_offset = 5),
-                          recompute = FALSE,
-                          na.rm = FALSE,
-                          inherit.aes = FALSE) {
+geom_magnify_tile <- function (mapping = NULL, data = NULL,  stat = "identity",
+                              position = "identity", ...,
+                              magnify,
+                              expand = TRUE,
+                              axes = "",
+                              proj = "facing",
+                              shadow = FALSE,
+                              linetype = 1,
+                              target.linetype = linetype,
+                              inset.linetype = linetype,
+                              proj.linetype = 2,
+                              alpha = 1,
+                              linewidth = 0.4,
+                              shape = "rect",
+                              plot = NULL,
+                              shadow.args = list(sigma = 5, colour = "grey40",
+                                                 x_offset = 5, y_offset = 5),
+                              recompute = FALSE,
+                              na.rm = FALSE,
+                              inherit.aes = FALSE) {
   if (missing(magnify)) {
     cli::cli_abort("{.f geom_magnify} requires {.code magnify} to be set")
   }

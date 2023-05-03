@@ -92,8 +92,7 @@ NULL
 #'
 #' TODO:
 #'
-#' * Support for maps
-#' * Support for non-standard scales and coordinates
+#' * Support for non-standard scales
 #'
 #' @export
 #'
@@ -147,7 +146,7 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                            to,
                            expand = TRUE,
                            axes = "",
-                           proj = "facing",
+                           proj = c("facing", "corresponding", "single"),
                            shadow = FALSE,
                            linetype = 1,
                            target.linetype = linetype,
@@ -155,7 +154,7 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                            proj.linetype = 2,
                            alpha = 1,
                            linewidth = 0.4,
-                           shape = "rect",
+                           shape = c("rect", "ellipse"),
                            plot = NULL,
                            shadow.args = list(sigma = 5, colour = "grey40",
                                               x_offset = 5, y_offset = 5),

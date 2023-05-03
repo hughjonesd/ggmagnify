@@ -32,7 +32,7 @@ test_that("reversed", {
 
 
 test_that("clipping", {
-  ggp2 + geom_magnify2(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+  ggp2 + geom_magnify_tile(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
                        magnify = 1)
 
   expect_snapshot_file(
@@ -40,7 +40,7 @@ test_that("clipping", {
   )
 
   ggp2 +
-    geom_magnify2(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+    geom_magnify_tile(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
                  magnify = 1, shape = "ellipse")
 
   expect_snapshot_file(

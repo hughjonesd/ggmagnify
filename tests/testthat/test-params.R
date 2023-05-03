@@ -18,7 +18,7 @@ test_param <- function (name, ...) {
     expect_silent(
       ggm <- ggp +
         labs(title = name) +
-        geom_magnify2(x = x, width = width, y = y, height = height,
+        geom_magnify_tile(x = x, width = width, y = y, height = height,
                      to_x = to_x, to_y = to_y, magnify = magnify, ...)
     )
     expect_silent(

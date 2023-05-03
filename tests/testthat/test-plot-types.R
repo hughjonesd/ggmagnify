@@ -26,7 +26,7 @@ test_plot_type <- function(
                            ) {
   test_that(name, {
     expect_silent(
-      ggm <- plot + geom_magnify2(x = x, width = width, y = y, height = height,
+      ggm <- plot + geom_magnify_tile(x = x, width = width, y = y, height = height,
                        to_x = to_x, to_y = to_y, magnify = magnify, ...)
     )
     expect_silent(

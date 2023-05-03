@@ -1,8 +1,6 @@
 
 library(ggplot2)
 
-library(ggplot2)
-
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species))
 ggp2 <- ggp + geom_point()
 

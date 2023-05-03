@@ -2,7 +2,7 @@
 % Please edit documentation in R/geom-magnify.R, R/geom-magnify2.R
 \name{geom_magnify}
 \alias{geom_magnify}
-\alias{geom_magnify2}
+\alias{geom_magnify_tile}
 \title{Magnified inset of a plot}
 \usage{
 geom_magnify(
@@ -31,7 +31,7 @@ geom_magnify(
   inherit.aes = FALSE
 )
 
-geom_magnify2(
+geom_magnify_tile(
   mapping = NULL,
   data = NULL,
   stat = "identity",
@@ -195,7 +195,7 @@ borders are drawn around the target and inset, along with projection lines
 from one to the other.
 }
 \details{
-\code{geom_magnify2()} is a version of \code{geom_magnify()} which uses different
+\code{geom_magnify_tile()} is a version of \code{geom_magnify()} which uses different
 aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{magnify}
 to specify the target and inset location.
 }
