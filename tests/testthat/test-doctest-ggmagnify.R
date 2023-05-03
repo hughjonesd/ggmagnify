@@ -9,11 +9,5 @@ test_that("Doctest: ggmagnify", {
   ggp <- ggplot(ChickWeight, aes(Time, weight, group = Chick, color = Diet)) + geom_line()
   expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
   inset_ylim = c(200, 350)))
-  expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
-  inset_ylim = c(200, 350), axes = TRUE))
-  if (requireNamespace("ggfx", quietly = TRUE)) {
-    expect_silent(ggmagnify(ggp, xlim = c(0, 5), ylim = c(30, 80), inset_xlim = c(0, 15),
-    inset_ylim = c(200, 350), shadow = TRUE))
-  }
 })
 

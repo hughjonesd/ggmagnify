@@ -399,6 +399,8 @@ ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
   NextMethod()
 }
 
+# The below are derived from ggplot2 code
+
 annotation_id <- local({
   i <- 1
   function() {
@@ -422,4 +424,8 @@ plot_clone <- function (plot) {
     p <- plot
     p$scales <- plot$scales$clone()
     p
+}
+
+`%||%` <- function (x, y) {
+    if (is.null(x)) y else x
 }
