@@ -5,25 +5,17 @@ NULL
 
 
 # TODO:
-# - make binned & discrete scales work
-# - bugs when you save a geom_magnify() plot to a variable, then add stuff?
-# - magnify should be an aes() if anything should
-#   - but more generally, are there simpler ways to specify stuff?
-#   - to_height, to_width? These actually make more sense, because if you
-#     add axes, then magnify quickly becomes misleading
-#   - and also then they're easy to make aesthetics; magnify could stay
-#     as a param.
-#   - a GeomMagnifyRect from which the main one inherits? Cheap way to get
-#     an alternative interface.
-# - if you have aes() at all, it makes sense to allow multiple on one plot
-# - some automatic way to find an empty area, cf. ggrepel?
 # - coord_sf, coord_fixed and others ***
-# - allow axes (not for "ellipse")
-# - be more independent. You can just draw your own border round
-#   the viewport
-# - new readme
-# - maybe complex example and tweak doctest to allow doctestFile
-# -make it work with log scales... if you can, ha ha
+# - make binned & discrete scales work (as and when ggplot2 faces reality...)
+# - make it work with log scales et al... if you can, ha ha
+# - why isn't geom_abline() working when recompute = FALSE?
+# - separate inset_xlim from to_xlim etc.; same by default
+#   - sometimes when you recompute, you want to use different limits, esp.
+#     y limits, in the inset
+#
+# - if you have aes() at all, it makes sense to allow multiple on one plot
+#   - but it's a very rare use case and overplotting will become a pain...
+
 
 #' Magnified inset of a plot
 #'
@@ -35,11 +27,12 @@ NULL
 #'
 #' @inherit ggplot2::layer params
 #' @inherit ggplot2::geom_point params
-#' @param magnify Numeric. How much to magnify the target area? Give a length 2
-#'   vector for separate x- and y-magnification.
+#' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
+#' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.
 #' @param expand Logical. Expand the limits of the target area by a small factor
 #'   in the inset plot. See [coord_cartesian()][ggplot2::coord_cartesian()].
-#' @param axes Logical. Draw axes in the inset?
+#' @param axes String. Which axes to plot in the inset? `""`, `"x"`, `"y"` or
+#'   `"xy"`.
 #' @param proj String. What style of projection lines to draw? `"facing"` (the
 #'   default), `"corresponding"` or `"single"`. Can be abbreviated. See below.
 #' @param shadow Logical. Draw a shadow behind the inset plot? Requires the
@@ -64,17 +57,21 @@ NULL
 #' geom_magnify understand the following aesthetics (required aesthetics are in
 #' bold):
 #'
-#' - **x**
-#' - **y**
-#' - **width**
-#' - **height**
-#' - **to_x**
-#' - **to_y**
+#' - **xmin**
+#' - **xmax**
+#' - **ymin**
+#' - **ymax**
+#' - **to_xmin**
+#' - **to_xmax**
+#' - **to_ymin**
+#' - **to_ymax**
 #' - colour
 #'
-#' Normally you'll set these directly in the call to `geom_magnify()`, but
-#' you can use them to change the magnification area, e.g. by facet. *Note:*
-#' as of today, the code only allows one magnification per panel.
+#' Normally you'll set these in the call to `geom_magnify()`, by specifying
+#' `from` and `to`, but you can use the aesthetics to specify the magnification
+#' area within your data, e.g. by facet. `from` and `to` override `xlim` etc.
+#' and `to_xlim` etc. respectively.
+#' *Note:* as of today, the code only allows one magnification per panel.
 #'
 #' ## Projection lines
 #'
@@ -85,6 +82,20 @@ NULL
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
 #' `"none"` draws no lines.
 #'
+#' ## Limitations
+#'
+#' `geom_magnify()` uses dark magic to deal with faceting. It may break with
+#' older (or newer!) versions of ggplot2.
+#'
+#' By design, `geom_magnify()` replots the original plot using new limits. It
+#' does not directly copy the target area pixels. The advantage is that you can
+#' e.g. add axes, or plot points at an appropriate size.
+#'
+#' TODO:
+#'
+#' * Support for maps
+#' * Support for non-standard scales and coordinates
+#'
 #' @export
 #'
 #' @doctest
@@ -94,96 +105,49 @@ NULL
 #'
 #' # Basic magnification
 #' @expect silent()
-#' ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                    to_x = 5, to_y = 5, magnify = 1.5)
+#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                      to = c(4, 5, 7, 6.5))
 #'
 #' # Inset axes
-#' ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                    to_x = 4, to_y = 5, magnify = c(3, 1.5), axes = TRUE)
+#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                      to = c(4, 5, 7, 6.5), axes = TRUE)
 #'
 #' # Ellipse magnification
 #' @expect silent()
 #' if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >= 4.2) {
-#'   ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                      to_x = 5, to_y = 5, magnify = 1.5, shape = "ellipse")
+#'   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                      to = c(4, 5, 7, 6.5), shape = "ellipse")
 #' }
 #'
 #' # Shadow
 #' @expect silent()
 #' if (requireNamespace("ggfx", quietly = TRUE)) {
-#'   ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                      to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
+#'   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 #' }
 #'
 #' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
 #' @expect no_error()
-#' ggp + geom_smooth() + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                    to_x = 5, to_y = 5, magnify = 1.5)
+#' ggp +
+#'   geom_smooth() +
+#'   geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                to = c(4, 5, 7, 6.5))
 #'
 #' # This will print the inset without the smooth:
 #' @expect no_error()
-#' ggp + geom_magnify(x = 3, width = 1, y = 6.5, height = 1,
-#'                    to_x = 5, to_y = 5, magnify = 1.5) + geom_smooth()
+#' ggp +
+#'   geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                to = c(4, 5, 7, 6.5)) +
+#'   geom_smooth()
 #'
 geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
-                          position = "identity", ...,
-                          magnify,
-                          expand = TRUE,
-                          axes = FALSE,
-                          proj = "facing",
-                          shadow = FALSE,
-                          linetype = 1,
-                          target.linetype = linetype,
-                          inset.linetype = linetype,
-                          proj.linetype = 2,
-                          alpha = 1,
-                          linewidth = 0.4,
-                          shape = "rect",
-                          plot = NULL,
-                          shadow.args = list(sigma = 5, colour = "grey40",
-                                             x_offset = 5, y_offset = 5),
-                          recompute = FALSE,
-                          na.rm = FALSE,
-                          inherit.aes = FALSE) {
-  if (missing(magnify)) {
-    cli::cli_abort("{.f geom_magnify} requires {.code magnify} to be set")
-  }
-  if (length(magnify) == 1L) {
-    magnify <- c(magnify, magnify)
-  }
-
-  l <- layer(
-         geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
-         mapping = mapping, data = data, stat = stat,
-         position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
-         params = list(na.rm = na.rm, magnify = magnify, expand = expand,
-                       axes = axes,
-                       proj = proj, shadow = shadow,
-                       linewidth = linewidth, linetype = linetype,
-                       target.linetype = target.linetype,
-                       proj.linetype = proj.linetype,
-                       inset.linetype = inset.linetype,
-                       shape = shape, alpha = alpha, plot = plot,
-                       shadow.args = shadow.args, recompute = recompute, ...)
-       )
-  class(l) <- c("GeomMagnifyS3", class(l))
-
-  l
-}
-
-#' @rdname geom_magnify
-#' @details
-#' `geom_magnify2()` is a version of `geom_magnify()` which uses different
-#' aesthetics. Set `xmin`, `xmax`, `ymin`, `ymax` and `to_xmin`, `to_xmax` etc.
-#' to specify the target and inset location.
-#'
-#' @export
-geom_magnify2 <- function (mapping = NULL, data = NULL,  stat = "identity",
                            position = "identity", ...,
+                           from,
+                           to,
                            expand = TRUE,
-                           axes = FALSE,
+                           axes = "",
                            proj = "facing",
                            shadow = FALSE,
                            linetype = 1,
@@ -201,33 +165,34 @@ geom_magnify2 <- function (mapping = NULL, data = NULL,  stat = "identity",
                            inherit.aes = FALSE) {
 
   l <- layer(
-         geom = ggproto(NULL, GeomMagnify2), # we clone because self$plot holds state
+         geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
-         params = list(na.rm = na.rm, expand = expand,
-                       axes = axes,
-                       proj = proj, shadow = shadow,
-                       linewidth = linewidth, linetype = linetype,
+         params = list(from = from, to = to,
+                       expand = expand, axes = axes, proj = proj, shadow = shadow,
+                       linewidth = linewidth, linetype = linetype, alpha = alpha,
                        target.linetype = target.linetype,
                        proj.linetype = proj.linetype,
                        inset.linetype = inset.linetype,
-                       shape = shape, alpha = alpha, plot = plot,
-                       shadow.args = shadow.args, recompute = recompute, ...)
+                       shape = shape, plot = plot,
+                       shadow.args = shadow.args, recompute = recompute,
+                       na.rm = na.rm,...)
        )
-  class(l) <- c("GeomMagnifyS3", class(l))
+  class(l) <- c("GeomMagnifyLayer", class(l))
 
   l
 }
 
 
-
-#' @rdname GeomMagnify
+#' Internals
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
-GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
-  required_aes = c("xmin", "xmax", "ymin", "ymax",
-                   "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
+GeomMagnify <- ggproto("GeomMagnify", Geom,
+  # this just causes pain
+  # required_aes = c("xmin", "xmax", "ymin", "ymax",
+  #                  "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
   default_aes = aes(colour = "black"),
   draw_key = draw_key_blank,
   plot = NULL,
@@ -239,19 +204,39 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
     if (params$shape == "ellipse") {
       rlang::check_installed("ggforce")
     }
-    if (params$axes && params$shape == "ellipse") {
-      cli::cli_warn(paste("Setting {.code axes} to {.code FALSE} with",
+    if (params$axes != "" && params$shape == "ellipse") {
+      cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} with",
                           "{.code shape = \"ellipse\"}"))
-      params$axes <- FALSE
+      params$axes <- ""
     }
 
     params
   },
 
-  draw_panel = function (self, data, panel_params, coord,
+  setup_data = function (data, params) {
+    if (! is.null(params$from)) {
+      from <- params$from
+      data$xmin <- from[1]
+      data$ymin <- from[2]
+      data$xmax <- from[3]
+      data$ymax <- from[4]
+    }
+    if (! is.null(params$to)) {
+      to <- params$to
+      data$to_xmin <- to[1]
+      data$to_ymin <- to[2]
+      data$to_xmax <- to[3]
+      data$to_ymax <- to[4]
+    }
+
+    data
+  },
+
+  draw_panel = function (self, data, panel_params, coord, from, to,
                          magnify, axes, proj, shadow,
                          linetype, target.linetype, proj.linetype, inset.linetype,
-                         linewidth, alpha, shape, expand, plot, shadow.args, recompute
+                         linewidth, alpha, shape, expand, plot, shadow.args,
+                         recompute
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
 
@@ -288,7 +273,7 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
                  to_xmin = d1$to_xmin, to_xmax = d1$to_xmax,
                  to_ymin = d1$to_ymin, to_ymax = d1$to_ymax
                )
-    proj_grob <- if (is.null(proj_df)) NULL else {
+    proj_grob <- if (is.null(proj_df) || nrow(proj_df) == 0L) NULL else {
       proj_df$colour <- d1$colour
       proj_df$alpha <- alpha
       proj_df$linewidth <- linewidth
@@ -307,22 +292,18 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
     if (rev_x) xlim_vals <- xlim_vals[2:1]
     if (rev_y) ylim_vals <- ylim_vals[2:1]
 
-    new_lims <- if (recompute) {
-      lims(x = xlim_vals, y = ylim_vals)
-    } else {
-      coord_cartesian(xlim = xlim_vals, ylim = ylim_vals,
-                        expand = expand)
-    }
-
-    rlang::with_options(
-      rlib_warning_verbosity = if (recompute) "quiet" else "default",
-      suppressWarnings(suppressMessages({
-        plot <- plot + new_lims + inset_theme(axes = axes)
-      })),
+    suppressMessages(
+      plot <- if (recompute) {
+        plot + coord_cartesian(expand = expand) + lims(x = xlim_vals, y = ylim_vals)
+      } else {
+        plot + coord_cartesian(xlim = xlim_vals, ylim = ylim_vals, expand = expand)
+      }
     )
+    plot <- plot + inset_theme(axes = axes)
 
-
-    plot_built <- ggplot_build(plot)
+    suppressWarnings(suppressMessages({
+      plot_built <- ggplot_build(plot)
+    }))
 
     # DARK MAGIC HERE ------------------------------------------------
     panel_id <- as.numeric(data$PANEL[1])
@@ -346,7 +327,9 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
     }
     # END MAGIC -------------------------------------------------------
 
-    plot_gtable <- ggplot_gtable(plot_built)
+    suppressWarnings(suppressMessages(
+      plot_gtable <- ggplot_gtable(plot_built)
+    ))
 
     corners <- data.frame(
       x = c(d1$to_xmin, d1$to_xmax),
@@ -384,35 +367,6 @@ GeomMagnify2 <- ggproto("GeomMagnify2", Geom,
 )
 
 
-#' Internals
-#'
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomMagnify <- ggproto("GeomMagnify", GeomMagnify2,
-  required_aes = c("x", "y", "height", "width", "to_x", "to_y"),
-
-  setup_data = function (self, data, params) {
-    for (v in c("x", "y", "to_x", "to_y", "width", "height")) {
-      data[[v]] <- data[[v]] %||% params[[v]]
-    }
-
-    magnify <- params$magnify
-    magnify_x <- magnify[1]
-    magnify_y <- magnify[2]
-    transform(data,
-              xmin = x - width/2,
-              xmax = x + width/2,
-              ymin = y - height/2,
-              ymax = y + height/2,
-              to_xmin = to_x - width * magnify_x/2,
-              to_xmax = to_x + width * magnify_x/2,
-              to_ymin = to_y - height * magnify_y/2,
-              to_ymax = to_y + height * magnify_y/2
-              )
-  }
-)
-
 
 make_geom_ellipse_grob <- function (df, panel_params, coord) {
   el_pts <- ellipse_points(df)
@@ -435,7 +389,7 @@ ellipse_points <- function(df) {
 }
 
 #' @export
-ggplot_add.GeomMagnifyS3 <- function(object, plot, object_name) {
+ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
   object$geom$plot <- plot
   NextMethod()
 }

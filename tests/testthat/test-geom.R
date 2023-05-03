@@ -7,9 +7,8 @@ ggp2 <- ggp + geom_point()
 
 test_that("basics", {
   expect_silent(
-    ggp2 +
-      geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 3, to_y = 7,
-                   magnify = 1)
+    ggp2 + geom_magnify(from = c(2.5, 5.5, 3.0, 6.0),
+                        to = c(3.5, 4.5, 4.5, 5.5))
   )
 
   expect_snapshot_file(
@@ -22,8 +21,8 @@ test_that("reversed", {
   ggp_rev <- ggp2 + coord_cartesian(xlim = c(6,2))
 
   expect_no_error(
-    ggp_rev + geom_magnify(x = 3, width = 1, y = 5, height = 1, to_x = 5, to_y = 7,
-                   magnify = 1.5)
+    ggp_rev + geom_magnify(from = c(2.5, 5.5, 3.0, 6.0),
+                           to = c(3.5, 4.5, 4.5, 5.5))
   )
 
   expect_snapshot_file(
@@ -32,28 +31,16 @@ test_that("reversed", {
 })
 
 
-test_that("geom_magnify2", {
-  expect_no_error(
-    ggp2 + geom_magnify2(xmin = 2.5, xmax = 3.0, ymin = 5.5, ymax = 6.0,
-                        to_xmin = 3.5, to_xmax = 4.5, to_ymin = 4.5, to_ymax = 5.5)
-  )
-
-  expect_snapshot_file(
-    ggsave("test-geom-magnify2.png", width = 5, height = 5)
-  )
-})
-
 test_that("clipping", {
-  ggp2 +
-    geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
-                 magnify = 1)
+  ggp2 + geom_magnify2(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+                       magnify = 1)
 
   expect_snapshot_file(
     ggsave("test-geom-clipping-rect.png", width = 5, height = 5)
   )
 
   ggp2 +
-    geom_magnify(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
+    geom_magnify2(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
                  magnify = 1, shape = "ellipse")
 
   expect_snapshot_file(

@@ -7,16 +7,16 @@
 inset_theme(
   blank = inset_blanks(axes = axes),
   axes,
-  margin = if (axes) 10 else 0
+  margin = if (axes == "") 0 else 8
 )
 }
 \arguments{
-\item{blank}{Character vector of extra elements to blank.
-See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
+\item{blank}{Character vector of theme elements to blank. See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
 
-\item{axes}{Logical: will the inset have axes?}
+\item{axes}{String. Which axes to plot in the inset? \code{""}, \code{"x"}, \code{"y"} or
+\code{"xy"}.}
 
-\item{margin}{Plot margin of inset.}
+\item{margin}{Margin around the plot. See \code{plot.margin} in \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
 }
 \value{
 A ggplot theme object

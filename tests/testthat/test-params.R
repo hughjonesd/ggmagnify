@@ -18,7 +18,7 @@ test_param <- function (name, ...) {
     expect_silent(
       ggm <- ggp +
         labs(title = name) +
-        geom_magnify(x = x, width = width, y = y, height = height,
+        geom_magnify2(x = x, width = width, y = y, height = height,
                      to_x = to_x, to_y = to_y, magnify = magnify, ...)
     )
     expect_silent(
@@ -32,7 +32,9 @@ test_param <- function (name, ...) {
 
 test_param("defaults")
 test_param("expand", expand = FALSE)
-test_param("axes", axes = TRUE)
+test_param("axes", axes = "xy")
+test_param("axes-x", axes = "x")
+test_param("axes-y", axes = "y")
 test_param("proj-corresponding", proj = "corresponding")
 test_param("proj-single", proj = "single")
 test_param("linetype", linetype = 2)
@@ -44,24 +46,8 @@ test_param("alpha", alpha = 0.5, colour = "red")
 test_param("linewidth", linewidth = 1.5)
 test_param("linetype", linetype = 2)
 test_param("plot", plot = ggp + geom_density2d())
+test_param("recompute", recompute = TRUE)
 
-test_that("recompute", {
-  expect_silent(
-      ggm <- ggp +
-        labs(title = "recompute") +
-        geom_magnify(x = x, width = width, y = y, height = height,
-                     to_x = to_x, to_y = to_y, magnify = magnify, recompute = TRUE)
-  )
-
-  # Refuses to be silent in non-interactive testing
-  suppressWarnings(expect_no_error(
-    print(ggm)
-  ))
-
-  skip_on_ci()
-  filename <- paste0("test-params-recompute.png")
-  expect_snapshot_file(ggsave(filename, ggm, width = 5, height = 5))
-})
 
 skip_if_not_installed("ggfx")
 test_param("shadow", shadow = TRUE)

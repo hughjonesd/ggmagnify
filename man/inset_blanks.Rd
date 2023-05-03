@@ -9,7 +9,8 @@ inset_blanks(..., axes)
 \arguments{
 \item{...}{Character vector of extra elements to blank.}
 
-\item{axes}{Logical. \code{TRUE} if the inset will include axes.}
+\item{axes}{String. Which axes to plot in the inset? \code{""}, \code{"x"}, \code{"y"} or
+\code{"xy"}.}
 }
 \value{
 A character vector.

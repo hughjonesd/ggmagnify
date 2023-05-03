@@ -81,6 +81,11 @@ calculate_proj_segments.rect <- function(proj, shape,
     can_proj <- which.max(gaps)
   }
 
+  if (! any(can_proj)) {
+    cli::cli_warn(c("Can't draw projection lines.",
+                  "*" = "Does inset cover target area or vice versa?"))
+  }
+
   proj_x    <- proj_x[can_proj]
   proj_y    <- proj_y[can_proj]
   proj_xend <- proj_xend[can_proj]

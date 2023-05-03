@@ -2,7 +2,7 @@
 #' Default elements to blank in the ggmagnify inset
 #'
 #' @param ... Character vector of extra elements to blank.
-#' @param axes Logical. `TRUE` if the inset will include axes.
+#' @inherit geom_magnify params
 #'
 #' @return A character vector.
 #' @export
@@ -14,12 +14,16 @@ inset_blanks <- function (..., axes) {
               "strip.text.x.bottom", "strip.text.x.top",
               "strip.text.y.left", "strip.text.y.right",
            ...)
-  blank_axes <- ! axes
-  if (blank_axes) {
-    axis_bits <- c(outer(c("axis.text", "axis.ticks", "axis.line"),
-                       c("", ".x", ".y"), paste0))
-    res <- c(res, axis_bits)
-  }
+
+  axis_suffixes_to_blank <- switch(paste0("+", axes), # avoid "zero-length name"
+                                   "+" = c("", ".x", ".y"),
+                                   "+x" = ".y",
+                                   "+y" = ".x",
+                                   "+xy" = character(0)
+                                    )
+  axis_bits <- c(outer(c("axis.text", "axis.ticks", "axis.line"),
+                     axis_suffixes_to_blank, paste0))
+  res <- c(res, axis_bits)
 
   res
 }
@@ -27,17 +31,16 @@ inset_blanks <- function (..., axes) {
 
 #' Create a theme suitable for an inset ggplot
 #'
-#' @param blank Character vector of extra elements to blank.
-#'   See [ggplot2::theme()].
-#' @param axes Logical: will the inset have axes?
-#' @inherit ggmagnify params
+#' @param blank Character vector of theme elements to blank. See [ggplot2::theme()].
+#' @param margin Margin around the plot. See `plot.margin` in [ggplot2::theme()].
+#' @inherit geom_magnify params
 #'
 #' @return A ggplot theme object
 #' @export
 inset_theme <- function (
     blank = inset_blanks(axes = axes),
     axes,
-    margin = if (axes) 10 else 0
+    margin = if (axes == "") 0 else 8
   ) {
   blank_elements <- lapply(blank, function (x) {
     ggplot2::element_blank()
@@ -50,15 +53,11 @@ inset_theme <- function (
     if (length(margin) == 1) margin <- rep(margin, 4)
     margin <- grid::unit(margin, "pt")
   }
-  thm <- thm + ggplot2::theme(plot.margin = margin)
+  thm <- thm + theme(plot.margin = margin)
 
-  if (! axes) {
-    thm <- thm + ggplot2::theme(
-      axis.ticks.length   = grid::unit(0, "pt"),
-      axis.ticks.length.x = grid::unit(0, "pt"),
-      axis.ticks.length.y = grid::unit(0, "pt")
-    )
-  }
+  if (axes == "") thm <- thm + theme(axis.ticks.length = grid::unit(0, "pt"))
+  if (axes %in% c("", "y")) thm <- thm + theme(axis.ticks.length.x = grid::unit(0, "pt"))
+  if (axes %in% c("", "x")) thm <- thm + theme(axis.ticks.length.y = grid::unit(0, "pt"))
 
   thm
 }
