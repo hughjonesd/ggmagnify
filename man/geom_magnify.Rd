@@ -27,6 +27,7 @@ geom_magnify(
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
+  scale.inset = 1,
   na.rm = FALSE,
   inherit.aes = FALSE
 )
@@ -37,7 +38,6 @@ geom_magnify_tile(
   stat = "identity",
   position = "identity",
   ...,
-  magnify,
   expand = TRUE,
   axes = "",
   proj = "facing",
@@ -52,6 +52,7 @@ geom_magnify_tile(
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
+  scale.inset = 1,
   na.rm = FALSE,
   inherit.aes = FALSE
 )
@@ -126,7 +127,11 @@ ggplot object to which \code{geom_magnify()} is added.}
 replot the inset. Statistics, e.g. smoothing lines, will be
 recomputed using only the data in the target area. If \code{FALSE}, use
 \link[ggplot2:coord_cartesian]{coord_cartesian()} to replot the inset,
-keeping all the data.
+keeping all the data.}
+
+\item{scale.inset}{Length 1 or 2 numeric. Normally, exactly the target area
+is shown on the inset. Sometimes you may wish to rescale the plot in the
+inset. Use 2 numbers to scale width and height separately.
 \subsection{Aesthetics}{
 
 geom_magnify understand the following aesthetics (required aesthetics are in
@@ -162,14 +167,20 @@ cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 
 \subsection{Limitations}{
 
+\code{geom_magnify()} uses masks. This requires R version 4.2.0 or higher, and
+a graphics device that supports masking. If you are using knitr, you may have
+luck with the \code{ragg_png} device.
+
 \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
 older (or newer!) versions of ggplot2.
 
 By design, \code{geom_magnify()} replots the original plot using new limits. It
 does not directly copy the target area pixels. The advantage is that you can
-e.g. add axes, or plot points at an appropriate size.
+e.g. add axes, plot points at an appropriate size, or recompute derived
+graphics.
+}
 
-TODO:
+\subsection{TODO:}{
 \itemize{
 \item Support for non-standard scales
 }
@@ -182,9 +193,6 @@ a warning. If \code{TRUE}, missing values are silently removed.}
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
-
-\item{magnify}{Numeric. How much to magnify the target area? Give a length 2
-vector for separate x- and y-magnification.}
 }
 \description{
 \code{geom_magnify()} creates a magnified inset of part of a plot. The target
@@ -195,8 +203,8 @@ from one to the other.
 }
 \details{
 \code{geom_magnify_tile()} is a version of \code{geom_magnify()} which uses different
-aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{magnify}
-to specify the target and inset location.
+aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x}, \code{to_width} \code{to_y},
+\code{to_height} to specify the target and inset location.
 }
 \examples{
 library(ggplot2)

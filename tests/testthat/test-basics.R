@@ -12,7 +12,7 @@ test_that("basics", {
   )
 
   expect_snapshot_file(
-    ggsave("test-geom-basics.png", width = 5, height = 5)
+    ggsave("test-basics-basics.png", width = 5, height = 5)
   )
 })
 
@@ -26,27 +26,27 @@ test_that("reversed", {
   )
 
   expect_snapshot_file(
-    ggsave("test-geom-reversed.png", width = 5, height = 5)
+    ggsave("test-basics-reversed.png", width = 5, height = 5)
   )
 })
 
 
 test_that("clipping", {
   ggp2 + geom_magnify_tile(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
-                       magnify = 1)
+                       to_width = 2, to_height = 1.5)
 
   expect_snapshot_file(
-    ggsave("test-geom-clipping-rect.png", width = 5, height = 5)
+    ggsave("test-basics-clipping-rect.png", width = 5, height = 5)
   )
 
   ggp2 +
     geom_magnify_tile(x = 3, width = 2, y = 5, height = 1.5, to_x = 4, to_y = 7,
-                 magnify = 1, shape = "ellipse")
+                 to_width = 2, to_height = 1.5, shape = "ellipse")
 
   expect_snapshot_file(
-    ggsave("test-geom-clipping-ellipse.png", width = 5, height = 5)
+    ggsave("test-basics-clipping-ellipse.png", width = 5, height = 5)
   )
 })
 
 
-file.remove(list.files(pattern = "test-geom.*png"))
+file.remove(list.files(pattern = "test-basics.*png"))

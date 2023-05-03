@@ -50,6 +50,9 @@ NULL
 #'   recomputed using only the data in the target area. If `FALSE`, use
 #'   [coord_cartesian()][ggplot2::coord_cartesian()] to replot the inset,
 #'   keeping all the data.
+#' @param scale.inset Length 1 or 2 numeric. Normally, exactly the target area
+#'   is shown on the inset. Sometimes you may wish to rescale the plot in the
+#'   inset. Use 2 numbers to scale width and height separately.
 #'
 #' ## Aesthetics
 #'
@@ -83,14 +86,19 @@ NULL
 #'
 #' ## Limitations
 #'
+#' `geom_magnify()` uses masks. This requires R version 4.2.0 or higher, and
+#' a graphics device that supports masking. If you are using knitr, you may have
+#' luck with the `ragg_png` device.
+#'
 #' `geom_magnify()` uses dark magic to deal with faceting. It may break with
 #' older (or newer!) versions of ggplot2.
 #'
 #' By design, `geom_magnify()` replots the original plot using new limits. It
 #' does not directly copy the target area pixels. The advantage is that you can
-#' e.g. add axes, or plot points at an appropriate size.
+#' e.g. add axes, plot points at an appropriate size, or recompute derived
+#' graphics.
 #'
-#' TODO:
+#' ## TODO:
 #'
 #' * Support for non-standard scales
 #'
@@ -159,6 +167,7 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                            shadow.args = list(sigma = 5, colour = "grey40",
                                               x_offset = 5, y_offset = 5),
                            recompute = FALSE,
+                           scale.inset = 1,
                            na.rm = FALSE,
                            inherit.aes = FALSE) {
 
@@ -174,6 +183,7 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
                        inset.linetype = inset.linetype,
                        shape = shape, plot = plot,
                        shadow.args = shadow.args, recompute = recompute,
+                       scale.inset = scale.inset,
                        na.rm = na.rm,...)
        )
   class(l) <- c("GeomMagnifyLayer", class(l))
@@ -202,10 +212,16 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     if (params$shape == "ellipse") {
       rlang::check_installed("ggforce")
     }
+    if (params$shadow) {
+      rlang::check_installed("ggfx")
+    }
     if (params$axes != "" && params$shape == "ellipse") {
       cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} with",
                           "{.code shape = \"ellipse\"}"))
       params$axes <- ""
+    }
+    if (length(params$scale.inset) == 1L) {
+      params$scale.inset <- rep(params$scale.inset, 2)
     }
 
     params
@@ -234,7 +250,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          magnify, axes, proj, shadow,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
-                         recompute
+                         recompute, scale.inset
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
 
@@ -293,6 +309,12 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     ylim_vals <- c(d1$ymin, d1$ymax)
     if (rev_x) xlim_vals <- xlim_vals[2:1]
     if (rev_y) ylim_vals <- ylim_vals[2:1]
+
+    scale_lims <- function (lim, sc) {
+      (lim - mean(lim)) * sc + mean(lim)
+    }
+    xlim_vals <- scale_lims(xlim_vals, scale.inset[1])
+    ylim_vals <- scale_lims(ylim_vals, scale.inset[2])
 
     plot_coord <- constructor(plot_coord)
     suppressMessages(
@@ -362,7 +384,6 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
 
     if (shadow) {
-      rlang::check_installed("ggfx")
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 

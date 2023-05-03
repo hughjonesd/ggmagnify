@@ -5,13 +5,14 @@ ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
   geom_point()
 
 x <- 3.25
-width <- .5
+width <- 0.5
 y <- 6.5
 height <- 1
 
 to_x <- 3.2
 to_y <- 5
-magnify <- c(1.6, 1.4)
+to_width <- 0.8
+to_height <- 1.4
 
 test_param <- function (name, ...) {
   test_that(name, {
@@ -19,7 +20,8 @@ test_param <- function (name, ...) {
       ggm <- ggp +
         labs(title = name) +
         geom_magnify_tile(x = x, width = width, y = y, height = height,
-                     to_x = to_x, to_y = to_y, magnify = magnify, ...)
+                     to_x = to_x, to_y = to_y, to_width = to_width,
+                     to_height = to_height, ...)
     )
     expect_silent(
       print(ggm)
@@ -47,7 +49,7 @@ test_param("linewidth", linewidth = 1.5)
 test_param("linetype", linetype = 2)
 test_param("plot", plot = ggp + geom_density2d())
 test_param("recompute", recompute = TRUE)
-
+test_param("scale.inset", scale.inset = c(2, 0.5))
 
 skip_if_not_installed("ggfx")
 test_param("shadow", shadow = TRUE)

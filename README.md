@@ -114,7 +114,8 @@ ggpi +
   facet_wrap(vars(Species)) +
   geom_magnify_tile(aes(x = median_sw, y = median_sl), 
                     width = 1, height = 1,
-                    to_x = 5, to_y = 5, magnify = 1.5, shadow = TRUE)
+                    to_x = 5, to_y = 5, to_width = 1.5, to_height = 1.5,
+                    shadow = TRUE)
 ```
 
 <img src="man/figures/README-example-faceting-1.png" width="100%" />

@@ -9,7 +9,7 @@ test_that("facet_wrap", {
   expect_silent(
     ggp2 + facet_wrap(vars(Species)) +
       geom_magnify_tile(x = 3, width = 2, y = 5, height = 1.5, to_x = 3, to_y = 7,
-                   magnify = 1)
+                   to_width = 2, to_height = 1.5)
   )
 
   skip_on_ci()
@@ -27,7 +27,7 @@ test_that("facet_grid", {
   expect_silent(
     ggp3 +
       geom_magnify_tile(x = 15, width = 4, y = 21, height = 2, to_x = 30, to_y = 18,
-                   magnify = 2)
+                   to_width = 8, to_height = 4)
   )
 
   skip_on_ci()
@@ -38,7 +38,7 @@ test_that("facet_grid", {
   expect_silent(
     ggp3 + facet_grid(vars(am), vars(vs), scales = "free") +
       geom_magnify_tile(x = 15, width = 4, y = 18, height = 2, to_x = 30, to_y = 21,
-                   magnify = 2)
+                   to_width = 8, to_height = 4)
   )
 
   skip_on_ci()

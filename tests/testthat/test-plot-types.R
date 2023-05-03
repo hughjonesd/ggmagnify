@@ -5,12 +5,13 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species))
 ggp1d <- ggplot(iris, aes(Sepal.Width, color = Species, fill = Species))
 x = 3.25
-width = .5
+width = 0.5
 y = 7
 height = 1
 to_x = 2.7
 to_y = 5.2
-magnify = 2
+to_width = 1
+to_height = 2
 
 test_plot_type <- function(
                     name,
@@ -21,13 +22,15 @@ test_plot_type <- function(
                     height = 1,
                     to_x = 2.7,
                     to_y = 5.2,
-                    magnify = 2,
+                    to_width = 1,
+                    to_height = 2,
                     ...
                            ) {
   test_that(name, {
     expect_silent(
       ggm <- plot + geom_magnify_tile(x = x, width = width, y = y, height = height,
-                       to_x = to_x, to_y = to_y, magnify = magnify, ...)
+                       to_x = to_x, to_y = to_y, to_width = to_width,
+                       to_height = to_height, ...)
     )
     expect_silent(
       print(ggm)
@@ -58,8 +61,10 @@ test_plot_type("geom_violin",
   geom_point() + geom_violin(fill = NA))
 
 test_plot_type("geom_histogram", ggp1d + geom_histogram(bins = 10))
-test_plot_type("geom_density", ggp1d + geom_density(), y = 1, height = 0.2,
-               to_y = 0.5)
+test_plot_type("geom_density", ggp1d + geom_density(), x = 3.25, width = 0.5,
+               y = 1, height = 0.2, to_y = 0.5, to_x = 2.7, to_width = 1,
+               to_height = 0.4)
+
 test_plot_type("geom_dotplot", ggp1d + geom_dotplot(binwidth = 0.2))
 
 test_plot_type("geom_function",
@@ -70,7 +75,7 @@ test_plot_type("geom_function",
     coord_cartesian(xlim = c(0.02,1)) +
     scale_color_gradient(low = "red", high = "blue"),
   x = 0.02, width = 0.04, y = -0.5, height = 1, to_x = 0.75, to_y = -0.5,
-  magnify = c(10, 1)
+  to_width = 0.4, to_height = 1
 )
 
 skip_if_not_installed("hexbin")
