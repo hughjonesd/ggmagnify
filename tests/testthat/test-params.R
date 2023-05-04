@@ -14,10 +14,10 @@ to_y <- 5
 to_width <- 0.8
 to_height <- 1.4
 
-test_param <- function (name, ...) {
+test_param <- function (name, ..., .ggplot = ggp) {
   test_that(name, {
     expect_silent(
-      ggm <- ggp +
+      ggm <- .ggplot +
         labs(title = name) +
         geom_magnify_tile(x = x, width = width, y = y, height = height,
                      to_x = to_x, to_y = to_y, to_width = to_width,
@@ -48,8 +48,10 @@ test_param("alpha", alpha = 0.5, colour = "red")
 test_param("linewidth", linewidth = 1.5)
 test_param("linetype", linetype = 2)
 test_param("plot", plot = ggp + geom_density2d())
-test_param("recompute", recompute = TRUE)
+test_param("recompute", recompute = TRUE, .ggplot = ggp + geom_density_2d())
 test_param("scale.inset", scale.inset = c(2, 0.5))
+
+
 
 skip_if_not_installed("ggfx")
 test_param("shadow", shadow = TRUE)
@@ -58,5 +60,10 @@ test_param("shadow.args", shadow = TRUE,
 
 skip_if_not_installed("ggforce")
 test_param("shape-ellipse", shape = "ellipse")
+test_param("shadow-ellipse", shadow = TRUE, shape = "ellipse")
+test_param("proj-single-ellipse", proj = "single", shape = "ellipse")
+test_param("scale.inset-ellipse", scale.inset = c(2, 0.5), shape = "ellipse")
+test_param("recompute-ellipse", recompute = TRUE, shape = "ellipse",
+           .ggplot = ggp + geom_density_2d())
 
 file.remove(list.files(pattern = "test-params.*.png"))

@@ -61,16 +61,7 @@ Length 2 numeric.}
 
 \item{margin}{Plot margin of inset.}
 
-\item{linewidth, linetype, colour, alpha}{Parameters for inset border, target border,
-and projection lines.}
-
-\item{inset_linewidth, inset_linetype, inset_colour, inset_alpha}{Parameters
-for inset border.}
-
-\item{proj_linewidth, proj_linetype, proj_colour, proj_alpha}{Parameters
-for projection lines.}
-
-\item{target_linewidth, target_linetype, target_colour, target_alpha}{Parameters for target border.}
+\item{linewidth, linetype, colour, alpha, inset_linewidth, inset_linetype, inset_colour, inset_alpha, proj_linewidth, proj_linetype, proj_colour, proj_alpha, target_linewidth, target_linetype, target_colour, target_alpha}{Style.}
 
 \item{shadow_args}{List of arguments to pass to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 

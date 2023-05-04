@@ -14,14 +14,7 @@
 #' @param shadow Logical. Draw a shadow behind the inset?
 #' @param axes Logical. Draw axes in the inset?
 #' @param margin Plot margin of inset.
-#' @param linewidth,linetype,colour,alpha Parameters for inset border, target border,
-#'   and projection lines.
-#' @param inset_linewidth,inset_linetype,inset_colour,inset_alpha Parameters
-#'   for inset border.
-#' @param proj_linewidth,proj_linetype,proj_colour,proj_alpha Parameters
-#'   for projection lines.
-#' @param target_linewidth,target_linetype,target_colour,target_alpha
-#'  Parameters for target border.
+#' @param linewidth,linetype,colour,alpha,inset_linewidth,inset_linetype,inset_colour,inset_alpha,proj_linewidth,proj_linetype,proj_colour,proj_alpha,target_linewidth,target_linetype,target_colour,target_alpha Style.
 #' @param shadow_args List of arguments to pass to [ggfx::with_shadow()].
 #' @param blank Character vector of theme elements to blank out in the inset.
 #' @param inset_expand Logical. Expand the inset's view of the target?

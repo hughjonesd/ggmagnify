@@ -124,28 +124,48 @@ calculate_proj_segments.ellipse <- function(proj, shape,
   j <- 1
   if (midpoint_vec[1] == 0) j <- 2
   k <- 3 - j
-  above_midpoint_vec <- function(pt) {
+  dist_midpoint_vec <- function(pt) {
     scaled_vec <- midpoint1 + midpoint_vec * (pt[j] - midpoint1[j])/midpoint_vec[j]
-    pt[k] > scaled_vec[k]
+    pt[k] - scaled_vec[k]
   }
 
-  e1$above <- apply(e1[c("x", "y")], 1, above_midpoint_vec)
-  e2$above <- apply(e2[c("x", "y")], 1, above_midpoint_vec)
+  e1$dist_mp <- apply(e1[c("x", "y")], 1, dist_midpoint_vec)
+  e2$dist_mp <- apply(e2[c("x", "y")], 1, dist_midpoint_vec)
 
-  find_tangent <- function (e1, e2) {
-    e2 <- e2[c("x", "y", "dydx")]
-    closest <- sapply(e1$dydx, function (x) which.min(abs(x - e2$dydx)))
+  e1$above <- e1$dist_mp > 0
+  e2$above <- e2$dist_mp > 0
 
-    names(e2) <- c("xend", "yend", "dydx2")
-    res <- cbind(e1[c("x", "y", "dydx")], e2[closest, ])
+  if (proj == "single") {
+    # get the closest to the midpoint vector, but also the nearest
+    shifted1 <- cbind(e1$x - midpoint1[1], e1$y - midpoint1[2])
+    shifted2 <- cbind(e2$x - midpoint2[1], e2$y - midpoint2[2])
+    between_quadrant1 <- sign(shifted1[, 1]) == sign(midpoint_vec[1]) &
+                         sign(shifted1[, 2]) == sign(midpoint_vec[2])
+    between_quadrant2 <- sign(shifted2[, 1]) != sign(midpoint_vec[1]) &
+                         sign(shifted2[, 2]) != sign(midpoint_vec[2])
 
-    res$dydx_slope <- with(res, atan((yend - y)/(xend - x)))
-    slope_diffs <- with(res, abs(dydx_slope - dydx) + abs(dydx_slope - dydx2))
-    res[which.min(slope_diffs), ]
+    q1 <- e1[between_quadrant1, ]
+    q2 <- e2[between_quadrant2, ]
+    closest1 <- q1[which.min(abs(q1$dist_mp)), c("x", "y")]
+    closest2 <- q2[which.min(abs(q2$dist_mp)), c("x", "y")]
+    names(closest2) <- c("xend", "yend")
+    cbind(closest1, closest2)
+  } else {
+    find_tangent <- function (e1, e2) {
+      e2 <- e2[c("x", "y", "dydx")]
+      closest <- sapply(e1$dydx, function (x) which.min(abs(x - e2$dydx)))
+
+      names(e2) <- c("xend", "yend", "dydx2")
+      res <- cbind(e1[c("x", "y", "dydx")], e2[closest, ])
+
+      res$dydx_slope <- with(res, atan((yend - y)/(xend - x)))
+      slope_diffs <- with(res, abs(dydx_slope - dydx) + abs(dydx_slope - dydx2))
+      res[which.min(slope_diffs), ]
+    }
+
+    tangent_above <- find_tangent(e1[e1$above,], e2[e2$above,])
+    tangent_below <- find_tangent(e1[!e1$above,], e2[!e2$above,])
+
+    rbind(tangent_above, tangent_below)
   }
-
-  tangent_above <- find_tangent(e1[e1$above,], e2[e2$above,])
-  tangent_below <- find_tangent(e1[!e1$above,], e2[!e2$above,])
-
-  rbind(tangent_above, tangent_below)
 }
