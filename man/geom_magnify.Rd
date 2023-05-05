@@ -246,7 +246,7 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
 shape <- grid::polygonGrob()
 ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
                    to = c(4, 5, 7, 6.5),
-                   shape = mask)
+                   shape = shape)
 # Order matters
 
 # `geom_magnify()` stores the plot when it is added to it:

@@ -6,11 +6,15 @@ NULL
 
 # TODO:
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
-# - make it work with log scales et al... if you can, ha ha
 # - why isn't geom_abline() working when recompute = FALSE?
+# - clean up the code. Work in transformed coordinates from the start of
+#   draw_panel(). Minimize use of external stuff. Note: gridExtra::ellipseGrob()
+#   is probably a lesser dependency than ggforce.
 #
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
+#   - and it's liable to blow up when you put your aesthetics in the data.
+#     Not worth it
 
 
 #' Magnified inset of a plot
@@ -150,7 +154,7 @@ NULL
 #' @expect no_error()
 #' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
 #'                    to = c(4, 5, 7, 6.5),
-#'                    shape = mask)
+#'                    shape = shape)
 #' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:

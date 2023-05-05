@@ -2,6 +2,7 @@ Package: ggmagnify
 Title: Create a Magnified Inset of Part of a "ggplot" Object
 Version: 0.0.0.9000
 Author: David Hugh-Jones
+Maintainer: David Hugh-Jones <davidhughjones@gmail.com>
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", role = c("aut", "cre"))
 Description: Creates a magnified inset of a ggplot, with projection lines and
