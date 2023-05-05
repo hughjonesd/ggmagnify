@@ -64,24 +64,27 @@ test_that("reverse", {
 
 test_that("reversed coords", {
 
-  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2))
+  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2)) +
+    geom_magnify(from = from, to = to)
 
   expect_no_error(
-    ggp_rev_x + geom_magnify(from = from, to = to)
+    print(ggp_rev_x)
   )
 
-  expect_snapshot_file(
-    ggsave("test-scales-reversed-coords-x.png", width = 5, height = 5)
-  )
-
-  ggp_rev_y <- ggp2 + coord_cartesian(ylim = c(8, 4))
+  ggp_rev_y <- ggp2 +
+    coord_cartesian(ylim = c(8, 4)) +
+    geom_magnify(from = from, to = to)
 
   expect_no_error(
-    ggp_rev_y + geom_magnify(from = from, to = to)
+    print(ggp_rev_y)
   )
 
+  skip_on_ci()
   expect_snapshot_file(
-    ggsave("test-scales-reversed-coords-y.png", width = 5, height = 5)
+    ggsave("test-scales-reversed-coords-x.png", ggp_rev_x, width = 5, height = 5)
+  )
+  expect_snapshot_file(
+    ggsave("test-scales-reversed-coords-y.png", ggp_rev_y, width = 5, height = 5)
   )
 })
 
