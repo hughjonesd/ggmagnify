@@ -280,11 +280,12 @@ ggplot(
   data.frame(x=runif(3000, 2,4.5),y= runif(3000, 4, 8)), 
   aes(x=x,y=y)) +
   coord_cartesian(expand = FALSE) +
-  geom_density2d_filled() + 
+  geom_density2d_filled(bins = 50, linewidth = 0) +
   geom_point(color='white', alpha = .5, size = .5) + 
-  geom_magnify(from = c(2.1, 4.1, 2.4, 4.4), to = c(2.4, 4.4, 3.0, 5.0), 
+  theme(legend.position = "none") +
+  geom_magnify(from = c(2.1, 4.1, 2.4, 4.4), to = c(2.5, 4.5, 3.4, 5.4), 
                colour = "white", proj.linetype = 1, linewidth = 0.6) +
-  geom_magnify(from = c(2.6, 4.6, 2.8, 4.8), to = c(3,5.5,4.5,6.9), 
+  geom_magnify(from = c(2.8, 4.8, 3.1, 5.1), to = c(3,5.5,4.4,6.9), 
                expand = FALSE, colour ="white", proj.linetype = 1, 
                linewidth = 0.6)
 ```
