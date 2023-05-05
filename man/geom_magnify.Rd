@@ -166,9 +166,11 @@ bold):
 }
 
 Normally you'll set these in the call to \code{geom_magnify()}, by specifying
-\code{from} and \code{to}, but you can use the aesthetics to specify the magnification
-area within your data, e.g. by facet. \code{from} and \code{to} override \code{xlim} etc.
-and \code{to_xlim} etc. respectively.
+\code{from} and \code{to}, but you can set them directly if you prefer to be explicit.
+(\code{from} and \code{to} override \code{xmin} etc. and \code{to_xmin} etc. respectively.) Or
+use the aesthetics to specify the magnification area within your data, e.g.
+by facet.
+
 \emph{Note:} as of today, the code only allows one magnification per call to
 \code{geom_magnify()}. However, nothing stops you adding multiple calls to
 \code{geom_magnify()}

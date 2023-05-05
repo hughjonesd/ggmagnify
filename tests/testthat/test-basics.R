@@ -38,17 +38,46 @@ test_that("clipping", {
 })
 
 
+test_that("setting aesthetics", {
+  expect_silent({
+    ggm_set <- ggp2 + geom_magnify(xmin = from[1], ymin = from[2],
+                                   xmax = from[3], ymax = from[4],
+                                   to_xmin = to[1], to_ymin = to[2],
+                                   to_xmax = to[3], to_ymax = to[4])
+    print(ggm_set)
+  })
+
+  skip_on_ci()
+  expect_snapshot_file(
+    ggsave("test-basics-setting-aesthetics.png", ggm_set, width = 5, height = 5)
+  )
+})
+
 test_that("position from data", {
+  d <- data.frame(xmin = from[1], ymin = from[2], xmax = from[3],
+                  ymax = from[4],
+                  to_xmin = to[1], to_ymin = to[2], to_xmax = to[3],
+                  to_ymax = to[4])
+
   expect_silent({
     ggm_pos_data <- ggp2 + geom_magnify(
       aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
           to_xmin = to_xmin, to_xmax = to_xmax, to_ymin = to_ymin, to_ymax = to_ymax),
-      data = data.frame(xmin = from[1], ymin = from[2], xmax = from[3],
-                        ymax = from[4],
-                        to_xmin = to[1], to_ymin = to[2], to_xmax = to[3],
-                        to_ymax = to[4]),
-    )
+      data = d)
     print(ggm_pos_data)
+  })
+
+  # mix of data and set aesthetics
+  expect_silent({
+    ggm_mix_data <- ggp2 + geom_magnify(
+      aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
+          to_xmin = to_xmin, to_xmax = to_xmax, to_ymin = to_ymin,
+          to_ymax = to_ymax),
+      data = d,
+      ymax = from[4] - .2, # set parameters
+      to_ymax = to[4] + 1)
+
+    print(ggm_mix_data)
   })
 
   expect_silent({
@@ -65,6 +94,10 @@ test_that("position from data", {
   skip_on_ci()
   expect_snapshot_file(
     ggsave("test-basics-position-from-data.png", ggm_pos_data,
+           width = 5, height = 5)
+  )
+  expect_snapshot_file(
+    ggsave("test-basics-position-mix-data.png", ggm_mix_data,
            width = 5, height = 5)
   )
   expect_snapshot_file(

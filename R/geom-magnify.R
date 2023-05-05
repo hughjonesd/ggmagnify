@@ -8,9 +8,6 @@ NULL
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
 # - make it work with log scales et al... if you can, ha ha
 # - why isn't geom_abline() working when recompute = FALSE?
-# - separate inset_xlim from to_xlim etc.; same by default
-#   - sometimes when you recompute, you want to use different limits, esp.
-#     y limits, in the inset
 #
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
@@ -71,9 +68,11 @@ NULL
 #' - colour
 #'
 #' Normally you'll set these in the call to `geom_magnify()`, by specifying
-#' `from` and `to`, but you can use the aesthetics to specify the magnification
-#' area within your data, e.g. by facet. `from` and `to` override `xlim` etc.
-#' and `to_xlim` etc. respectively.
+#' `from` and `to`, but you can set them directly if you prefer to be explicit.
+#' (`from` and `to` override `xmin` etc. and `to_xmin` etc. respectively.) Or
+#' use the aesthetics to specify the magnification area within your data, e.g.
+#' by facet.
+#'
 #' *Note:* as of today, the code only allows one magnification per call to
 #' `geom_magnify()`. However, nothing stops you adding multiple calls to
 #' `geom_magnify()`
@@ -421,8 +420,19 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   optional_aes = c("xmin", "xmax", "ymin", "ymax",
                    "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
 
+  setup_data = function (self, data, params, scales) {
+    for (var in self$optional_aes) {
+      if (var %in% names(params)) data[[var]] <- params[[var]]
+    }
 
-  compute_group = function (data, scales, from = NULL, to = NULL) {
+    data
+  },
+
+  # note: these parameters do magic by computing Stat$parameters()
+  compute_group = function (data, scales, from = NULL, to = NULL,
+                            xmin = NULL, ymin = NULL, xmax = NULL, ymax = NULL,
+                            to_xmin = NULL, to_ymin = NULL, to_xmax = NULL,
+                            to_ymax = NULL) {
     if (! is.null(from)) {
       data$xmin <- from[1]
       data$ymin <- from[2]

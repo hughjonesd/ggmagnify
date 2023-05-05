@@ -25,7 +25,7 @@ test_that("coord_trans", {
 
 
 test_that("coord_polar", {
-  skip("Not yet!")
+  skip("Not implemented")
 })
 
 

@@ -56,15 +56,7 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
   optional_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
                   "to_height"),
 
-  setup_data = function (self, data, params) {
-    for (var in c("x", "y", "width", "height", "to_x", "to_y", "to_width",
-                  "to_height")) {
-      data[[var]] <- data[[var]] %||% params[[var]]
-    }
-
-    data
-  },
-
+  # note: these parameters do magic by computing Stat$parameters()
   compute_group = function (self, data, scales, x = NULL, y = NULL,
                             width = NULL, height = NULL,
                             to_x = NULL, to_y = NULL, to_width = NULL,
