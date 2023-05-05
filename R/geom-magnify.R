@@ -38,7 +38,8 @@ NULL
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components.
 #' @param shape `"rect"` to magnify a rectangle. `"ellipse"` to magnify an ellipse.
-#'   `"ellipse` requires the "ggforce" package.
+#'   `"ellipse` requires the "ggforce" package. Or (experimental!) pass in a
+#'   [grid::grob()] for an arbitrary mask.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -85,6 +86,12 @@ NULL
 #' `"facing"` sometimes draws lines between facing corners, when this looks
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
 #' `"none"` draws no lines.
+#'
+#' ## Arbitrary shapes
+#'
+#' To magnify an arbitrary area, pass a grid grob into `shape`. The grob should
+#' be scaled to between 0 and 1 on both dimensions. This is experimental. (Well,
+#' everything is experimental. This is just *more* experimental.)
 #'
 #' ## Limitations
 #'
@@ -138,6 +145,12 @@ NULL
 #'                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 #' }
 #'
+#' # Arbitrary shape using grid
+#' shape <- grid::polygonGrob()
+#' @expect no_error()
+#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                    to = c(4, 5, 7, 6.5),
+#'                    shape = mask)
 #' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
@@ -213,16 +226,18 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
   setup_params = function (data, params) {
     params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
-    params$shape <- match.arg(params$shape, c("rect", "ellipse"))
-    if (params$shape == "ellipse") {
+    if (is.character(params$shape)) {
+      params$shape <- match.arg(params$shape, c("rect", "ellipse"))
+    }
+    if (identical(params$shape, "ellipse")) {
       rlang::check_installed("ggforce")
     }
     if (params$shadow) {
       rlang::check_installed("ggfx")
     }
-    if (params$axes != "" && params$shape == "ellipse") {
+    if (params$axes != "" && ! identical(params$shape, "rect")) {
       cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} with",
-                          "{.code shape = \"ellipse\"}"))
+                          "{.code shape != \"rect\"}"))
       params$axes <- ""
     }
     if (length(params$scale.inset) == 1L) {
@@ -247,10 +262,28 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                             linewidth = linewidth, alpha = NA,
                             linetype = target.linetype,
                             group = 1L) # group = 1 needed for some coord systems
-    target_grob <- if (shape == "rect") {
+    target_grob <- if (identical(shape, "rect")) {
                      GeomRect$draw_panel(target_df, panel_params, coord)
-                   } else {
+                   } else if (identical(shape, "ellipse")) {
                      make_geom_ellipse_grob(target_df, panel_params, coord)
+                   } else {
+                     target_corners <- data.frame(
+                       x = c(d1$xmin, d1$xmax),
+                       y = c(d1$ymin, d1$ymax)
+                     )
+                     target_corners_t <- coord$transform(target_corners, panel_params)
+                     target_x_rng <- range(target_corners_t$x, na.rm = TRUE)
+                     target_y_rng <- range(target_corners_t$y, na.rm = TRUE)
+                     target_vp <- viewport(x = mean(target_x_rng),
+                                           y = mean(target_y_rng),
+                                           width = diff(target_y_rng),
+                                           height = diff(target_y_rng))
+                     editGrob(shape,
+                              vp = target_vp,
+                              gp = gpar(fill = NA, col = alpha(d1$colour, alpha),
+                                            lwd = linewidth * .pt,
+                                            lty = target.linetype
+                                            ))
                    }
 
     # == draw projection lines ==========================================
@@ -347,14 +380,14 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     x_rng <- range(corners_t$x, na.rm = TRUE)
     y_rng <- range(corners_t$y, na.rm = TRUE)
-    mask <- if (shape == "ellipse") {
+    mask <- if (identical(shape, "ellipse")) {
       ellipse_df <- data.frame(xmin = 0, xmax = 1,
                                ymin = 0, ymax = 1)
       el_pts <- ellipse_points(ellipse_df)
       grid::polygonGrob(x = el_pts$x, y = el_pts$y,
                         default.units = "native",
                         gp = gpar(fill = rgb(0,0,0,1)))
-    } else if (shape == "rect") {
+    } else if (identical(shape, "rect")) {
       grid::rectGrob(default.units = "native",
                      gp = gpar(fill = rgb(0,0,0,1)))
     } else {
