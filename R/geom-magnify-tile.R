@@ -52,21 +52,6 @@ geom_magnify_tile <- function (mapping = NULL,
 }
 
 
-#' #' @rdname GeomMagnify
-#' #' @format NULL
-#' #' @usage NULL
-#' #' @export
-#' GeomMagnifyTile <- ggproto("GeomMagnifyTile", GeomMagnify,
-#'   required_aes = c("x", "y", "height", "width",
-#'                    "to_x", "to_y", "to_height", "to_width"),
-#'
-#'   draw_panel = function(self, ...) {
-#'     ggproto_parent(GeomMagnify, self)$draw_panel(...)
-#'   }
-#' )
-
-
-
 StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
   optional_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
                   "to_height"),

@@ -74,7 +74,9 @@ NULL
 #' `from` and `to`, but you can use the aesthetics to specify the magnification
 #' area within your data, e.g. by facet. `from` and `to` override `xlim` etc.
 #' and `to_xlim` etc. respectively.
-#' *Note:* as of today, the code only allows one magnification per panel.
+#' *Note:* as of today, the code only allows one magnification per call to
+#' `geom_magnify()`. However, nothing stops you adding multiple calls to
+#' `geom_magnify()`
 #'
 #' ## Projection lines
 #'
