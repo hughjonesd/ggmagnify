@@ -183,23 +183,21 @@ cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 }
 
 \subsection{Limitations}{
-
-\code{geom_magnify()} uses masks. This requires R version 4.2.0 or higher, and
+\itemize{
+\item \code{geom_magnify()} uses masks. This requires R version 4.2.0 or higher, and
 a graphics device that supports masking. If you are using knitr, you may have
 luck with the \code{ragg_png} device.
-
-\code{geom_magnify()} uses dark magic to deal with faceting. It may break with
+\item You can't set params \verb{xmin,...} or \verb{to_xmin,...} directly in the call
+to \code{geom_magnify()}. If you want to set them, supply \code{data} and \code{mapping}
+arguments.
+\item \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
 older (or newer!) versions of ggplot2.
-
-By design, \code{geom_magnify()} replots the original plot using new limits. It
+\item By design, \code{geom_magnify()} replots the original plot using new limits. It
 does not directly copy the target area pixels. The advantage is that you can
 e.g. add axes, plot points at an appropriate size, or recompute derived
 graphics.
-}
-
-\subsection{TODO:}{
-\itemize{
-\item Support for non-standard scales
+\item \code{geom_magnify()} may break with discrete scales. This is a limitation in
+ggplot2 for now.
 }
 }
 

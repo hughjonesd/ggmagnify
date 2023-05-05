@@ -87,21 +87,25 @@ NULL
 #'
 #' ## Limitations
 #'
-#' `geom_magnify()` uses masks. This requires R version 4.2.0 or higher, and
-#' a graphics device that supports masking. If you are using knitr, you may have
-#' luck with the `ragg_png` device.
+#' * `geom_magnify()` uses masks. This requires R version 4.2.0 or higher, and
+#'   a graphics device that supports masking. If you are using knitr, you may have
+#'   luck with the `ragg_png` device.
 #'
-#' `geom_magnify()` uses dark magic to deal with faceting. It may break with
-#' older (or newer!) versions of ggplot2.
+#'  * You can't set params `xmin,...` or `to_xmin,...` directly in the call
+#'    to `geom_magnify()`. If you want to set them, supply `data` and `mapping`
+#'    arguments.
 #'
-#' By design, `geom_magnify()` replots the original plot using new limits. It
-#' does not directly copy the target area pixels. The advantage is that you can
-#' e.g. add axes, plot points at an appropriate size, or recompute derived
-#' graphics.
+#' * `geom_magnify()` uses dark magic to deal with faceting. It may break with
+#'   older (or newer!) versions of ggplot2.
 #'
-#' ## TODO:
+#' * By design, `geom_magnify()` replots the original plot using new limits. It
+#'   does not directly copy the target area pixels. The advantage is that you can
+#'   e.g. add axes, plot points at an appropriate size, or recompute derived
+#'   graphics.
 #'
-#' * Support for non-standard scales
+#' * `geom_magnify()` may break with discrete scales. This is a limitation in
+#'   ggplot2 for now.
+#'
 #'
 #' @export
 #'
