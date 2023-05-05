@@ -71,13 +71,28 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
   optional_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
                   "to_height"),
 
-
-  compute_group = function (self, data, scales, x, y, width, height,
-                            to_x, to_y, to_width, to_height) {
+  setup_data = function (self, data, params) {
     for (var in c("x", "y", "width", "height", "to_x", "to_y", "to_width",
                   "to_height")) {
-      if (missing(var)) assign(var, data[[var]])
+      data[[var]] <- data[[var]] %||% params[[var]]
     }
+
+    data
+  },
+
+  compute_group = function (self, data, scales, x = NULL, y = NULL,
+                            width = NULL, height = NULL,
+                            to_x = NULL, to_y = NULL, to_width = NULL,
+                            to_height = NULL) {
+    # missing/get/assign are weird, maybe due to ggproto? Hence this
+    if (is.null(x)) x <- data$x
+    if (is.null(y)) y <- data$y
+    if (is.null(width)) width <- data$width
+    if (is.null(height)) height <- data$height
+    if (is.null(to_x)) to_x <- data$to_x
+    if (is.null(to_y)) to_y <- data$to_y
+    if (is.null(to_width)) to_width <- data$to_width
+    if (is.null(to_height)) to_height <- data$to_height
 
     data$xmin = x - width/2
     data$xmax = x + width/2
