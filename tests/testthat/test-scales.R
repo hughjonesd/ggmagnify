@@ -62,34 +62,6 @@ test_that("reverse", {
 })
 
 
-test_that("reversed coords", {
-
-  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2)) +
-    geom_magnify(from = from, to = to)
-
-  expect_no_error(
-    print(ggp_rev_x)
-  )
-
-  ggp_rev_y <- ggp2 +
-    coord_cartesian(ylim = c(8, 4)) +
-    geom_magnify(from = from, to = to)
-
-  expect_no_error(
-    print(ggp_rev_y)
-  )
-
-  skip_on_ci()
-  expect_snapshot_file(
-    ggsave("test-scales-reversed-coords-x.png", ggp_rev_x, width = 5, height = 5)
-  )
-  expect_snapshot_file(
-    ggsave("test-scales-reversed-coords-y.png", ggp_rev_y, width = 5, height = 5)
-  )
-})
-
-
-
 test_that("log", {
   dfr <- data.frame(x = c(1:10, 60), y = c(1:10, 60))
   ggp_log <- ggplot(dfr, aes(x = x, y = y)) + geom_point()
@@ -123,15 +95,38 @@ test_that("log", {
 
 
 test_that("date", {
-  skip("Not working yet")
   ggpd <- ggplot(economics, aes(date, unemploy/pop)) +
-    geom_line() +
-    scale_x_date()
+    geom_line(color = "navy") +
+    scale_x_date() +
+    coord_cartesian(ylim = c(0, 0.08)) +
+    theme_classic()
 
-  ggpd + geom_magnify(from = list(as.Date("1970-01-01"), 0,
-                                  as.Date("1972-01-01"), 0.03),
-                      to = list(as.Date("1990-01-01"), 0,
-                                  as.Date("2010-01-01"), 0.03))
+  expect_silent({
+    ggm_date <- ggpd + geom_magnify(xmin = as.Date("1970-01-01"), ymin = 0.018,
+                                    xmax = as.Date("1974-01-01"), ymax = 0.025,
+                                    to_xmin = as.Date("1983-01-01"), to_ymin = 0.06,
+                                    to_xmax = as.Date("2013-01-01"), to_ymax = 0.08,
+                                    axes = "xy")
+    print(ggm_date)
+  })
+
+  expect_silent({
+    ggm_date_ellipse <- ggpd +
+      geom_magnify(xmin = as.Date("1970-01-01"), ymin = 0.018,
+                   xmax = as.Date("1974-01-01"), ymax = 0.025,
+                   to_xmin = as.Date("1983-01-01"), to_ymin = 0.06,
+                   to_xmax = as.Date("2013-01-01"), to_ymax = 0.08,
+                   shape = "ellipse")
+    print(ggm_date_ellipse)
+  })
+
+  skip_on_ci()
+  expect_silent(
+    ggsave("test-scales-date.png", ggm_date, width = 5, height = 5)
+  )
+  expect_silent(
+    ggsave("test-scales-date-ellipse.png", ggm_date_ellipse, width = 5, height = 5)
+  )
 })
 
 

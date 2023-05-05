@@ -24,26 +24,39 @@ test_that("facet_grid", {
           geom_point() +
           facet_grid(vars(am), vars(vs))
 
-  expect_silent(
-    ggp3 +
-      geom_magnify_tile(x = 15, width = 4, y = 21, height = 2, to_x = 30, to_y = 18,
-                   to_width = 8, to_height = 4)
-  )
+  expect_silent({
+    ggp_facet_grid <- ggp3 +
+                        geom_magnify_tile(x = 15, width = 4, y = 21, height = 2,
+                                          to_x = 30, to_y = 18, to_width = 8,
+                                          to_height = 4)
+    print(ggp_facet_grid)
+  })
+
+  expect_silent({
+    ggp_facet_free <- ggp3 + facet_grid(vars(am), vars(vs), scales = "free") +
+                        geom_magnify_tile(x = 15, width = 4, y = 18, height = 2,
+                                          to_x = 30, to_y = 21, to_width = 8,
+                                          to_height = 4)
+    print(ggp_facet_free)
+  })
 
   skip_on_ci()
   expect_snapshot_file(
-    ggsave("test-geom-facet-grid.png", width = 5, height = 5)
+    ggsave("test-geom-facet-grid.png", ggp_facet_grid, width = 5, height = 5)
   )
-
-  expect_silent(
-    ggp3 + facet_grid(vars(am), vars(vs), scales = "free") +
-      geom_magnify_tile(x = 15, width = 4, y = 18, height = 2, to_x = 30, to_y = 21,
-                   to_width = 8, to_height = 4)
-  )
-
-  skip_on_ci()
   expect_snapshot_file(
-    ggsave("test-geom-facet-free.png", width = 5, height = 5)
+    ggsave("test-geom-facet-free.png", ggp_facet_free, width = 5, height = 5)
   )
+})
+
+
+test_that("facet_zoom", {
+  skip("Not working yet")
+  skip_if_not_installed("ggforce")
+  ggp2 + ggforce::facet_zoom(x = Species == 'versicolor') +
+    geom_magnify_tile(x = 15, width = 4, y = 18, height = 2,
+                      to_x = 30, to_y = 21, to_width = 8,
+                      to_height = 4)
+
 })
 

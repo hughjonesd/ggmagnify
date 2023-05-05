@@ -308,9 +308,15 @@ ggp +
 ```
 
 
-## Source
+
+## Acknowledgements
+
+ggmagnify was inspired by [this post](https://stackoverflow.com/a/66409862/10522567)
+and motivated by making [these plots](https://github.com/hughjonesd/academic-bias).
+
+Data for the GWAS plots comes from:
 
 Davies et al. (2018)
-'Study of 300,486 individuals identifies 148 independent genetic loci influencing general cognitive function.' Nature Communications
+'Study of 300,486 individuals identifies 148 independent genetic loci influencing general cognitive function.' *Nature Communications*.
 
 Data was trimmed to remove overlapping points.

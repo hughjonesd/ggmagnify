@@ -8,6 +8,33 @@ from <- c(3, 6, 3.5, 7)
 to <- c(2.4, 4.3, 3.2, 5.7)
 
 
+
+test_that("reversed coords", {
+  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2)) +
+    geom_magnify(from = from, to = to)
+
+  expect_no_error(
+    print(ggp_rev_x)
+  )
+
+  ggp_rev_y <- ggp2 +
+    coord_cartesian(ylim = c(8, 4)) +
+    geom_magnify(from = from, to = to)
+
+  expect_no_error(
+    print(ggp_rev_y)
+  )
+
+  skip_on_ci()
+  expect_snapshot_file(
+    ggsave("test-scales-reversed-coords-x.png", ggp_rev_x, width = 5, height = 5)
+  )
+  expect_snapshot_file(
+    ggsave("test-scales-reversed-coords-y.png", ggp_rev_y, width = 5, height = 5)
+  )
+})
+
+
 test_that("coord_fixed", {
   expect_no_error(
     ggp2 + coord_fixed() + geom_magnify(from = from, to = to)

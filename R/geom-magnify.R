@@ -384,7 +384,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 
-    grid::gTree(name = paste("ggmagnify", annotation_id()),
+    grid::gTree(name = paste("ggmagnify", incremental_id()),
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
   },
 )
@@ -397,6 +397,10 @@ make_geom_ellipse_grob <- function (df, panel_params, coord) {
 
 
 ellipse_points <- function(df) {
+  df$xmin <- as.numeric(df$xmin)
+  df$xmax <- as.numeric(df$xmax)
+  df$ymin <- as.numeric(df$ymin)
+  df$ymax <- as.numeric(df$ymax)
   df$x0 = (df$xmin + df$xmax)/2
   df$y0 = (df$ymin + df$ymax)/2
   df$a =  (df$xmax - df$xmin)/2
@@ -408,6 +412,7 @@ ellipse_points <- function(df) {
 
   el_pts
 }
+
 
 #' @export
 ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
@@ -475,35 +480,3 @@ StatMagnify <- ggproto("StatMagnify", Stat,
     data
   }
 )
-
-
-# The below are derived from ggplot2 code
-
-annotation_id <- local({
-  i <- 1
-  function() {
-    i <<- i + 1
-    i
-  }
-})
-
-
-constructor <- function (x) {
-  # copypasted from ggplot2 snakeize()
-  x <- class(x)[1]
-  x <- gsub("([A-Za-z])([A-Z])([a-z])", "\\1_\\2\\3", x)
-  x <- gsub(".", "_", x, fixed = TRUE)
-  x <- gsub("([a-z])([A-Z])", "\\1_\\2", x)
-  x <- chartr("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz", x)
-}
-
-
-plot_clone <- function (plot) {
-    p <- plot
-    p$scales <- plot$scales$clone()
-    p
-}
-
-`%||%` <- function (x, y) {
-    if (is.null(x)) y else x
-}

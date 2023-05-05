@@ -13,10 +13,11 @@ calculate_proj_segments <- function(proj, shape,
 calculate_proj_segments.rect <- function(proj, shape,
                                     xmin, xmax, ymin, ymax,
                                     to_xmin, to_xmax, to_ymin, to_ymax) {
-  x <- (xmin + xmax)/2
-  y <- (ymin + ymax)/2
-  to_x <- (to_xmin + to_xmax)/2
-  to_y <- (to_ymin + to_ymax)/2
+  # using mean allows Dates and maybe other things
+  x <- mean(c(xmin, xmax))
+  y <- mean(c(ymin, ymax))
+  to_x <- mean(c(to_xmin, to_xmax))
+  to_y <- mean(c(to_ymin, to_ymax))
 
   if (proj %in% c("auto", "corresponding", "facing")) {
     # which of the four lines connecting the four corners can we draw?
@@ -99,6 +100,14 @@ calculate_proj_segments.rect <- function(proj, shape,
 calculate_proj_segments.ellipse <- function(proj, shape,
                                  xmin, xmax, ymin, ymax,
                                  to_xmin, to_xmax, to_ymin, to_ymax) {
+  xmin <- as.numeric(xmin)
+  xmax <- as.numeric(xmax)
+  ymin <- as.numeric(ymin)
+  ymax <- as.numeric(ymax)
+  to_xmin <- as.numeric(to_xmin)
+  to_xmax <- as.numeric(to_xmax)
+  to_ymin <- as.numeric(to_ymin)
+  to_ymax <- as.numeric(to_ymax)
   e1 <- ellipse_points(data.frame(xmin, xmax, ymin, ymax))
   e2 <- ellipse_points(data.frame(xmin = to_xmin, xmax = to_xmax,
                                   ymin = to_ymin, ymax = to_ymax))
