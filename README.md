@@ -296,18 +296,23 @@ An inset *within* an inset is a bit more complex, but also doable:
 
 ``` r
 
-ggp <- data.frame(x = rnorm(1e5), y = rnorm(1e5)) |> 
-  ggplot(aes(x = x, y = y)) + 
-  geom_point(alpha = 0.12, colour = "seagreen", size = 0.7) + 
+ggp <- data.frame(x = rnorm(1e5), y = rnorm(1e5), 
+                  colour = sample(8L, 1e5, replace = TRUE)) |> 
+  ggplot(aes(x = x, y = y, colour = factor(colour))) + 
+  scale_color_brewer(type = "qual", palette = 2) +
+  geom_point(alpha = 0.12, size = 0.7) + 
   lims(x = c(-3,3), y = c(-3,3)) +
   theme_classic() + theme(panel.grid = element_blank(), 
-                          axis.line = element_blank())
+                          axis.line = element_blank(), 
+                          plot.background = element_rect(fill = "black"),
+                          panel.background = element_rect(fill = "black"),
+                          legend.position = "none")
 
 ggpm <- ggp + 
   lims(x = c(-0.3, 0.3), y = c(-0.3, 0.3)) + 
   geom_magnify(from = c(-0.03, -0.03, 0.03, 0.03),
                to = c(-0.3, -0.3, -0.1, -0.1),
-               expand = FALSE)
+               expand = FALSE, colour = "white")
 #> Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
 #> Scale for y is already present.
@@ -317,7 +322,7 @@ ggp +
   geom_magnify(plot = ggpm, 
                from = c(-0.3, -0.3, 0.3, 0.3),
                to = c(-3, -3, -1, -1),
-               expand = FALSE) +
+               expand = FALSE, colour = "white") +
   labs(title = "Normal data", 
        subtitle = "The distribution gets more uniform as you zoom in")
 #> Warning: Removed 566 rows containing missing values (`geom_point()`).
