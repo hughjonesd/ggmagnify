@@ -240,7 +240,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
 
-    # == draw borders around target and inset ==
+    # == create grob for border around inset ==
     target_df <- data.frame(xmin = d1$xmin, xmax = d1$xmax, ymin = d1$ymin,
                             ymax = d1$ymax,
                             colour = alpha(d1$colour, alpha), fill = NA,
@@ -252,19 +252,6 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                    } else {
                      make_geom_ellipse_grob(target_df, panel_params, coord)
                    }
-
-    border_df <- data.frame(xmin = d1$to_xmin, xmax = d1$to_xmax, ymin = d1$to_ymin,
-                            ymax = d1$to_ymax,
-                            colour = alpha(d1$colour, alpha), fill = NA,
-                            linewidth = linewidth, alpha = NA,
-                            linetype = inset.linetype,
-                            group = 1L)
-    border_grob <- if (shape == "rect") {
-                     GeomRect$draw_panel(border_df, panel_params, coord)
-                   } else {
-                     make_geom_ellipse_grob(border_df, panel_params, coord)
-                   }
-
 
     # == draw projection lines ==========================================
 
@@ -367,26 +354,38 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       grid::polygonGrob(x = el_pts$x, y = el_pts$y,
                         default.units = "native",
                         gp = gpar(fill = rgb(0,0,0,1)))
-    } else {
+    } else if (shape == "rect") {
       grid::rectGrob(default.units = "native",
                      gp = gpar(fill = rgb(0,0,0,1)))
+    } else {
+      shape
     }
 
+    border_grob <- grid::editGrob(mask,
+                                  name = paste0("ggmagnify-border-",
+                                                     incremental_id()),
+                                  gp = gpar(fill = NA,
+                                            col = alpha(d1$colour, alpha),
+                                            lwd = linewidth * .pt,
+                                            lty = inset.linetype
+                                            ))
+    # browser()
     # we use a mask here instead of clipping because gtable doesn't inherit
     # clip, and grid doesn't nest clips (so I guess ggplot needs its own
     # clipping, presumably when grid.draw is called on it?)
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
-                     height = diff(y_rng), default.units = "native",
-                     mask = mask)
+                   height = diff(y_rng), default.units = "native",
+                   mask = mask)
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
+    border_grob <- grid::editGrob(border_grob, vp = vp)
 
-        if (shadow) {
+    if (shadow) {
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 
-    grid::gTree(name = paste("ggmagnify", incremental_id()),
+    grid::gTree(name = paste0("ggmagnify-", incremental_id()),
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
-  },
+  }
 )
 
 
