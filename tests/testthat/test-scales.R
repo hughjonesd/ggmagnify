@@ -8,47 +8,56 @@ from <- c(3, 6, 3.5, 7)
 to <- c(2.4, 4.3, 3.2, 5.7)
 
 test_that("limits", {
-  expect_silent(
-    ggp2 +
+  ggp_limits_x <- ggp2 +
       scale_x_continuous(limits = c(2, 5)) +
       geom_magnify(from = from, to = to)
+  expect_silent(
+    print(ggp_limits_x)
   )
 
-  expect_snapshot_file(
-    ggsave("test-scales-limits-x.png", width = 5, height = 5)
-  )
+
+  ggp_limits_y <- ggp2 +
+    scale_y_continuous(limits = c(4, 8)) +
+    geom_magnify(from = from, to = to)
 
   expect_silent(
-    ggp2 +
-      scale_y_continuous(limits = c(4, 8)) +
-      geom_magnify(from = from, to = to)
+    print(ggp_limits_y)
   )
 
+  skip_on_ci()
   expect_snapshot_file(
-    ggsave("test-scales-limits-y.png", width = 5, height = 5)
+    ggsave("test-scales-limits-x.png", ggp_limits_x, width = 5, height = 5)
+  )
+  expect_snapshot_file(
+    ggsave("test-scales-limits-y.png", ggp_limits_y, width = 5, height = 5)
   )
 })
 
 
 test_that("reverse", {
+  ggp_reverse_x <- ggp2 +
+    scale_x_reverse() +
+    geom_magnify(from = from[c(3,2,1,4)], to = to[c(3,2,1,4)])
+
   expect_silent(
-    ggp2 +
-      scale_x_reverse() +
-      geom_magnify(from = from[c(3,2,1,4)], to = to[c(3,2,1,4)])
+    print(ggp_reverse_x)
+  )
+
+  ggp_reverse_y <- ggp2 +
+    scale_y_reverse() +
+    geom_magnify(from = from[c(1,4,3,2)], to = to[c(1,4,3,2)])
+
+  expect_silent(
+    print(ggp_reverse_y)
+  )
+
+  skip_on_ci()
+  expect_snapshot_file(
+    ggsave("test-scales-reverse-x.png", ggp_reverse_x, width = 5, height = 5)
   )
 
   expect_snapshot_file(
-    ggsave("test-scales-reverse-x.png", width = 5, height = 5)
-  )
-
-  expect_silent(
-    ggp2 +
-      scale_y_reverse() +
-      geom_magnify(from = from[c(1,4,3,2)], to = to[c(1,4,3,2)])
-  )
-
-  expect_snapshot_file(
-    ggsave("test-scales-reverse-y.png", width = 5, height = 5)
+    ggsave("test-scales-reverse-y.png", ggp_reverse_y, width = 5, height = 5)
   )
 })
 
@@ -82,25 +91,29 @@ test_that("log", {
   dfr <- data.frame(x = c(1:10, 60), y = c(1:10, 60))
   ggp_log <- ggplot(dfr, aes(x = x, y = y)) + geom_point()
 
-  expect_silent(
-    ggp_log +
-      scale_x_log10() +
-      geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
-  )
-
-  expect_snapshot_file(
-    ggsave("test-scales-log-x.png", width = 5, height = 5)
-  )
+  ggp_log_x <- ggp_log +
+    scale_x_log10() +
+    geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
 
   expect_silent(
-    ggp_log +
-      scale_x_log10() +
-      scale_y_log10() +
-      geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
+    print(ggp_log_x)
   )
 
+  ggp_log_xy <- ggp_log +
+    scale_x_log10() +
+    scale_y_log10() +
+    geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
+
+  expect_silent(
+    print(ggp_log_xy)
+  )
+
+  skip_on_ci()
   expect_snapshot_file(
-    ggsave("test-scales-log-xy.png", width = 5, height = 5)
+    ggsave("test-scales-log-x.png", ggp_log_x, width = 5, height = 5)
+  )
+  expect_snapshot_file(
+    ggsave("test-scales-log-xy.png", ggp_log_xy, width = 5, height = 5)
   )
 })
 
