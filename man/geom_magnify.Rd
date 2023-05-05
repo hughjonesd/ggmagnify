@@ -8,11 +8,11 @@
 geom_magnify(
   mapping = NULL,
   data = NULL,
-  stat = "identity",
+  stat = StatMagnify,
   position = "identity",
   ...,
-  from,
-  to,
+  from = NULL,
+  to = NULL,
   expand = TRUE,
   axes = "",
   proj = c("facing", "corresponding", "single"),
@@ -35,7 +35,7 @@ geom_magnify(
 geom_magnify_tile(
   mapping = NULL,
   data = NULL,
-  stat = "identity",
+  stat = StatMagnifyTile,
   position = "identity",
   ...,
   expand = TRUE,
@@ -131,7 +131,24 @@ keeping all the data.}
 
 \item{scale.inset}{Length 1 or 2 numeric. Normally, exactly the target area
 is shown on the inset. Sometimes you may wish to rescale the plot in the
-inset. Use 2 numbers to scale width and height separately.
+inset. Use 2 numbers to scale width and height separately.}
+
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
+
+\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+}
+\description{
+\code{geom_magnify()} creates a magnified inset of part of a plot. The target
+area is centred at \verb{(x,y)} with \code{width} and \code{height}. The inset is centred
+at \verb{(to_x,to_y)}, with \code{width} and \code{height} multiplied by \code{magnify}. Optional
+borders are drawn around the target and inset, along with projection lines
+from one to the other.
+}
+\details{
 \subsection{Aesthetics}{
 
 geom_magnify understand the following aesthetics (required aesthetics are in
@@ -184,24 +201,8 @@ graphics.
 \itemize{
 \item Support for non-standard scales
 }
-}}
-
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
-
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 }
-\description{
-\code{geom_magnify()} creates a magnified inset of part of a plot. The target
-area is centred at \verb{(x,y)} with \code{width} and \code{height}. The inset is centred
-at \verb{(to_x,to_y)}, with \code{width} and \code{height} multiplied by \code{magnify}. Optional
-borders are drawn around the target and inset, along with projection lines
-from one to the other.
-}
-\details{
+
 \code{geom_magnify_tile()} is a version of \code{geom_magnify()} which uses different
 aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x}, \code{to_width} \code{to_y},
 \code{to_height} to specify the target and inset location.

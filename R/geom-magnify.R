@@ -54,6 +54,7 @@ NULL
 #'   is shown on the inset. Sometimes you may wish to rescale the plot in the
 #'   inset. Use 2 numbers to scale width and height separately.
 #'
+#' @details
 #' ## Aesthetics
 #'
 #' geom_magnify understand the following aesthetics (required aesthetics are in
@@ -148,10 +149,10 @@ NULL
 #'                to = c(4, 5, 7, 6.5)) +
 #'   geom_smooth()
 #'
-geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
+geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                            position = "identity", ...,
-                           from,
-                           to,
+                           from = NULL,
+                           to = NULL,
                            expand = TRUE,
                            axes = "",
                            proj = c("facing", "corresponding", "single"),
@@ -198,9 +199,8 @@ geom_magnify <- function (mapping = NULL, data = NULL,  stat = "identity",
 #' @usage NULL
 #' @export
 GeomMagnify <- ggproto("GeomMagnify", Geom,
-  # this just causes pain
-  # required_aes = c("xmin", "xmax", "ymin", "ymax",
-  #                  "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
+  optional_aes = c("xmin", "xmax", "ymin", "ymax",
+                   "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
   default_aes = aes(colour = "black"),
   draw_key = draw_key_blank,
   plot = NULL,
@@ -225,25 +225,6 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     }
 
     params
-  },
-
-  setup_data = function (data, params) {
-    if (! is.null(params$from)) {
-      from <- params$from
-      data$xmin <- from[1]
-      data$ymin <- from[2]
-      data$xmax <- from[3]
-      data$ymax <- from[4]
-    }
-    if (! is.null(params$to)) {
-      to <- params$to
-      data$to_xmin <- to[1]
-      data$to_ymin <- to[2]
-      data$to_xmax <- to[3]
-      data$to_ymax <- to[4]
-    }
-
-    data
   },
 
   draw_panel = function (self, data, panel_params, coord, from, to,
@@ -305,8 +286,14 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     rev_x <- ! is.null(plot_limits$x) && diff(plot_limits$x) < 0
     rev_y <- ! is.null(plot_limits$y) && diff(plot_limits$y) < 0
-    xlim_vals <- c(d1$xmin, d1$xmax)
-    ylim_vals <- c(d1$ymin, d1$ymax)
+
+    if ("inset_xmin" %in% names(d1)) {
+      xlim_vals <- c(d1$inset_xmin, d1$inset_xmax)
+      ylim_vals <- c(d1$inset_ymin, d1$inset_ymax)
+    } else {
+      xlim_vals <- c(d1$xmin, d1$xmax)
+      ylim_vals <- c(d1$ymin, d1$ymax)
+    }
     if (rev_x) xlim_vals <- xlim_vals[2:1]
     if (rev_y) ylim_vals <- ylim_vals[2:1]
 
@@ -358,6 +345,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       plot_gtable <- ggplot_gtable(plot_built)
     ))
 
+    # == create the viewport and mask for the inset plot ==============
+
     corners <- data.frame(
       x = c(d1$to_xmin, d1$to_xmax),
       y = c(d1$to_ymin, d1$to_ymax)
@@ -378,12 +367,15 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                      gp = gpar(fill = rgb(0,0,0,1)))
     }
 
+    # we use a mask here instead of clipping because gtable doesn't inherit
+    # clip, and grid doesn't nest clips (so I guess ggplot needs its own
+    # clipping, presumably when grid.draw is called on it?)
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
                      height = diff(y_rng), default.units = "native",
                      mask = mask)
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
 
-    if (shadow) {
+        if (shadow) {
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 
@@ -393,7 +385,6 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 )
 
 
-
 make_geom_ellipse_grob <- function (df, panel_params, coord) {
   el_pts <- ellipse_points(df)
   ggforce::GeomCircle$draw_panel(el_pts, panel_params, coord)
@@ -401,14 +392,13 @@ make_geom_ellipse_grob <- function (df, panel_params, coord) {
 
 
 ellipse_points <- function(df) {
-  ellipse_df <- transform(df,
-                x0 = (xmin + xmax)/2,
-                y0 = (ymin + ymax)/2,
-                a =  (xmax - xmin)/2,
-                b =  (ymax - ymin)/2,
-                angle = 0,
-                group = 1)
-  ellipse_df <- ggforce::StatEllip$setup_data(ellipse_df)
+  df$x0 = (df$xmin + df$xmax)/2
+  df$y0 = (df$ymin + df$ymax)/2
+  df$a =  (df$xmax - df$xmin)/2
+  df$b =  (df$ymax - df$ymin)/2
+  df$angle = 0
+  df$group = 1
+  ellipse_df <- ggforce::StatEllip$setup_data(df)
   el_pts <- ggforce::StatEllip$compute_panel(data = ellipse_df, scales = NULL)
 
   el_pts
@@ -419,6 +409,57 @@ ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
   object$geom$plot <- plot
   NextMethod()
 }
+
+
+StatMagnify <- ggproto("StatMagnify", Stat,
+  optional_aes = c("xmin", "xmax", "ymin", "ymax",
+                   "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
+
+
+  compute_group = function (data, scales, from = NULL, to = NULL) {
+    if (! is.null(from)) {
+      data$xmin <- from[1]
+      data$ymin <- from[2]
+      data$xmax <- from[3]
+      data$ymax <- from[4]
+    }
+
+    data[c("inset_xmin", "inset_ymin", "inset_xmax", "inset_ymax")] <-
+      data[c("xmin", "ymin", "xmax", "ymax")]
+
+    transform_x <- ! is.null(scales$x) && ! scales$x$is_discrete()
+    transform_y <- ! is.null(scales$y) && ! scales$y$is_discrete()
+
+    # if from is not null then xmin and friends will already have been
+    # through the transformation
+    if (! is.null(from)) {
+      if (transform_x) {
+        data[, c("xmin", "xmax")] <- scales$x$transform_df(data[, c("xmin", "xmax")])
+      }
+      if (transform_y) {
+        data[, c("ymin", "ymax")] <- scales$y$transform_df(data[, c("ymin", "ymax")])
+      }
+    }
+
+    if (! is.null(to)) {
+      data$to_xmin <- to[1]
+      data$to_ymin <- to[2]
+      data$to_xmax <- to[3]
+      data$to_ymax <- to[4]
+      if (transform_x) {
+        data$to_xmin <- scales$x$transform(data$to_xmin)
+        data$to_xmax <- scales$x$transform(data$to_xmax)
+      }
+      if (transform_y) {
+        data$to_ymin <- scales$y$transform(data$to_ymin)
+        data$to_ymax <- scales$y$transform(data$to_ymax)
+      }
+    }
+
+    data
+  }
+)
+
 
 # The below are derived from ggplot2 code
 

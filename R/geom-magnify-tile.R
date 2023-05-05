@@ -7,8 +7,11 @@
 #' `to_height` to specify the target and inset location.
 #'
 #' @export
-geom_magnify_tile <- function (mapping = NULL, data = NULL,  stat = "identity",
-                               position = "identity", ...,
+geom_magnify_tile <- function (mapping = NULL,
+                               data = NULL,
+                               stat = StatMagnifyTile,
+                               position = "identity",
+                               ...,
                                expand = TRUE,
                                axes = "",
                                proj = "facing",
@@ -29,7 +32,7 @@ geom_magnify_tile <- function (mapping = NULL, data = NULL,  stat = "identity",
                                inherit.aes = FALSE) {
 
   l <- layer(
-         geom = ggproto(NULL, GeomMagnify2), # we clone because self$plot holds state
+         geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
          params = list(na.rm = na.rm, expand = expand,
@@ -49,29 +52,43 @@ geom_magnify_tile <- function (mapping = NULL, data = NULL,  stat = "identity",
 }
 
 
-#' @rdname GeomMagnify
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomMagnify2 <- ggproto("GeomMagnify2", GeomMagnify,
-  required_aes = c("x", "y", "height", "width",
-                   "to_x", "to_y", "to_height", "to_width"),
+#' #' @rdname GeomMagnify
+#' #' @format NULL
+#' #' @usage NULL
+#' #' @export
+#' GeomMagnifyTile <- ggproto("GeomMagnifyTile", GeomMagnify,
+#'   required_aes = c("x", "y", "height", "width",
+#'                    "to_x", "to_y", "to_height", "to_width"),
+#'
+#'   draw_panel = function(self, ...) {
+#'     ggproto_parent(GeomMagnify, self)$draw_panel(...)
+#'   }
+#' )
 
-  setup_data = function (self, data, params) {
-    for (v in c("x", "y", "to_x", "to_y", "width", "height", "to_width",
-                "to_height")) {
-      data[[v]] <- data[[v]] %||% params[[v]]
+
+
+StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
+  optional_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
+                  "to_height"),
+
+
+  compute_group = function (self, data, scales, x, y, width, height,
+                            to_x, to_y, to_width, to_height) {
+    for (var in c("x", "y", "width", "height", "to_x", "to_y", "to_width",
+                  "to_height")) {
+      if (missing(var)) assign(var, data[[var]])
     }
 
-    transform(data,
-              xmin = x - width/2,
-              xmax = x + width/2,
-              ymin = y - height/2,
-              ymax = y + height/2,
-              to_xmin = to_x - to_width/2,
-              to_xmax = to_x + to_width/2,
-              to_ymin = to_y - to_height/2,
-              to_ymax = to_y + to_height/2
-              )
+    data$xmin = x - width/2
+    data$xmax = x + width/2
+    data$ymin = y - height/2
+    data$ymax = y + height/2
+    data$to_xmin = to_x - to_width/2
+    data$to_xmax = to_x + to_width/2
+    data$to_ymin = to_y - to_height/2
+    data$to_ymax = to_y + to_height/2
+
+    ggproto_parent(StatMagnify, self)$compute_group(data = data, scales = scales)
   }
 )
+
