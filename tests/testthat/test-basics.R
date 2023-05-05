@@ -39,8 +39,8 @@ test_that("clipping", {
 
 
 test_that("position from data", {
-  expect_silent(
-    ggp2 + geom_magnify(
+  expect_silent({
+    ggm_pos_data <- ggp2 + geom_magnify(
       aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
           to_xmin = to_xmin, to_xmax = to_xmax, to_ymin = to_ymin, to_ymax = to_ymax),
       data = data.frame(xmin = from[1], ymin = from[2], xmax = from[3],
@@ -48,9 +48,28 @@ test_that("position from data", {
                         to_xmin = to[1], to_ymin = to[2], to_xmax = to[3],
                         to_ymax = to[4]),
     )
+    print(ggm_pos_data)
+  })
+
+  expect_silent({
+    ggmt_pos_data <- ggp2 + geom_magnify_tile(
+      aes(x = x, y = y, width = width, height = height,
+          to_x = to_x, to_y = to_y, to_width = to_width, to_height = to_height
+          ),
+      data = data.frame(x = 2.75, y = 5.75,  width = .5, height = .5,
+                        to_x = 4, to_y = 5, to_width = 1, to_height = 1)
+    )
+    print(ggmt_pos_data)
+  })
+
+  skip_on_ci()
+  expect_snapshot_file(
+    ggsave("test-basics-position-from-data.png", ggm_pos_data,
+           width = 5, height = 5)
   )
   expect_snapshot_file(
-    ggsave("test-basics-position-from-data.png", width = 5, height = 5)
+    ggsave("test-basics-tile-position-from-data.png", ggmt_pos_data,
+           width = 5, height = 5)
   )
 })
 
