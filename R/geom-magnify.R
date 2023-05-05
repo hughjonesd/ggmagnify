@@ -391,7 +391,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       grid::rectGrob(default.units = "native",
                      gp = gpar(fill = rgb(0,0,0,1)))
     } else {
-      shape
+      grid::editGrob(shape, gp = gpar(fill = rgb(0, 0, 0, 1)))
     }
 
     border_grob <- grid::editGrob(mask,
