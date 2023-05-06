@@ -38,5 +38,6 @@ Collate:
     'geom-magnify.R'
     'geom-magnify-tile.R'
     'ggmagnify.R'
+    'ggplot-utils.R'
     'inset-theme.R'
     'projection.R'
