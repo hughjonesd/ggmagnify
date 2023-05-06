@@ -6,11 +6,15 @@ NULL
 
 # TODO:
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
-# - make it work with log scales et al... if you can, ha ha
 # - why isn't geom_abline() working when recompute = FALSE?
+# - clean up the code. Work in transformed coordinates from the start of
+#   draw_panel(). Minimize use of external stuff. Note: gridExtra::ellipseGrob()
+#   is probably a lesser dependency than ggforce.
 #
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
+#   - and it's liable to blow up when you put your aesthetics in the data.
+#     Not worth it
 
 
 #' Magnified inset of a plot
@@ -38,7 +42,8 @@ NULL
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components.
 #' @param shape `"rect"` to magnify a rectangle. `"ellipse"` to magnify an ellipse.
-#'   `"ellipse` requires the "ggforce" package.
+#'   `"ellipse` requires the "ggforce" package. Or (experimental!) pass in a
+#'   [grid::grob()] for an arbitrary mask.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -85,6 +90,12 @@ NULL
 #' `"facing"` sometimes draws lines between facing corners, when this looks
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
 #' `"none"` draws no lines.
+#'
+#' ## Arbitrary shapes
+#'
+#' To magnify an arbitrary area, pass a grid grob into `shape`. The grob should
+#' be scaled to between 0 and 1 on both dimensions. This is experimental. (Well,
+#' everything is experimental. This is just *more* experimental.)
 #'
 #' ## Limitations
 #'
@@ -138,6 +149,12 @@ NULL
 #'                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 #' }
 #'
+#' # Arbitrary shape using grid
+#' shape <- grid::polygonGrob()
+#' @expect no_error()
+#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+#'                    to = c(4, 5, 7, 6.5),
+#'                    shape = shape)
 #' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
@@ -213,16 +230,18 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
   setup_params = function (data, params) {
     params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
-    params$shape <- match.arg(params$shape, c("rect", "ellipse"))
-    if (params$shape == "ellipse") {
+    if (is.character(params$shape)) {
+      params$shape <- match.arg(params$shape, c("rect", "ellipse"))
+    }
+    if (identical(params$shape, "ellipse")) {
       rlang::check_installed("ggforce")
     }
     if (params$shadow) {
       rlang::check_installed("ggfx")
     }
-    if (params$axes != "" && params$shape == "ellipse") {
+    if (params$axes != "" && ! identical(params$shape, "rect")) {
       cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} with",
-                          "{.code shape = \"ellipse\"}"))
+                          "{.code shape != \"rect\"}"))
       params$axes <- ""
     }
     if (length(params$scale.inset) == 1L) {
@@ -240,31 +259,36 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
 
-    # == draw borders around target and inset ==
+    # == create grob for border around inset ==
     target_df <- data.frame(xmin = d1$xmin, xmax = d1$xmax, ymin = d1$ymin,
                             ymax = d1$ymax,
                             colour = alpha(d1$colour, alpha), fill = NA,
                             linewidth = linewidth, alpha = NA,
                             linetype = target.linetype,
                             group = 1L) # group = 1 needed for some coord systems
-    target_grob <- if (shape == "rect") {
+    target_grob <- if (identical(shape, "rect")) {
                      GeomRect$draw_panel(target_df, panel_params, coord)
-                   } else {
+                   } else if (identical(shape, "ellipse")) {
                      make_geom_ellipse_grob(target_df, panel_params, coord)
-                   }
-
-    border_df <- data.frame(xmin = d1$to_xmin, xmax = d1$to_xmax, ymin = d1$to_ymin,
-                            ymax = d1$to_ymax,
-                            colour = alpha(d1$colour, alpha), fill = NA,
-                            linewidth = linewidth, alpha = NA,
-                            linetype = inset.linetype,
-                            group = 1L)
-    border_grob <- if (shape == "rect") {
-                     GeomRect$draw_panel(border_df, panel_params, coord)
                    } else {
-                     make_geom_ellipse_grob(border_df, panel_params, coord)
+                     target_corners <- data.frame(
+                       x = c(d1$xmin, d1$xmax),
+                       y = c(d1$ymin, d1$ymax)
+                     )
+                     target_corners_t <- coord$transform(target_corners, panel_params)
+                     target_x_rng <- range(target_corners_t$x, na.rm = TRUE)
+                     target_y_rng <- range(target_corners_t$y, na.rm = TRUE)
+                     target_vp <- viewport(x = mean(target_x_rng),
+                                           y = mean(target_y_rng),
+                                           width = diff(target_y_rng),
+                                           height = diff(target_y_rng))
+                     editGrob(shape,
+                              vp = target_vp,
+                              gp = gpar(fill = NA, col = alpha(d1$colour, alpha),
+                                            lwd = linewidth * .pt,
+                                            lty = target.linetype
+                                            ))
                    }
-
 
     # == draw projection lines ==========================================
 
@@ -360,33 +384,45 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     x_rng <- range(corners_t$x, na.rm = TRUE)
     y_rng <- range(corners_t$y, na.rm = TRUE)
-    mask <- if (shape == "ellipse") {
+    mask <- if (identical(shape, "ellipse")) {
       ellipse_df <- data.frame(xmin = 0, xmax = 1,
                                ymin = 0, ymax = 1)
       el_pts <- ellipse_points(ellipse_df)
       grid::polygonGrob(x = el_pts$x, y = el_pts$y,
                         default.units = "native",
                         gp = gpar(fill = rgb(0,0,0,1)))
-    } else {
+    } else if (identical(shape, "rect")) {
       grid::rectGrob(default.units = "native",
                      gp = gpar(fill = rgb(0,0,0,1)))
+    } else {
+      grid::editGrob(shape, gp = gpar(fill = rgb(0, 0, 0, 1)))
     }
 
+    border_grob <- grid::editGrob(mask,
+                                  name = paste0("ggmagnify-border-",
+                                                     incremental_id()),
+                                  gp = gpar(fill = NA,
+                                            col = alpha(d1$colour, alpha),
+                                            lwd = linewidth * .pt,
+                                            lty = inset.linetype
+                                            ))
+    # browser()
     # we use a mask here instead of clipping because gtable doesn't inherit
     # clip, and grid doesn't nest clips (so I guess ggplot needs its own
     # clipping, presumably when grid.draw is called on it?)
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
-                     height = diff(y_rng), default.units = "native",
-                     mask = mask)
+                   height = diff(y_rng), default.units = "native",
+                   mask = mask)
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
+    border_grob <- grid::editGrob(border_grob, vp = vp)
 
-        if (shadow) {
+    if (shadow) {
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 
-    grid::gTree(name = paste("ggmagnify", incremental_id()),
+    grid::gTree(name = paste0("ggmagnify-", incremental_id()),
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
-  },
+  }
 )
 
 

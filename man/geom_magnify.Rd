@@ -116,7 +116,8 @@ and projection lines. Set \code{linetype = 0} for no lines.}
 for specific components.}
 
 \item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.
-\verb{"ellipse} requires the "ggforce" package.}
+\verb{"ellipse} requires the "ggforce" package. Or (experimental!) pass in a
+\code{\link[grid:grid.grob]{grid::grob()}} for an arbitrary mask.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
@@ -186,6 +187,13 @@ cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 \code{"none"} draws no lines.
 }
 
+\subsection{Arbitrary shapes}{
+
+To magnify an arbitrary area, pass a grid grob into \code{shape}. The grob should
+be scaled to between 0 and 1 on both dimensions. This is experimental. (Well,
+everything is experimental. This is just \emph{more} experimental.)
+}
+
 \subsection{Limitations}{
 \itemize{
 \item \code{geom_magnify()} uses masks. This requires R version 4.2.0 or higher, and
@@ -234,6 +242,11 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 }
 
+# Arbitrary shape using grid
+shape <- grid::polygonGrob()
+ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
+                   to = c(4, 5, 7, 6.5),
+                   shape = shape)
 # Order matters
 
 # `geom_magnify()` stores the plot when it is added to it:

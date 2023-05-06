@@ -4,7 +4,7 @@
 calculate_proj_segments <- function(proj, shape,
                                     xmin, xmax, ymin, ymax,
                                     to_xmin, to_xmax, to_ymin, to_ymax) {
-  shape <- structure(list(), class = shape)
+  shape <- structure(list(), class = if (is.character(shape)) shape else "mask")
   UseMethod("calculate_proj_segments", shape)
 
 }
@@ -177,4 +177,16 @@ calculate_proj_segments.ellipse <- function(proj, shape,
 
     rbind(tangent_above, tangent_below)
   }
+}
+
+
+calculate_proj_segments.mask <- function(proj, shape,
+                                    xmin, xmax, ymin, ymax,
+                                    to_xmin, to_xmax, to_ymin, to_ymax) {
+  # find closest point of mask to midpoint_vec
+  # the second point will just be hidden under the picture
+  midpoint1 <- c((xmin + xmax)/2, (ymin + ymax)/2)
+  midpoint2 <- c((to_xmin + to_xmax)/2, (to_ymin + to_ymax)/2)
+  data.frame(x = midpoint1[1], y = midpoint1[2], xend = midpoint2[1],
+        yend = midpoint2[2])
 }
