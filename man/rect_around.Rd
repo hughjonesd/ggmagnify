@@ -5,9 +5,9 @@
 \alias{hull_around}
 \title{Helper functions to find rectangles or convex hulls of data}
 \usage{
-rect_around(x, y, data, expand = 0.1)
+rect_around(x, y, data = NULL, expand = 0.1)
 
-hull_around(x, y, data, expand = 0.1)
+hull_around(x, y, data = NULL, expand = 0.1)
 }
 \arguments{
 \item{x, y}{Unquoted names of expressions}

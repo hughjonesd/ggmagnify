@@ -35,7 +35,7 @@ expand_by <- function (x, expand) {
 #'   geom_magnify(to = to,
 #'                from = hull_around(Sepal.Width, Sepal.Length,
 #'                                   data = setosas))
-rect_around <- function (x, y, data, expand = 0.1) {
+rect_around <- function (x, y, data = NULL, expand = 0.1) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   x <- rlang::eval_tidy(x, data = data)
@@ -49,7 +49,7 @@ rect_around <- function (x, y, data, expand = 0.1) {
 
 #' @rdname rect_around
 #' @export
-hull_around <- function (x, y, data, expand = 0.1) {
+hull_around <- function (x, y, data = NULL, expand = 0.1) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   x <- rlang::eval_tidy(x, data = data)
