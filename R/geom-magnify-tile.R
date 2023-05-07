@@ -13,6 +13,7 @@ geom_magnify_tile <- function (mapping = NULL,
                                position = "identity",
                                ...,
                                expand = TRUE,
+                               aspect = c("free", "fixed"),
                                axes = "",
                                proj = "facing",
                                shadow = FALSE,
@@ -35,7 +36,7 @@ geom_magnify_tile <- function (mapping = NULL,
          geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
-         params = list(na.rm = na.rm, expand = expand,
+         params = list(na.rm = na.rm, expand = expand, aspect = aspect,
                        axes = axes,
                        proj = proj, shadow = shadow,
                        linewidth = linewidth, linetype = linetype,
@@ -60,7 +61,7 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
   compute_group = function (self, data, scales, x = NULL, y = NULL,
                             width = NULL, height = NULL,
                             to_x = NULL, to_y = NULL, to_width = NULL,
-                            to_height = NULL) {
+                            to_height = NULL, aspect = NULL) {
     # missing/get/assign are weird, maybe due to ggproto? Hence this
     if (is.null(x)) x <- data$x
     if (is.null(y)) y <- data$y

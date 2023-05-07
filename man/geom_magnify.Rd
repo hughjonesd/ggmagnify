@@ -14,6 +14,7 @@ geom_magnify(
   from = NULL,
   to = NULL,
   expand = TRUE,
+  aspect = c("free", "fixed"),
   axes = "",
   proj = c("facing", "corresponding", "single"),
   shadow = FALSE,
@@ -39,6 +40,7 @@ geom_magnify_tile(
   position = "identity",
   ...,
   expand = TRUE,
+  aspect = c("free", "fixed"),
   axes = "",
   proj = "facing",
   shadow = FALSE,
@@ -100,6 +102,8 @@ Alternatively, pass in a data frame or \code{\link[grid:grid.grob]{grid::grob()}
 
 \item{expand}{Logical. Expand the limits of the target area by a small factor
 in the inset plot. See \link[ggplot2:coord_cartesian]{coord_cartesian()}.}
+
+\item{aspect}{String. \code{"fixed"} to fix the aspect ratio (overrides \code{ymax}).}
 
 \item{axes}{String. Which axes to plot in the inset? \code{""}, \code{"x"}, \code{"y"} or
 \code{"xy"}.}

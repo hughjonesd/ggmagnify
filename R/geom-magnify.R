@@ -33,6 +33,7 @@ NULL
 #' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
 #'   Alternatively, pass in a data frame or [grid::grob()] object, see below.
 #' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.
+#' @param aspect String. `"fixed"` to fix the aspect ratio (overrides `ymax`).
 #' @param expand Logical. Expand the limits of the target area by a small factor
 #'   in the inset plot. See [coord_cartesian()][ggplot2::coord_cartesian()].
 #' @param axes String. Which axes to plot in the inset? `""`, `"x"`, `"y"` or
@@ -180,6 +181,7 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                            from = NULL,
                            to = NULL,
                            expand = TRUE,
+                           aspect = c("free", "fixed"),
                            axes = "",
                            proj = c("facing", "corresponding", "single"),
                            shadow = FALSE,
@@ -202,8 +204,8 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
          geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
-         params = list(from = from, to = to,
-                       expand = expand, axes = axes, proj = proj, shadow = shadow,
+         params = list(from = from, to = to, expand = expand, aspect = aspect,
+                       axes = axes, proj = proj, shadow = shadow,
                        linewidth = linewidth, linetype = linetype, alpha = alpha,
                        target.linetype = target.linetype,
                        proj.linetype = proj.linetype,
@@ -470,6 +472,8 @@ StatMagnify <- ggproto("StatMagnify", Stat,
                          max(grobcc[,"y"]))
       }
     }
+    params$aspect <- match.arg(params$aspect, c("free", "fixed"))
+
 
     params
   },
@@ -486,7 +490,7 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   compute_group = function (data, scales, from = NULL, to = NULL,
                             xmin = NULL, ymin = NULL, xmax = NULL, ymax = NULL,
                             to_xmin = NULL, to_ymin = NULL, to_xmax = NULL,
-                            to_ymax = NULL) {
+                            to_ymax = NULL, aspect = NULL) {
     if (! is.null(from)) {
       data$xmin <- from[1]
       data$ymin <- from[2]
@@ -524,6 +528,10 @@ StatMagnify <- ggproto("StatMagnify", Stat,
         data$to_ymin <- scales$y$transform(data$to_ymin)
         data$to_ymax <- scales$y$transform(data$to_ymax)
       }
+    }
+    if (identical(aspect, "fixed")) {
+      magnification <- (data$to_xmax - data$to_xmin)/(data$xmax - data$xmin)
+      data$to_ymax <- data$to_ymin + (data$ymax - data$ymin) * magnification
     }
 
     data

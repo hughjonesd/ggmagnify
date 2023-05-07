@@ -156,7 +156,6 @@ ggplot(starwars, aes(mass, height, color = species == "Human")) +
 ## Maps (experimental)
 
 ```{r example-map}
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
 
 usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
 

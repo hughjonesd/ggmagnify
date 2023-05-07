@@ -1,5 +1,6 @@
 
 library(ggplot2)
+library(rlang)
 
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
   geom_point()
@@ -15,14 +16,19 @@ to_width <- 0.8
 to_height <- 1.4
 
 test_param <- function (name, ..., .ggplot = ggp) {
+  dots <- list(...)
+  if ("to_y" %in% names(dots)) {
+    to_y <- dots$to_y # hack
+    dots$to_y <- NULL
+  }
   if (grepl("\\.", name)) warning("Dot in snapshot file name may cause testthat bug.")
   test_that(name, {
     expect_silent(
       ggm <- .ggplot +
         labs(title = name) +
-        geom_magnify_tile(x = x, width = width, y = y, height = height,
+        rlang::inject(geom_magnify_tile(x = x, width = width, y = y, height = height,
                      to_x = to_x, to_y = to_y, to_width = to_width,
-                     to_height = to_height, ...)
+                     to_height = to_height, !!!dots))
     )
     expect_silent(
       print(ggm)
@@ -37,6 +43,7 @@ test_param("defaults")
 mask <- grid::polygonGrob(x = c(0, 0.5, 1, 0.5, 0.2), y = c(0, 0.1, 0.5, 1, 0.3))
 test_param("from-mask", from = mask)
 test_param("expand", expand = FALSE)
+test_param("aspect-fixed", aspect = "fixed", to_y = 4.6)
 test_param("axes", axes = "xy")
 test_param("axes-x", axes = "x")
 test_param("axes-y", axes = "y")
