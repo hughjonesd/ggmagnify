@@ -31,7 +31,7 @@ NULL
 #' from one to the other.
 #'
 #' @inherit ggplot2::layer params
-#' @param mapping,data,stat,position See e.g. [ggplot2::geom_point()].
+#' @param mapping,data,stat,position,...,na.rm See e.g. [ggplot2::geom_point()].
 #' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
 #'   Alternatively, pass in a data frame or [grid::grob()] object, see below.
 #' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.

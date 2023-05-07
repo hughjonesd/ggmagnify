@@ -26,6 +26,7 @@ per cenet.}
 Helper functions to find rectangles or convex hulls of data
 }
 \examples{
+library(ggplot2)
 to <- c(2, 6, 4.5, 8)
 setosas <- iris[iris$Species == "setosa", ]
 ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +

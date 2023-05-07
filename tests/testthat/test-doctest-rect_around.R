@@ -5,6 +5,7 @@ test_that("Doctest: rect_around", {
   # Created from @doctest for `rect_around`
   # Source file: R/helpers.R
   # Source line: 21
+  library(ggplot2)
   to <- c(2, 6, 4.5, 8)
   setosas <- iris[iris$Species == "setosa", ]
   expect_silent(ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + geom_point() +

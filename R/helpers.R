@@ -20,6 +20,7 @@ expand_by <- function (x, expand) {
 #'
 #' @doctest
 #'
+#' library(ggplot2)
 #' to <- c(2, 6, 4.5, 8)
 #' setosas <- iris[iris$Species == "setosa", ]
 #'

@@ -60,7 +60,7 @@ geom_magnify_tile(
 )
 }
 \arguments{
-\item{mapping, data, stat, position}{See e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.}
+\item{mapping, data, stat, position, ..., na.rm}{See e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.}
 
 \item{from}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the target area to magnify.
 Alternatively, pass in a data frame or \code{\link[grid:grid.grob]{grid::grob()}} object, see below.}
