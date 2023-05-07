@@ -22,14 +22,12 @@ NULL
 
 #' Magnified inset of a plot
 #'
-#' `geom_magnify()` creates a magnified inset of part of a plot. The target
-#' area is centred at `(x,y)` with `width` and `height`. The inset is centred
-#' at `(to_x,to_y)`, with `width` and `height` multiplied by `magnify`. Optional
+#' `geom_magnify()` creates a magnified inset of part of a plot. Optional
 #' borders are drawn around the target and inset, along with projection lines
 #' from one to the other.
 #'
 #' @inherit ggplot2::layer params
-#' @inherit ggplot2::geom_point params
+#' @param mapping,data,stat,position See e.g. [ggplot2::geom_point()].
 #' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
 #'   Alternatively, pass in a data frame or [grid::grob()] object, see below.
 #' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.
@@ -96,10 +94,10 @@ NULL
 #'
 #' ## Arbitrary shapes
 #'
-#' To magnify an arbitrary area, pass a grid grob or a data frame of x and y
+#' To magnify an arbitrary area, pass a [grid::grob()] or a data frame of x and y
 #' points into `from`. Points should be on the same scale as the data,
-#' with `default.units = "native"`. This is experimental. (Well, everything is
-#' experimental. This is just *more* experimental.)
+#' with `default.units = "native"` in the grob. This is experimental.
+#' (Well, everything is experimental. This is just *more* experimental.)
 #'
 #' ## Limitations
 #'

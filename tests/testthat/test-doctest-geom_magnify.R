@@ -4,7 +4,7 @@
 test_that("Doctest: geom_magnify", {
   # Created from @doctest for `geom_magnify`
   # Source file: R/geom-magnify.R
-  # Source line: 125
+  # Source line: 123
   library(ggplot2)
   ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() +
     xlim(c(2, 6))

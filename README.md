@@ -154,7 +154,6 @@ ggplot(starwars, aes(mass, height, color = species == "Human")) +
 ## Maps (experimental)
 
 ``` r
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
 
 usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
 
@@ -170,7 +169,8 @@ texas <- sf::st_transform(texas, sf::st_crs(4326))
 texas <- sf::st_as_grob(sf::st_as_sfc(texas))
 ggpm + geom_magnify(from = texas,
                     to = c(-120, 10, -95, 30), 
-                    shadow = TRUE, linewidth = 1, colour = "orange3")
+                    shadow = TRUE, linewidth = 1, colour = "orange3",
+                    aspect = "fixed")
 ```
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
