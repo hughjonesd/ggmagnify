@@ -137,11 +137,10 @@ humans <- starwars |>
   filter(species == "Human") |> 
   select(mass, height) |> 
   na.omit()
-hhull <- humans[grDevices::chull(humans),]
 
-rescale <- function (x, sc) (x - mean(x)) * sc + mean(x)
-hhull$mass <- rescale(hhull$mass, 1.2)
-hhull$height <- rescale(hhull$height, 1.2)
+# finds the convex hull
+hhull <- hull_around(mass, height, data = humans, expand = 0.2)
+
 
 ggplot(starwars, aes(mass, height, color = species == "Human")) + 
   geom_point() + xlim(0, 200) + ylim(0, 250) + 

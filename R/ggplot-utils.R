@@ -1,3 +1,11 @@
+
+
+df_to_grob <- function (df) {
+  # the [[]] matters so we get vectors
+  grid::polygonGrob(x = df[[1]], y = df[[2]], default.units = "native")
+}
+
+
 # The below are derived from ggplot2 code
 
 incremental_id <- local({

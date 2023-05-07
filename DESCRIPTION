@@ -37,8 +37,10 @@ Config/testthat/edition: 3
 Remotes: 
     hughjonesd/doctest
 Collate: 
+    'stat-magnify.R'
     'geom-magnify.R'
     'geom-magnify-tile.R'
     'ggplot-utils.R'
+    'helpers.R'
     'inset-theme.R'
     'projection.R'
