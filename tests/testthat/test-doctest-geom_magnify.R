@@ -6,8 +6,8 @@ test_that("Doctest: geom_magnify", {
   # Source file: R/geom-magnify.R
   # Source line: 124
   library(ggplot2)
-  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
-    geom_point() + xlim(c(2, 6))
+  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() +
+    xlim(c(2, 6))
   expect_silent(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5)))
   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5), axes = TRUE)
   expect_silent(if (getRversion() >= 4.2) {
@@ -16,12 +16,14 @@ test_that("Doctest: geom_magnify", {
   expect_silent(if (requireNamespace("ggfx", quietly = TRUE)) {
     ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5), shadow = TRUE)
   })
-  shape <- grid::polygonGrob()
-  expect_no_error(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7,
-    6.5), shape = shape))
-  expect_no_error(ggp + geom_smooth() + geom_magnify(from = c(3, 6.5, 4, 7.5),
-  to = c(4, 5, 7, 6.5)))
-  expect_no_error(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7,
-    6.5)) + geom_smooth())
+  setosas <- iris[iris$Species == "setosa", ]
+  setosa_hull <- grDevices::chull(setosas[, c("Sepal.Width", "Sepal.Length")])
+  setosa_hull <- setosas[setosa_hull, c("Sepal.Width", "Sepal.Length")]
+  expect_no_error(ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+    geom_point() + xlim(c(2, 5)) + geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8)))
+  expect_no_error(ggp + geom_smooth() + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5,
+    7, 6.5)))
+  expect_no_error(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5)) +
+    geom_smooth())
 })
 

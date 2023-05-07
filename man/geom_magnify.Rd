@@ -241,10 +241,13 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
 }
 
 # Arbitrary shape using grid
-shape <- grid::polygonGrob()
-ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-                   to = c(4, 5, 7, 6.5),
-                   shape = shape)
+setosas <- iris[iris$Species == "setosa", ]
+setosa_hull <- grDevices::chull(setosas[, c("Sepal.Width", "Sepal.Length")])
+setosa_hull <- setosas[setosa_hull, c("Sepal.Width", "Sepal.Length")]
+ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+       geom_point() + xlim(c(2, 5)) +
+       geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8))
+
 # Order matters
 
 # `geom_magnify()` stores the plot when it is added to it:
