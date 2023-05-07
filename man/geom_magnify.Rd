@@ -93,7 +93,8 @@ often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
 
-\item{from}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the target area to magnify.}
+\item{from}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the target area to magnify.
+Alternatively, pass in a data frame or \code{\link[grid:grid.grob]{grid::grob()}} object, see below.}
 
 \item{to}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the magnified inset.}
 
@@ -115,8 +116,7 @@ and projection lines. Set \code{linetype = 0} for no lines.}
 \item{target.linetype, inset.linetype, proj.linetype}{Linetypes
 for specific components.}
 
-\item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.
-Or (experimental!) pass in a \code{\link[grid:grid.grob]{grid::grob()}} for an arbitrary mask.}
+\item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
@@ -188,26 +188,24 @@ cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 
 \subsection{Arbitrary shapes}{
 
-To magnify an arbitrary area, pass a grid grob into \code{shape}. The grob should
-be scaled to between 0 and 1 on both dimensions, with units \code{"npc"} (see
-\code{\link[grid:unit]{grid::unit()}}. This is experimental. (Well, everything is experimental.
-This is just \emph{more} experimental.)
+To magnify an arbitrary area, pass a grid grob or a data frame of x and y
+points into \code{from}. Points should be on the same scale as the data,
+with \code{default.units = "native"}. This is experimental. (Well, everything is
+experimental. This is just \emph{more} experimental.)
 }
 
 \subsection{Limitations}{
 \itemize{
-\item \code{geom_magnify()} uses masks. This requires R version 4.2.0 or higher, and
+\item \code{geom_magnify()} uses masks. This requires R version 4.1.0 or higher, and
 a graphics device that supports masking. If you are using knitr, you may have
 luck with the \code{ragg_png} device.
-\item You can't set params \verb{xmin,...} or \verb{to_xmin,...} directly in the call
-to \code{geom_magnify()}. If you want to set them, supply \code{data} and \code{mapping}
-arguments.
 \item \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
 older (or newer!) versions of ggplot2.
 \item By design, \code{geom_magnify()} replots the original plot using new limits. It
 does not directly copy the target area pixels. The advantage is that you can
-e.g. add axes, plot points at an appropriate size, or recompute derived
-graphics.
+e.g. add axes, plot points at an appropriate size, zoom in on data that's
+invisible in the main plot, or recompute derived graphics. If you want an
+exact pixel-by-pixel copy, use a different tool.
 \item \code{geom_magnify()} may break with discrete scales. This is a limitation in
 ggplot2 for now.
 }

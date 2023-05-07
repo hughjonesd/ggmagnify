@@ -87,9 +87,6 @@ This requires R \>= 4.2.0 and an appropriate graphics device.
 
 ``` r
 
-loadNamespace("ggforce")
-#> <environment: namespace:ggforce>
-
 ggp + 
   geom_magnify(from = from, to = to, 
                shape = "ellipse", shadow = TRUE)
@@ -136,6 +133,40 @@ ggpm + geom_magnify(from = c(-79, 35, -77, 35.5),
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
 
+## Magnify an arbitrary region (you guessed it, experimental)
+
+``` r
+
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+
+humans <- starwars |> 
+  filter(species == "Human") |> 
+  select(mass, height) |> 
+  na.omit()
+hhull <- humans[grDevices::chull(humans),]
+
+rescale <- function (x, sc) (x - mean(x)) * sc + mean(x)
+hhull$mass <- rescale(hhull$mass, 1.2)
+hhull$height <- rescale(hhull$height, 1.2)
+
+ggplot(starwars, aes(mass, height, color = species == "Human")) + 
+  geom_point() + xlim(0, 200) + ylim(0, 250) + 
+  scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "grey60")) + 
+  geom_magnify(from = hhull, to = c(30, 0, 200, 120), shadow = TRUE,
+               alpha = 0.8, colour = "darkgreen", linewidth = 0.6)
+#> Warning: Removed 29 rows containing missing values (`geom_point()`).
+```
+
+<img src="man/figures/README-example-mask-grob-1.png" width="100%" />
+
 ## Tips and tricks
 
 ### Adding layers to the inset
@@ -171,8 +202,9 @@ For complex modifications to the inset, set `plot` explicitly:
 ``` r
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
-         geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B")
+         geom_contour_filled(aes(z = density), bins = 50) +
+         scale_fill_viridis_d(option = "B") + 
+         theme(legend.position = "none")
 
 booms_inset <- booms + 
   geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7, 
@@ -330,10 +362,16 @@ ggp +
 
 <img src="man/figures/README-example-and-so-ad-infinitum-1.png" width="100%" />
 
-## Source
+## Acknowledgements
+
+ggmagnify was inspired by [this
+post](https://stackoverflow.com/a/66409862/10522567) and motivated by
+making [these plots](https://github.com/hughjonesd/academic-bias).
+
+Data for the GWAS plots comes from:
 
 Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
-independent genetic loci influencing general cognitive function.’ Nature
-Communications
+independent genetic loci influencing general cognitive function.’
+*Nature Communications*.
 
 Data was trimmed to remove overlapping points.

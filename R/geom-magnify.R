@@ -8,12 +8,12 @@ NULL
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
 # - why isn't geom_abline() working when recompute = FALSE?
 #
-# - clean up the code.
-#   - projection logic for arbitrary grobs? But NB: "facing" is
-#     still special-cased? Ditto "single" for rect?
-#   - could we automatically scale a grob shape to viewport with 0,1 npc?
-#     But then when we again add a new viewport maybe we lose that first scale.
+#  - `fixed` aspect ratio, useful with grobs.
 #
+# - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
+#   meaningless mask
+#
+# NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
 #   - and it's liable to blow up when you put your aesthetics in the data.
@@ -31,6 +31,7 @@ NULL
 #' @inherit ggplot2::layer params
 #' @inherit ggplot2::geom_point params
 #' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
+#'   Alternatively, pass in a data frame or [grid::grob()] object, see below.
 #' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.
 #' @param expand Logical. Expand the limits of the target area by a small factor
 #'   in the inset plot. See [coord_cartesian()][ggplot2::coord_cartesian()].
@@ -45,7 +46,6 @@ NULL
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components.
 #' @param shape `"rect"` to magnify a rectangle. `"ellipse"` to magnify an ellipse.
-#'   Or (experimental!) pass in a [grid::grob()] for an arbitrary mask.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -95,28 +95,25 @@ NULL
 #'
 #' ## Arbitrary shapes
 #'
-#' To magnify an arbitrary area, pass a grid grob into `shape`. The grob should
-#' be scaled to between 0 and 1 on both dimensions, with units `"npc"` (see
-#' [grid::unit()]. This is experimental. (Well, everything is experimental.
-#' This is just *more* experimental.)
+#' To magnify an arbitrary area, pass a grid grob or a data frame of x and y
+#' points into `from`. Points should be on the same scale as the data,
+#' with `default.units = "native"`. This is experimental. (Well, everything is
+#' experimental. This is just *more* experimental.)
 #'
 #' ## Limitations
 #'
-#' * `geom_magnify()` uses masks. This requires R version 4.2.0 or higher, and
+#' * `geom_magnify()` uses masks. This requires R version 4.1.0 or higher, and
 #'   a graphics device that supports masking. If you are using knitr, you may have
 #'   luck with the `ragg_png` device.
-#'
-#'  * You can't set params `xmin,...` or `to_xmin,...` directly in the call
-#'    to `geom_magnify()`. If you want to set them, supply `data` and `mapping`
-#'    arguments.
 #'
 #' * `geom_magnify()` uses dark magic to deal with faceting. It may break with
 #'   older (or newer!) versions of ggplot2.
 #'
 #' * By design, `geom_magnify()` replots the original plot using new limits. It
 #'   does not directly copy the target area pixels. The advantage is that you can
-#'   e.g. add axes, plot points at an appropriate size, or recompute derived
-#'   graphics.
+#'   e.g. add axes, plot points at an appropriate size, zoom in on data that's
+#'   invisible in the main plot, or recompute derived graphics. If you want an
+#'   exact pixel-by-pixel copy, use a different tool.
 #'
 #' * `geom_magnify()` may break with discrete scales. This is a limitation in
 #'   ggplot2 for now.
@@ -153,11 +150,15 @@ NULL
 #' }
 #'
 #' # Arbitrary shape using grid
-#' shape <- grid::polygonGrob()
+#' setosas <- iris[iris$Species == "setosa", ]
+#' setosa_hull <- grDevices::chull(setosas[, c("Sepal.Width", "Sepal.Length")])
+#' setosa_hull <- setosas[setosa_hull, c("Sepal.Width", "Sepal.Length")]
+#'
 #' @expect no_error()
-#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                    to = c(4, 5, 7, 6.5),
-#'                    shape = shape)
+#' ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+#'        geom_point() + xlim(c(2, 5)) +
+#'        geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8))
+#'
 #' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
@@ -233,9 +234,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
   setup_params = function (data, params) {
     params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
-    if (is.character(params$shape)) {
-      params$shape <- match.arg(params$shape, c("rect", "ellipse"))
-    }
+    params$shape <- match.arg(params$shape, c("rect", "ellipse"))
+
     if (params$shadow) {
       rlang::check_installed("ggfx")
     }
@@ -247,23 +247,39 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     if (length(params$scale.inset) == 1L) {
       params$scale.inset <- rep(params$scale.inset, 2)
     }
+    if (is.data.frame(params$from)) {
+      # we've got the xmin et al. from the grob in StatMagnify
+      params$from <- df_to_grob(params$from)
+    }
 
     params
   },
 
-  draw_panel = function (self, data, panel_params, coord, from, to,
+  draw_panel = function (self, data, panel_params, coord, from = NULL, to,
                          magnify, axes, proj, shadow,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
                          recompute, scale.inset
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
-
+    if (grid::is.grob(from)) {
+      # this will be on scale of data
+      shape <- from
+      shape_cc <- as.data.frame(allcoords(shape))
+      shape_cc <- coord$transform(shape_cc, panel_params)
+      # this is rough, could we do better by rescaling?
+      shape <- polygonGrob(x = shape_cc$x, y = shape_cc$y,
+                        default.units = "native")
+    }
     # create shape_grob for target border, inset border, and inset mask
     # this is scaled to 0, 1 in both directions, with
     # default units "npc"
     shape_grob <- if (grid::is.grob(shape)) {
-      shape
+      scale01 <- function (x) (x - min(x))/(max(x) - min(x))
+      x_scaled <- scale01(as.numeric(shape$x))
+      y_scaled <- scale01(as.numeric(shape$y))
+      editGrob(shape, x = grid::unit(x_scaled, "npc"),
+                      y = grid::unit(y_scaled, "npc"))
     } else if (shape == "ellipse"){
       gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5,
                              position.units = "npc", size.units = "npc")
@@ -312,6 +328,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     # clipping, presumably when grid.draw is called on it?)
     mask_grob <- grid::editGrob(shape_grob,
                                 gp = gpar(fill = rgb(0, 0, 0, 1)))
+    # should be fine but needs testing
+    # if (identical(shape, "rect")) mask_grob <- "inherit"
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
                    height = diff(y_rng), default.units = "native",
                    mask = mask_grob)
@@ -440,6 +458,22 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   optional_aes = c("xmin", "xmax", "ymin", "ymax",
                    "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
 
+  setup_params = function (self, data, params) {
+    if (! is.null(params$from)) {
+      if (is.data.frame(params$from)) {
+        params$from <- df_to_grob(params$from)
+      }
+      if (is.grob(params$from)) {
+        from_grob <- params$from
+        grobcc <- allcoords(from_grob)
+        params$from <- c(min(grobcc[,"x"]), min(grobcc[,"y"]), max(grobcc[,"x"]),
+                         max(grobcc[,"y"]))
+      }
+    }
+
+    params
+  },
+
   setup_data = function (self, data, params, scales) {
     for (var in self$optional_aes) {
       if (var %in% names(params)) data[[var]] <- params[[var]]
@@ -495,3 +529,8 @@ StatMagnify <- ggproto("StatMagnify", Stat,
     data
   }
 )
+
+df_to_grob <- function (df) {
+  # the [[]] matters so we get vectors
+  grid::polygonGrob(x = df[[1]], y = df[[2]], default.units = "native")
+}

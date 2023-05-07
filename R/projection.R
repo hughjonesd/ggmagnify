@@ -26,7 +26,8 @@ calculate_proj_chull <- function(grob1, grob2) {
   # make it "circular"
   switching <- c(switching, both$grob[nrow(both)] != both$grob[1])
   switching <- which(switching)
-  switched <- (switching + 1) %% nrow(both)
+  switched <- switching + 1
+  switched <- (switched - 1) %% nrow(both) + 1 # starts again at 1 not 0
 
   # we draw lines from switching points to switched points
   from <- both[switching, c("x", "y")]
@@ -88,7 +89,7 @@ allcoords <- function (grob) {
   cc2 <- unit(cc[, 2], "inches")
   cc1 <- convertX(cc1, "native", valueOnly = TRUE)
   cc2 <- convertY(cc2, "native", valueOnly = TRUE)
-  cbind(cc1, cc2)
+  cbind(x = cc1, y = cc2)
 }
 
 #' Vectors of "rejections"   at 90 deg to line through `vec` & `origin`

@@ -99,8 +99,6 @@ This requires R >= 4.2.0 and an appropriate graphics device.
 
 ```{r example-ellipse}
 
-loadNamespace("ggforce")
-
 ggp + 
   geom_magnify(from = from, to = to, 
                shape = "ellipse", shadow = TRUE)
@@ -128,9 +126,8 @@ ggpi +
 
 ```
 
+
 ## Maps (experimental)
-
-
 
 ```{r example-map}
 nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
@@ -144,6 +141,32 @@ ggpm + geom_magnify(from = c(-79, 35, -77, 35.5),
                     )
 ```
 
+
+## Magnify an arbitrary region (you guessed it, experimental)
+
+
+```{r example-mask-grob}
+
+library(dplyr)
+
+humans <- starwars |> 
+  filter(species == "Human") |> 
+  select(mass, height) |> 
+  na.omit()
+hhull <- humans[grDevices::chull(humans),]
+
+rescale <- function (x, sc) (x - mean(x)) * sc + mean(x)
+hhull$mass <- rescale(hhull$mass, 1.2)
+hhull$height <- rescale(hhull$height, 1.2)
+
+ggplot(starwars, aes(mass, height, color = species == "Human")) + 
+  geom_point() + xlim(0, 200) + ylim(0, 250) + 
+  scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "grey60")) + 
+  geom_magnify(from = hhull, to = c(30, 0, 200, 120), shadow = TRUE,
+               alpha = 0.8, colour = "darkgreen", linewidth = 0.6)
+
+
+```
 
 ## Tips and tricks
 
@@ -170,8 +193,9 @@ For complex modifications to the inset, set `plot` explicitly:
 ```{r example-advanced-2}
 
 booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
-         geom_contour_filled(aes(z = density)) +
-         scale_fill_viridis_d(option = "B")
+         geom_contour_filled(aes(z = density), bins = 50) +
+         scale_fill_viridis_d(option = "B") + 
+         theme(legend.position = "none")
 
 booms_inset <- booms + 
   geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7, 
