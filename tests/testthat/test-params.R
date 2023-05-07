@@ -62,7 +62,6 @@ test_param("shadow-args", shadow = TRUE,
 mask <- grid::polygonGrob(x = c(0, 0.5, 1, 0.5, 0.2), y = c(0, 0.1, 0.5, 1, 0.3))
 test_param("shape-mask", shape = mask)
 
-skip_if_not_installed("ggforce")
 test_param("shape-ellipse", shape = "ellipse")
 test_param("shadow-ellipse", shadow = TRUE, shape = "ellipse")
 test_param("proj-single-ellipse", proj = "single", shape = "ellipse")
