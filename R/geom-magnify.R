@@ -7,9 +7,13 @@ NULL
 # TODO:
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
 # - why isn't geom_abline() working when recompute = FALSE?
-# - clean up the code. Work in transformed coordinates from the start of
-#   draw_panel(). Minimize use of external stuff. Note: gridExtra::ellipseGrob()
-#   is probably a lesser dependency than ggforce.
+#
+# - clean up the code.
+#   - projection logic for arbitrary grobs? But NB: "facing" is
+#     still special-cased? Ditto "single" for rect?
+#   - Minimize use of external stuff. Remove ggforce as a dependency?
+#   - could we automatically scale a grob shape to viewport with 0,1 npc?
+#     But then when we again add a new viewport maybe we lose that first scale.
 #
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
@@ -94,8 +98,9 @@ NULL
 #' ## Arbitrary shapes
 #'
 #' To magnify an arbitrary area, pass a grid grob into `shape`. The grob should
-#' be scaled to between 0 and 1 on both dimensions. This is experimental. (Well,
-#' everything is experimental. This is just *more* experimental.)
+#' be scaled to between 0 and 1 on both dimensions, with units `"npc"` (see
+#' [grid::unit()]. This is experimental. (Well, everything is experimental.
+#' This is just *more* experimental.)
 #'
 #' ## Limitations
 #'
@@ -259,120 +264,44 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          ) {
     d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
 
-    # == create grob for border around inset ==
-    target_df <- data.frame(xmin = d1$xmin, xmax = d1$xmax, ymin = d1$ymin,
-                            ymax = d1$ymax,
-                            colour = alpha(d1$colour, alpha), fill = NA,
-                            linewidth = linewidth, alpha = NA,
-                            linetype = target.linetype,
-                            group = 1L) # group = 1 needed for some coord systems
-    target_grob <- if (identical(shape, "rect")) {
-                     GeomRect$draw_panel(target_df, panel_params, coord)
-                   } else if (identical(shape, "ellipse")) {
-                     make_geom_ellipse_grob(target_df, panel_params, coord)
-                   } else {
-                     target_corners <- data.frame(
+    # create shape_grob for target border, inset border, and inset mask
+    # this is scaled to 0, 1 in both directions, with
+    # default units "npc"
+    shape_grob <- if (grid::is.grob(shape)) {
+      shape
+    } else if (shape == "ellipse"){
+      gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5,
+                             position.units = "npc", size.units = "npc")
+    } else {
+      grid::rectGrob()
+    }
+
+    # == create grob for border around target ==
+    target_corners <- data.frame(
                        x = c(d1$xmin, d1$xmax),
                        y = c(d1$ymin, d1$ymax)
                      )
-                     target_corners_t <- coord$transform(target_corners, panel_params)
-                     target_x_rng <- range(target_corners_t$x, na.rm = TRUE)
-                     target_y_rng <- range(target_corners_t$y, na.rm = TRUE)
-                     target_vp <- viewport(x = mean(target_x_rng),
-                                           y = mean(target_y_rng),
-                                           width = diff(target_y_rng),
-                                           height = diff(target_y_rng))
-                     editGrob(shape,
-                              vp = target_vp,
-                              gp = gpar(fill = NA, col = alpha(d1$colour, alpha),
-                                            lwd = linewidth * .pt,
-                                            lty = target.linetype
-                                            ))
-                   }
 
-    # == draw projection lines ==========================================
+    target_corners_t <- coord$transform(target_corners, panel_params)
+    target_x_rng <- range(target_corners_t$x, na.rm = TRUE)
+    target_y_rng <- range(target_corners_t$y, na.rm = TRUE)
 
-    proj_df <- calculate_proj_segments(
-                 proj = proj, shape = shape,
-                 xmin = d1$xmin, xmax = d1$xmax,
-                 ymin = d1$ymin, ymax = d1$ymax,
-                 to_xmin = d1$to_xmin, to_xmax = d1$to_xmax,
-                 to_ymin = d1$to_ymin, to_ymax = d1$to_ymax
-               )
-    proj_grob <- if (is.null(proj_df) || nrow(proj_df) == 0L) NULL else {
-      proj_df$colour <- d1$colour
-      proj_df$alpha <- alpha
-      proj_df$linewidth <- linewidth
-      proj_df$linetype <- proj.linetype
-      GeomSegment$draw_panel(proj_df, panel_params, coord)
-    }
+    target_vp <- viewport(x = mean(target_x_rng),
+                          y = mean(target_y_rng),
+                          width = diff(target_x_rng),
+                          height = diff(target_y_rng),
+                          default.units =  "native")
+    target_grob <- editGrob(shape_grob, vp = target_vp,
+                            gp = gpar(fill = NA, col = alpha(d1$colour, alpha),
+                                      lwd = linewidth * .pt,
+                                      lty = target.linetype))
 
-    # == draw the magnified plot ========================================
+    # == create the magnified plot =======================================
+
     plot <- plot %||% self$plot
-    # or just coord, unless `plot` might have a different coord
-    plot_coord <- ggplot_build(plot)$layout$coord
-    plot_limits <- plot_coord$limits
-
-    rev_x <- ! is.null(plot_limits$x) && diff(plot_limits$x) < 0
-    rev_y <- ! is.null(plot_limits$y) && diff(plot_limits$y) < 0
-
-    if ("inset_xmin" %in% names(d1)) {
-      xlim_vals <- c(d1$inset_xmin, d1$inset_xmax)
-      ylim_vals <- c(d1$inset_ymin, d1$inset_ymax)
-    } else {
-      xlim_vals <- c(d1$xmin, d1$xmax)
-      ylim_vals <- c(d1$ymin, d1$ymax)
-    }
-    if (rev_x) xlim_vals <- xlim_vals[2:1]
-    if (rev_y) ylim_vals <- ylim_vals[2:1]
-
-    scale_lims <- function (lim, sc) {
-      (lim - mean(lim)) * sc + mean(lim)
-    }
-    xlim_vals <- scale_lims(xlim_vals, scale.inset[1])
-    ylim_vals <- scale_lims(ylim_vals, scale.inset[2])
-
-    plot_coord <- constructor(plot_coord)
-    suppressMessages(
-      plot <- if (recompute) {
-        plot + do.call(plot_coord, list(expand = expand)) +
-          lims(x = xlim_vals, y = ylim_vals)
-      } else {
-        plot + do.call(plot_coord,
-                       list(xlim = xlim_vals, ylim = ylim_vals, expand = expand))
-      }
-    )
-    plot <- plot + inset_theme(axes = axes)
-
-    suppressWarnings(suppressMessages({
-      plot_built <- ggplot_build(plot)
-    }))
-
-    # DARK MAGIC HERE ------------------------------------------------
-    panel_id <- as.numeric(data$PANEL[1])
-
-    layout_df <- plot_built$layout$layout
-    layout_df <- layout_df[as.numeric(layout_df$PANEL) == panel_id,]
-    if (nrow(layout_df) > 0) {
-      layout_df$PANEL <- factor(1)
-      layout_df$ROW <- 1
-      layout_df$COL <- 1
-    } else {
-      layout_df$PANEL <- factor(levels = 1)
-    }
-    plot_built$layout$layout <- layout_df
-
-    for (i in seq_along(plot_built$data)) {
-      pbd <- plot_built$data[[i]]
-      pbd <- pbd[as.numeric(pbd$PANEL) == panel_id,]
-      pbd$PANEL <- if (nrow(pbd) > 0) factor(1) else factor(levels = 1)
-      plot_built$data[[i]] <- pbd
-    }
-    # END MAGIC -------------------------------------------------------
-
-    suppressWarnings(suppressMessages(
-      plot_gtable <- ggplot_gtable(plot_built)
-    ))
+    plot_gtable <- create_plot_gtable(plot, data = d1, expand = expand,
+                                      axes = axes, recompute = recompute,
+                                      scale.inset = scale.inset)
 
     # == create the viewport and mask for the inset plot ==============
 
@@ -381,24 +310,18 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       y = c(d1$to_ymin, d1$to_ymax)
     )
     corners_t <- coord$transform(corners, panel_params)
-
     x_rng <- range(corners_t$x, na.rm = TRUE)
     y_rng <- range(corners_t$y, na.rm = TRUE)
-    mask <- if (identical(shape, "ellipse")) {
-      ellipse_df <- data.frame(xmin = 0, xmax = 1,
-                               ymin = 0, ymax = 1)
-      el_pts <- ellipse_points(ellipse_df)
-      grid::polygonGrob(x = el_pts$x, y = el_pts$y,
-                        default.units = "native",
-                        gp = gpar(fill = rgb(0,0,0,1)))
-    } else if (identical(shape, "rect")) {
-      grid::rectGrob(default.units = "native",
-                     gp = gpar(fill = rgb(0,0,0,1)))
-    } else {
-      grid::editGrob(shape, gp = gpar(fill = rgb(0, 0, 0, 1)))
-    }
-
-    border_grob <- grid::editGrob(mask,
+    # we use a mask here instead of clipping because gtable doesn't inherit
+    # clip, and grid doesn't nest clips (so I guess ggplot needs its own
+    # clipping, presumably when grid.draw is called on it?)
+    mask_grob <- grid::editGrob(shape_grob,
+                                gp = gpar(fill = rgb(0, 0, 0, 1)))
+    vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
+                   height = diff(y_rng), default.units = "native",
+                   mask = mask_grob)
+    plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
+    border_grob <- grid::editGrob(shape_grob, vp = vp,
                                   name = paste0("ggmagnify-border-",
                                                      incremental_id()),
                                   gp = gpar(fill = NA,
@@ -406,15 +329,22 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                             lwd = linewidth * .pt,
                                             lty = inset.linetype
                                             ))
-    # browser()
-    # we use a mask here instead of clipping because gtable doesn't inherit
-    # clip, and grid doesn't nest clips (so I guess ggplot needs its own
-    # clipping, presumably when grid.draw is called on it?)
-    vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
-                   height = diff(y_rng), default.units = "native",
-                   mask = mask)
-    plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
-    border_grob <- grid::editGrob(border_grob, vp = vp)
+
+    # == create projection lines =====
+    proj_df <- if (identical(shape, "rect")) {
+      calculate_proj_df_rect(proj, d1, coord, panel_params)
+    } else {
+      calculate_proj_df(proj, target_grob, border_grob)
+    }
+
+    proj_grob <- segmentsGrob(proj_df$x, proj_df$y, proj_df$xend, proj_df$yend,
+                              #vp = vp,
+                              default.units = "native",
+                              gp = gpar(
+                                col = alpha(d1$colour, alpha),
+                                lty = proj.linetype,
+                                lwd = linewidth * .pt
+                              ))
 
     if (shadow) {
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
@@ -426,9 +356,81 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 )
 
 
-make_geom_ellipse_grob <- function (df, panel_params, coord) {
-  el_pts <- ellipse_points(df)
-  ggforce::GeomCircle$draw_panel(el_pts, panel_params, coord)
+create_plot_gtable <- function (plot, data, expand, axes, recompute, scale.inset) {
+  plot_coord <- ggplot_build(plot)$layout$coord
+  plot_limits <- plot_coord$limits
+
+  if ("inset_xmin" %in% names(data)) {
+    xlim_vals <- c(data$inset_xmin, data$inset_xmax)
+    ylim_vals <- c(data$inset_ymin, data$inset_ymax)
+  } else {
+    xlim_vals <- c(data$xmin, data$xmax)
+    ylim_vals <- c(data$ymin, data$ymax)
+  }
+
+  rev_x <- ! is.null(plot_limits$x) && diff(plot_limits$x) < 0
+  rev_y <- ! is.null(plot_limits$y) && diff(plot_limits$y) < 0
+  if (rev_x) xlim_vals <- xlim_vals[2:1]
+  if (rev_y) ylim_vals <- ylim_vals[2:1]
+
+  scale_lims <- function (lim, sc) {
+    (lim - mean(lim)) * sc + mean(lim)
+  }
+  xlim_vals <- scale_lims(xlim_vals, scale.inset[1])
+  ylim_vals <- scale_lims(ylim_vals, scale.inset[2])
+
+  plot_coord <- constructor(plot_coord)
+  suppressMessages(
+    plot <- if (recompute) {
+      plot + do.call(plot_coord, list(expand = expand)) +
+        lims(x = xlim_vals, y = ylim_vals)
+    } else {
+      plot + do.call(plot_coord,
+                     list(xlim = xlim_vals, ylim = ylim_vals, expand = expand))
+    }
+  )
+  plot <- plot + inset_theme(axes = axes)
+
+  suppressWarnings(suppressMessages({
+    plot_built <- ggplot_build(plot)
+  }))
+
+  panel_id <- as.numeric(data$PANEL[1])
+  plot_built <- edit_to_panel(plot_built, panel_id)
+
+  suppressWarnings(suppressMessages(
+    plot_gtable <- ggplot_gtable(plot_built)
+  ))
+
+  plot_gtable
+}
+
+
+edit_to_panel <- function (plot_built, panel_id) {
+  # DARK MAGIC HERE ------------------------------------------------
+  # the idea is to limit the plot to this particular panel
+  # we edit the layout, and the plot data
+  # obviously this messes deeply in ggplot2 internals
+
+  layout_df <- plot_built$layout$layout
+  layout_df <- layout_df[as.numeric(layout_df$PANEL) == panel_id,]
+  if (nrow(layout_df) > 0) {
+    layout_df$PANEL <- factor(1)
+    layout_df$ROW <- 1
+    layout_df$COL <- 1
+  } else {
+    layout_df$PANEL <- factor(levels = 1)
+  }
+  plot_built$layout$layout <- layout_df
+
+  for (i in seq_along(plot_built$data)) {
+    pbd <- plot_built$data[[i]]
+    pbd <- pbd[as.numeric(pbd$PANEL) == panel_id,]
+    pbd$PANEL <- if (nrow(pbd) > 0) factor(1) else factor(levels = 1)
+    plot_built$data[[i]] <- pbd
+  }
+
+  plot_built
 }
 
 
@@ -437,6 +439,9 @@ ellipse_points <- function(df) {
   df$xmax <- as.numeric(df$xmax)
   df$ymin <- as.numeric(df$ymin)
   df$ymax <- as.numeric(df$ymax)
+
+
+
   df$x0 = (df$xmin + df$xmax)/2
   df$y0 = (df$ymin + df$ymax)/2
   df$a =  (df$xmax - df$xmin)/2

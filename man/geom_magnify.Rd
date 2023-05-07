@@ -190,8 +190,9 @@ cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
 \subsection{Arbitrary shapes}{
 
 To magnify an arbitrary area, pass a grid grob into \code{shape}. The grob should
-be scaled to between 0 and 1 on both dimensions. This is experimental. (Well,
-everything is experimental. This is just \emph{more} experimental.)
+be scaled to between 0 and 1 on both dimensions, with units \code{"npc"} (see
+\code{\link[grid:unit]{grid::unit()}}. This is experimental. (Well, everything is experimental.
+This is just \emph{more} experimental.)
 }
 
 \subsection{Limitations}{

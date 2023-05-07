@@ -1,19 +1,153 @@
 
 
-
-calculate_proj_segments <- function(proj, shape,
-                                    xmin, xmax, ymin, ymax,
-                                    to_xmin, to_xmax, to_ymin, to_ymax) {
-  shape <- structure(list(), class = if (is.character(shape)) shape else "mask")
-  UseMethod("calculate_proj_segments", shape)
-
+calculate_proj_df <- function (proj, grob1, grob2) {
+  if (proj == "single") {
+    # get rid of the non-single branch
+    calculate_proj_midpoint(grob1, grob2)
+  }  else {
+    calculate_proj_chull(grob1, grob2)
+  }
 }
 
 
-calculate_proj_segments.rect <- function(proj, shape,
-                                    xmin, xmax, ymin, ymax,
-                                    to_xmin, to_xmax, to_ymin, to_ymax) {
+calculate_proj_chull <- function(grob1, grob2) {
+  c1 <- allcoords(grob1)
+  c2 <- allcoords(grob2)
+
+  both <- rbind(c1, c2)
+  on_chull <- chull(both)
+  both <- as.data.frame(both)
+  names(both) <- c("x", "y")
+  both$grob <- c(rep(1, nrow(c1)), rep(2, nrow(c2)))
+
+  both <- both[on_chull,] # now in "clockwise order"
+  # points on the chull where we move from one grob to another
+  switching <- diff(both$grob) != 0
+  # make it "circular"
+  switching <- c(switching, both$grob[nrow(both)] != both$grob[1])
+  switching <- which(switching)
+  switched <- (switching + 1) %% nrow(both)
+
+  # we draw lines from switching points to switched points
+  from <- both[switching, c("x", "y")]
+  to <- both[switched, c("x", "y")] # if row 1 is
+  names(to) <- c("xend", "yend")
+  cbind(from, to)
+}
+
+
+calculate_proj_midpoint <- function(grob1, grob2) {
+  c1 <- allcoords(grob1)
+  c2 <- allcoords(grob2)
+  stopifnot(nrow(c1) == nrow(c2))
+
+  # this is how grid defines "centre" for xDetails
+  c1r <- apply(c1, 2, range)
+  c2r <- apply(c2, 2, range)
+  mp1 <- apply(c1r, 2, mean)
+  mp2 <- apply(c2r, 2, mean)
+  mp_vec <- mp2 - mp1
+  # theta <- atan(mp_vec[2]/mp_vec[1]) * 360 / (2 * pi)
+  # if (mp_vec[2] == 0 && mp_vec[1] < 0) theta <- 180
+
+  c1_in_bbox <- in_bbox(c1, mp1, mp2)
+  c2_in_bbox <- in_bbox(c2, mp1, mp2)
+
+  # find closest point to mp_vec in bounding box
+  # rather than bounding box, we want to  look at all points between
+  # lines orthogonal to mp2 - mp1
+  orthog_mp_vec <- c(mp_vec[2], - mp_vec[1])
+  between_midpoints <- function (cc) {
+    rv_mp1 <- rejection_vec(cc, orthog_mp_vec, mp1)
+    d1 <- rejection_vec(matrix(mp2, 1, 2), orthog_mp_vec, mp1)[,1]
+    in_mp1 <- rv_mp1[, 1]  *  d1 >= 0
+    rv_mp2 <- rejection_vec(cc, orthog_mp_vec, mp2)
+    d2 <- rejection_vec(matrix(mp1, 1, 2), orthog_mp_vec, mp2)[,1]
+    in_mp2 <- rv_mp2[, 1]  * d2 >= 0
+    in_mp1 & in_mp2
+  }
+
+  c1 <- c1[between_midpoints(c1),]
+  c2 <- c2[between_midpoints(c2),]
+  c1_dist_mp_vec <- dist_vec(c1, mp2, mp1)
+  c2_dist_mp_vec <- dist_vec(c2, mp2, mp1)
+  closest1 <- c1[which.min(c1_dist_mp_vec), ]
+  closest2 <- c2[which.min(c2_dist_mp_vec), ]
+  res <- data.frame(x = closest1[1], y = closest1[2], xend = closest2[1],
+                    yend = closest2[2])
+
+  return(res)
+}
+
+
+allcoords <- function (grob) {
+  gc <- grid::grobCoords(grob)
+  cc <- lapply(gc, function(l) as.data.frame(l[c("x", "y")]))
+  cc <- do.call(rbind, cc)
+  cc1 <- unit(cc[, 1], "inches") # can't store units in a matrix
+  cc2 <- unit(cc[, 2], "inches")
+  cc1 <- convertX(cc1, "native", valueOnly = TRUE)
+  cc2 <- convertY(cc2, "native", valueOnly = TRUE)
+  cbind(cc1, cc2)
+}
+
+#' Vectors of "rejections"   at 90 deg to line through `vec` & `origin`
+#'
+#' @param pts n by 2 matrix
+#' @param vec length 2
+#' @param origin length 2
+#'
+#' @return n x 2 matrix
+#' @noRd
+rejection_vec <- function (pts, vec, origin) {
+  if (nrow(pts) > 0) pts <- pts - matrix(origin, nrow(pts), 2, byrow = TRUE)
+  vec <- vec - origin
+  a.b <- pts %*% vec # n x 1
+  b.b <- t(vec) %*% vec # 1x1
+  on_vec <- (a.b/c(b.b)) %*% vec # n x 2 matrix of projections
+  on_vec - pts # n x 2 matrix of rejections
+}
+
+
+dist_vec <- function(pts, vec, origin) {
+  rej_vec <- rejection_vec(pts, vec, origin)
+  rowSums(rej_vec^2) # distances
+}
+
+
+#' Are pts in bounding box with corners p1 , p2
+#'
+#' @param pts n x 2 matrix
+#' @param p1,p2 2 length vector
+#'
+#' @return n length logical vector
+#' @noRd
+in_bbox <- function(pts, p1, p2) {
+  vec <- p2 - p1
+
+  (pts[, 1] - p1[1]) * vec[1] >= 0 &
+  (pts[, 2] - p1[2]) * vec[2] >= 0 &
+  (pts[, 1] - p2[1]) * vec[1] <= 0 &
+  (pts[, 2] - p2[1]) * vec[2] <= 0
+  # sign(pts[, 1] - p1[1]) == sign(vec[1]) &
+  # sign(pts[, 2] - p1[2]) == sign(vec[2]) &
+  # sign(pts[, 1] - p2[1]) != sign(vec[1]) &
+  # sign(pts[, 2] - p2[2]) != sign(vec[2])
+}
+
+
+calculate_proj_df_rect <- function(proj, data, coord, panel_params) {
   # using mean allows Dates and maybe other things
+  xmin <- data$xmin
+  xmax <- data$xmax
+  ymin <- data$ymin
+  ymax <- data$ymax
+  to_xmin <- data$to_xmin
+  to_xmax <- data$to_xmax
+  to_ymin <- data$to_ymin
+  to_ymax <- data$to_ymax
+
+
   x <- mean(c(xmin, xmax))
   y <- mean(c(ymin, ymax))
   to_x <- mean(c(to_xmin, to_xmax))
@@ -92,101 +226,6 @@ calculate_proj_segments.rect <- function(proj, shape,
   proj_xend <- proj_xend[can_proj]
   proj_yend <- proj_yend[can_proj]
 
-  return(data.frame(x = proj_x, y = proj_y, xend = proj_xend, yend = proj_yend))
-}
-
-
-
-calculate_proj_segments.ellipse <- function(proj, shape,
-                                 xmin, xmax, ymin, ymax,
-                                 to_xmin, to_xmax, to_ymin, to_ymax) {
-  xmin <- as.numeric(xmin)
-  xmax <- as.numeric(xmax)
-  ymin <- as.numeric(ymin)
-  ymax <- as.numeric(ymax)
-  to_xmin <- as.numeric(to_xmin)
-  to_xmax <- as.numeric(to_xmax)
-  to_ymin <- as.numeric(to_ymin)
-  to_ymax <- as.numeric(to_ymax)
-  e1 <- ellipse_points(data.frame(xmin, xmax, ymin, ymax))
-  e2 <- ellipse_points(data.frame(xmin = to_xmin, xmax = to_xmax,
-                                  ymin = to_ymin, ymax = to_ymax))
-
-  dydx <- function (ell) {
-    dy <- c(NA, diff(ell$y))
-    dy[1] <- ell$y[1] - ell$y[length(ell$y)]
-    dx <- c(NA, diff(ell$x))
-    dx[1] <- ell$x[1] - ell$x[length(ell$x)]
-    atan(dy/dx)
-  }
-
-  e1$dydx <- dydx(e1)
-  e2$dydx <- dydx(e2)
-
-  # we look for a "top point" and a "bottom point" on either side of the line
-  # between the two points
-  midpoint1 <- c((xmin + xmax)/2, (ymin + ymax)/2)
-  midpoint2 <- c((to_xmin + to_xmax)/2, (to_ymin + to_ymax)/2)
-  midpoint_vec <- midpoint2 - midpoint1
-
-  # avoid division by 0 in the below
-  j <- 1
-  if (midpoint_vec[1] == 0) j <- 2
-  k <- 3 - j
-  dist_midpoint_vec <- function(pt) {
-    scaled_vec <- midpoint1 + midpoint_vec * (pt[j] - midpoint1[j])/midpoint_vec[j]
-    pt[k] - scaled_vec[k]
-  }
-
-  e1$dist_mp <- apply(e1[c("x", "y")], 1, dist_midpoint_vec)
-  e2$dist_mp <- apply(e2[c("x", "y")], 1, dist_midpoint_vec)
-
-  e1$above <- e1$dist_mp > 0
-  e2$above <- e2$dist_mp > 0
-
-  if (proj == "single") {
-    # get the closest to the midpoint vector, but also the nearest
-    shifted1 <- cbind(e1$x - midpoint1[1], e1$y - midpoint1[2])
-    shifted2 <- cbind(e2$x - midpoint2[1], e2$y - midpoint2[2])
-    between_quadrant1 <- sign(shifted1[, 1]) == sign(midpoint_vec[1]) &
-                         sign(shifted1[, 2]) == sign(midpoint_vec[2])
-    between_quadrant2 <- sign(shifted2[, 1]) != sign(midpoint_vec[1]) &
-                         sign(shifted2[, 2]) != sign(midpoint_vec[2])
-
-    q1 <- e1[between_quadrant1, ]
-    q2 <- e2[between_quadrant2, ]
-    closest1 <- q1[which.min(abs(q1$dist_mp)), c("x", "y")]
-    closest2 <- q2[which.min(abs(q2$dist_mp)), c("x", "y")]
-    names(closest2) <- c("xend", "yend")
-    cbind(closest1, closest2)
-  } else {
-    find_tangent <- function (e1, e2) {
-      e2 <- e2[c("x", "y", "dydx")]
-      closest <- sapply(e1$dydx, function (x) which.min(abs(x - e2$dydx)))
-
-      names(e2) <- c("xend", "yend", "dydx2")
-      res <- cbind(e1[c("x", "y", "dydx")], e2[closest, ])
-
-      res$dydx_slope <- with(res, atan((yend - y)/(xend - x)))
-      slope_diffs <- with(res, abs(dydx_slope - dydx) + abs(dydx_slope - dydx2))
-      res[which.min(slope_diffs), ]
-    }
-
-    tangent_above <- find_tangent(e1[e1$above,], e2[e2$above,])
-    tangent_below <- find_tangent(e1[!e1$above,], e2[!e2$above,])
-
-    rbind(tangent_above, tangent_below)
-  }
-}
-
-
-calculate_proj_segments.mask <- function(proj, shape,
-                                    xmin, xmax, ymin, ymax,
-                                    to_xmin, to_xmax, to_ymin, to_ymax) {
-  # find closest point of mask to midpoint_vec
-  # the second point will just be hidden under the picture
-  midpoint1 <- c((xmin + xmax)/2, (ymin + ymax)/2)
-  midpoint2 <- c((to_xmin + to_xmax)/2, (to_ymin + to_ymax)/2)
-  data.frame(x = midpoint1[1], y = midpoint1[2], xend = midpoint2[1],
-        yend = midpoint2[2])
+  df <- data.frame(x = proj_x, y = proj_y, xend = proj_xend, yend = proj_yend)
+  coord$transform(df, panel_params)
 }
