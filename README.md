@@ -117,23 +117,7 @@ ggpi +
 
 <img src="man/figures/README-example-faceting-1.png" width="100%" />
 
-## Maps (experimental)
-
-``` r
-nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
-ggpm <- ggplot(nc) +
-          geom_sf(aes(fill = AREA)) +
-          coord_sf(default_crs = sf::st_crs(4326))
-
-ggpm + geom_magnify(from = c(-79, 35, -77, 35.5),
-                    to = c(-84, 34, -80, 35), 
-                    colour = "orange", linewidth = 1, shadow = TRUE, 
-                    )
-```
-
-<img src="man/figures/README-example-map-1.png" width="100%" />
-
-## Magnify an arbitrary region (you guessed it, experimental)
+## Magnify an arbitrary region (experimental)
 
 ``` r
 
@@ -166,6 +150,30 @@ ggplot(starwars, aes(mass, height, color = species == "Human")) +
 ```
 
 <img src="man/figures/README-example-mask-grob-1.png" width="100%" />
+
+## Maps (experimental)
+
+``` r
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
+
+ggpm <- ggplot(usa) +
+          geom_sf(aes(fill = ID == "texas"), colour = "grey20") +
+          coord_sf(default_crs = sf::st_crs(4326), ylim = c(10, 50)) + 
+          theme(legend.position = "none") +
+          scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "steelblue4"))
+          
+
+texas <- usa[usa$ID == "texas",]
+texas <- sf::st_transform(texas, sf::st_crs(4326))
+texas <- sf::st_as_grob(sf::st_as_sfc(texas))
+ggpm + geom_magnify(from = texas,
+                    to = c(-120, 10, -95, 30), 
+                    shadow = TRUE, linewidth = 1, colour = "orange3")
+```
+
+<img src="man/figures/README-example-map-1.png" width="100%" />
 
 ## Tips and tricks
 

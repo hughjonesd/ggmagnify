@@ -82,7 +82,7 @@ calculate_proj_midpoint <- function(grob1, grob2) {
 
 
 allcoords <- function (grob) {
-  gc <- grid::grobCoords(grob)
+  gc <- grid::grobCoords(grob, closed = TRUE)
   cc <- lapply(gc, function(l) as.data.frame(l[c("x", "y")]))
   cc <- do.call(rbind, cc)
   cc1 <- unit(cc[, 1], "inches") # can't store units in a matrix
