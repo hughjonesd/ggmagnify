@@ -116,8 +116,7 @@ and projection lines. Set \code{linetype = 0} for no lines.}
 for specific components.}
 
 \item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.
-\verb{"ellipse} requires the "ggforce" package. Or (experimental!) pass in a
-\code{\link[grid:grid.grob]{grid::grob()}} for an arbitrary mask.}
+Or (experimental!) pass in a \code{\link[grid:grid.grob]{grid::grob()}} for an arbitrary mask.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
@@ -232,7 +231,7 @@ ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
                      to = c(4, 5, 7, 6.5), axes = TRUE)
 
 # Ellipse magnification
-if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >= 4.2) {
+if (getRversion() >= 4.2) {
   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
                      to = c(4, 5, 7, 6.5), shape = "ellipse")
 }

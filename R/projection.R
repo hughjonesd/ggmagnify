@@ -15,7 +15,7 @@ calculate_proj_chull <- function(grob1, grob2) {
   c2 <- allcoords(grob2)
 
   both <- rbind(c1, c2)
-  on_chull <- chull(both)
+  on_chull <- grDevices::chull(both)
   both <- as.data.frame(both)
   names(both) <- c("x", "y")
   both$grob <- c(rep(1, nrow(c1)), rep(2, nrow(c2)))

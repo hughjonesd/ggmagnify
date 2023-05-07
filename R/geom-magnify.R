@@ -11,7 +11,6 @@ NULL
 # - clean up the code.
 #   - projection logic for arbitrary grobs? But NB: "facing" is
 #     still special-cased? Ditto "single" for rect?
-#   - Minimize use of external stuff. Remove ggforce as a dependency?
 #   - could we automatically scale a grob shape to viewport with 0,1 npc?
 #     But then when we again add a new viewport maybe we lose that first scale.
 #
@@ -46,8 +45,7 @@ NULL
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components.
 #' @param shape `"rect"` to magnify a rectangle. `"ellipse"` to magnify an ellipse.
-#'   `"ellipse` requires the "ggforce" package. Or (experimental!) pass in a
-#'   [grid::grob()] for an arbitrary mask.
+#'   Or (experimental!) pass in a [grid::grob()] for an arbitrary mask.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -142,7 +140,7 @@ NULL
 #'
 #' # Ellipse magnification
 #' @expect silent()
-#' if (requireNamespace("ggforce", quietly = TRUE) && getRversion() >= 4.2) {
+#' if (getRversion() >= 4.2) {
 #'   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
 #'                      to = c(4, 5, 7, 6.5), shape = "ellipse")
 #' }
@@ -237,9 +235,6 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
     if (is.character(params$shape)) {
       params$shape <- match.arg(params$shape, c("rect", "ellipse"))
-    }
-    if (identical(params$shape, "ellipse")) {
-      rlang::check_installed("ggforce")
     }
     if (params$shadow) {
       rlang::check_installed("ggfx")
@@ -431,27 +426,6 @@ edit_to_panel <- function (plot_built, panel_id) {
   }
 
   plot_built
-}
-
-
-ellipse_points <- function(df) {
-  df$xmin <- as.numeric(df$xmin)
-  df$xmax <- as.numeric(df$xmax)
-  df$ymin <- as.numeric(df$ymin)
-  df$ymax <- as.numeric(df$ymax)
-
-
-
-  df$x0 = (df$xmin + df$xmax)/2
-  df$y0 = (df$ymin + df$ymax)/2
-  df$a =  (df$xmax - df$xmin)/2
-  df$b =  (df$ymax - df$ymin)/2
-  df$angle = 0
-  df$group = 1
-  ellipse_df <- ggforce::StatEllip$setup_data(df)
-  el_pts <- ggforce::StatEllip$compute_panel(data = ellipse_df, scales = NULL)
-
-  el_pts
 }
 
 

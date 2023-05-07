@@ -24,7 +24,6 @@ Imports:
     rlang
 Suggests: 
     doctest (>= 0.2.0.9000),
-    ggforce,
     ggfx,
     hexbin,
     rmarkdown,
