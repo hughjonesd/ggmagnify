@@ -21,6 +21,7 @@ Imports:
     cli,
     ggplot2 (>= 3.4.0),
     grid,
+    gridExtra,
     rlang
 Suggests: 
     doctest (>= 0.2.0.9000),
