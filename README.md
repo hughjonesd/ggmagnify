@@ -135,6 +135,8 @@ humans <- starwars |>
   filter(species == "Human") |> 
   select(mass, height) |> 
   na.omit()
+
+# ggmagnify helper function: finds the convex hull
 hhull <- hull_around(mass, height, data = humans, expand = 0.2)
 
 

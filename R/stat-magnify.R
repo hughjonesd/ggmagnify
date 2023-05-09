@@ -22,6 +22,7 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   },
 
   setup_data = function (self, data, params, scales) {
+
     for (var in self$optional_aes) {
       if (var %in% names(params)) data[[var]] <- params[[var]]
     }
@@ -30,7 +31,7 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   },
 
   # note: these parameters do magic by computing Stat$parameters()
-  compute_group = function (data, scales, from = NULL, to = NULL,
+  compute_panel = function (data, scales, from = NULL, to = NULL,
                             xmin = NULL, ymin = NULL, xmax = NULL, ymax = NULL,
                             to_xmin = NULL, to_ymin = NULL, to_xmax = NULL,
                             to_ymax = NULL, aspect = NULL) {
