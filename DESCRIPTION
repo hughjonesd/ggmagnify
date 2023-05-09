@@ -1,6 +1,6 @@
 Package: ggmagnify
 Title: Create a Magnified Inset of Part of a "ggplot" Object
-Version: 0.0.0.9000
+Version: 0.1.0
 Author: David Hugh-Jones
 Maintainer: David Hugh-Jones <davidhughjones@gmail.com>
 Authors@R: 
@@ -24,7 +24,7 @@ Imports:
     gridExtra,
     rlang
 Suggests: 
-    doctest (>= 0.2.0.9000),
+    doctest,
     ggforce,
     ggfx,
     hexbin,
@@ -34,8 +34,6 @@ Suggests:
 URL: https://github.com/hughjonesd/ggmagnify
 BugReports: https://github.com/hughjonesd/ggmagnify/issues
 Config/testthat/edition: 3
-Remotes: 
-    hughjonesd/doctest
 Collate: 
     'stat-magnify.R'
     'geom-magnify.R'

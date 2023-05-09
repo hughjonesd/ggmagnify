@@ -208,8 +208,7 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
 
 # Arbitrary shape using grid
 setosas <- iris[iris$Species == "setosa", ]
-setosa_hull <- grDevices::chull(setosas[, c("Sepal.Width", "Sepal.Length")])
-setosa_hull <- setosas[setosa_hull, c("Sepal.Width", "Sepal.Length")]
+setosa_hull <- hull_around(Sepal.Width, Sepal.Length, data = setosas)
 ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
        geom_point() + xlim(c(2, 5)) +
        geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8))

@@ -154,9 +154,7 @@ NULL
 #'
 #' # Arbitrary shape using grid
 #' setosas <- iris[iris$Species == "setosa", ]
-#' setosa_hull <- grDevices::chull(setosas[, c("Sepal.Width", "Sepal.Length")])
-#' setosa_hull <- setosas[setosa_hull, c("Sepal.Width", "Sepal.Length")]
-#'
+#' setosa_hull <- hull_around(Sepal.Width, Sepal.Length, data = setosas)
 #' @expect no_error()
 #' ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 #'        geom_point() + xlim(c(2, 5)) +
