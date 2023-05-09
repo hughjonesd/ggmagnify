@@ -62,3 +62,23 @@ hull_around <- function (x, y, data = NULL, expand = 0.1) {
 
   data.frame(x = x, y = y)
 }
+
+
+# what I want
+# geom_magnify(from = hull_where(mpg > 5))
+# geom_magnify(from = rect_where(hp < 5))
+# evaluated per-facet, ideally
+# could we modify their environment
+# I think `eval_tidy(expr, data)` would
+# work but note that expr must be an expression.
+#
+# Neither geoms nor stats get the raw data, but they do get
+# aes's and can inherit them with inherit.aes = TRUE
+# So one approach would be to define `geom_magnify_where`
+# which defines an aesthetic:
+# geom_magnify_where(aes(target = Species == "setosa"), ...,
+# shape = c("rect", "hull", "ellipse"), expand = 0.1)
+# then you take the x and y from where target evaluates to TRUE
+# and built a rect/hull/ellipse around it.
+# Or, you could add this to default geom_magnify()...
+

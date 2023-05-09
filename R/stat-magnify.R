@@ -1,6 +1,6 @@
 
 StatMagnify <- ggproto("StatMagnify", Stat,
-  optional_aes = c("xmin", "xmax", "ymin", "ymax",
+  optional_aes = c("xmin", "xmax", "ymin", "ymax", "from",
                    "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
 
   setup_params = function (self, data, params) {
@@ -15,6 +15,9 @@ StatMagnify <- ggproto("StatMagnify", Stat,
                          max(grobcc[,"y"]))
       }
     }
+    if (is.numeric(params$from)) {
+      params$from <- list(params$from)
+    }
     params$aspect <- match.arg(params$aspect, c("free", "fixed"))
 
 
@@ -22,7 +25,6 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   },
 
   setup_data = function (self, data, params, scales) {
-
     for (var in self$optional_aes) {
       if (var %in% names(params)) data[[var]] <- params[[var]]
     }
@@ -35,7 +37,10 @@ StatMagnify <- ggproto("StatMagnify", Stat,
                             xmin = NULL, ymin = NULL, xmax = NULL, ymax = NULL,
                             to_xmin = NULL, to_ymin = NULL, to_xmax = NULL,
                             to_ymax = NULL, aspect = NULL) {
+    browser()
+    from <- from %||% data$from[[1]]
     if (! is.null(from)) {
+      from <- unlist(from)
       data$xmin <- from[1]
       data$ymin <- from[2]
       data$xmax <- from[3]

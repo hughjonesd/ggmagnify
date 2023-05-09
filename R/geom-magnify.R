@@ -230,7 +230,7 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
 #' @export
 GeomMagnify <- ggproto("GeomMagnify", Geom,
   optional_aes = c("xmin", "xmax", "ymin", "ymax",
-                   "to_xmin", "to_xmax", "to_ymin", "to_ymax"),
+                   "to_xmin", "to_xmax", "to_ymin", "to_ymax", "from"),
   default_aes = aes(colour = "black"),
   draw_key = draw_key_blank,
   plot = NULL,
