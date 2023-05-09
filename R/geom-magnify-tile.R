@@ -58,7 +58,7 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
                   "to_height"),
 
   # note: these parameters do magic by computing Stat$parameters()
-  compute_group = function (self, data, scales, x = NULL, y = NULL,
+  compute_panel = function (self, data, scales, x = NULL, y = NULL,
                             width = NULL, height = NULL,
                             to_x = NULL, to_y = NULL, to_width = NULL,
                             to_height = NULL, aspect = NULL) {
@@ -81,7 +81,7 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
     data$to_ymin = to_y - to_height/2
     data$to_ymax = to_y + to_height/2
 
-    ggproto_parent(StatMagnify, self)$compute_group(data = data, scales = scales)
+    ggproto_parent(StatMagnify, self)$compute_panel(data = data, scales = scales)
   }
 )
 
