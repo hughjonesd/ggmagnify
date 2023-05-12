@@ -102,21 +102,41 @@ test_that("date", {
     theme_classic()
 
   expect_silent({
-    ggm_date <- ggpd + geom_magnify(xmin = as.Date("1970-01-01"), ymin = 0.018,
-                                    xmax = as.Date("1974-01-01"), ymax = 0.025,
-                                    to_xmin = as.Date("1983-01-01"), to_ymin = 0.06,
-                                    to_xmax = as.Date("2013-01-01"), to_ymax = 0.08,
-                                    axes = "xy")
+    ggm_date <- ggpd + geom_magnify(
+      from = list(
+        xmin = as.Date("1970-01-01"),
+        ymin = 0.018,
+        xmax = as.Date("1974-01-01"),
+        ymax = 0.025
+      ),
+      to = list(
+        xmin = as.Date("1983-01-01"),
+        ymin = 0.06,
+        xmax = as.Date("2013-01-01"),
+        ymax = 0.08
+      ),
+      axes = "xy"
+    )
     print(ggm_date)
   })
 
   expect_silent({
     ggm_date_ellipse <- ggpd +
-      geom_magnify(xmin = as.Date("1970-01-01"), ymin = 0.018,
-                   xmax = as.Date("1974-01-01"), ymax = 0.025,
-                   to_xmin = as.Date("1983-01-01"), to_ymin = 0.06,
-                   to_xmax = as.Date("2013-01-01"), to_ymax = 0.08,
-                   shape = "ellipse")
+      geom_magnify(
+        from = list(
+          xmin = as.Date("1970-01-01"),
+          ymin = 0.018,
+          xmax = as.Date("1974-01-01"),
+          ymax = 0.025
+        ),
+        to = list(
+          xmin = as.Date("1983-01-01"),
+          ymin = 0.06,
+          xmax = as.Date("2013-01-01"),
+          ymax = 0.08
+        ),
+        shape = "ellipse"
+      )
     print(ggm_date_ellipse)
   })
 

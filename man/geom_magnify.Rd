@@ -11,26 +11,25 @@ geom_magnify(
   stat = StatMagnify,
   position = "identity",
   ...,
-  from = NULL,
-  to = NULL,
-  expand = TRUE,
+  expand = 0.05,
   aspect = c("free", "fixed"),
   axes = "",
   proj = c("facing", "corresponding", "single"),
   shadow = FALSE,
+  colour = "black",
   linetype = 1,
   target.linetype = linetype,
   inset.linetype = linetype,
   proj.linetype = 2,
   alpha = 1,
   linewidth = 0.4,
-  shape = c("rect", "ellipse"),
+  shape = c("rect", "ellipse", "hull", "map"),
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
   scale.inset = 1,
   na.rm = FALSE,
-  inherit.aes = FALSE
+  inherit.aes = TRUE
 )
 
 geom_magnify_tile(
@@ -44,6 +43,7 @@ geom_magnify_tile(
   axes = "",
   proj = "facing",
   shadow = FALSE,
+  colour = "black",
   linetype = 1,
   target.linetype = linetype,
   inset.linetype = linetype,
@@ -62,13 +62,8 @@ geom_magnify_tile(
 \arguments{
 \item{mapping, data, stat, position, ..., na.rm}{See e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.}
 
-\item{from}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the target area to magnify.
-Alternatively, pass in a data frame or \code{\link[grid:grid.grob]{grid::grob()}} object, see below.}
-
-\item{to}{Length 4 numeric: points \verb{x0, y0, x1, y1} of the magnified inset.}
-
-\item{expand}{Logical. Expand the limits of the target area by a small factor
-in the inset plot. See \link[ggplot2:coord_cartesian]{coord_cartesian()}.}
+\item{expand}{Number. Expand the target area and inset proportionally
+by this amount.}
 
 \item{aspect}{String. \code{"fixed"} to fix the aspect ratio (overrides \code{ymax}).}
 
@@ -82,12 +77,14 @@ default), \code{"corresponding"} or \code{"single"}. Can be abbreviated. See bel
 "ggfx" package.}
 
 \item{linetype, alpha, linewidth}{Linetype, alpha and linewidth for borders
-and projection lines. Set \code{linetype = 0} for no lines.}
+and projection lines.}
 
 \item{target.linetype, inset.linetype, proj.linetype}{Linetypes
-for specific components.}
+for specific components. Set to \code{0} for no lines.}
 
-\item{shape}{\code{"rect"} to magnify a rectangle. \code{"ellipse"} to magnify an ellipse.}
+\item{shape}{Shape of the area to be magnified. \code{"rect"} for a rectangle.
+\code{"ellipse"} for an ellipse. \code{"hull"} for the convex hull of a set of points.
+\code{"map"} for a map area. See below.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
@@ -120,26 +117,23 @@ from one to the other.
 geom_magnify understand the following aesthetics (required aesthetics are in
 bold):
 \itemize{
-\item \strong{xmin}
-\item \strong{xmax}
-\item \strong{ymin}
-\item \strong{ymax}
-\item \strong{to_xmin}
-\item \strong{to_xmax}
-\item \strong{to_ymin}
-\item \strong{to_ymax}
-\item colour
+\item \strong{from}
+\item \strong{to}
 }
 
-Normally you'll set these in the call to \code{geom_magnify()}, by specifying
-\code{from} and \code{to}, but you can set them directly if you prefer to be explicit.
-(\code{from} and \code{to} override \code{xmin} etc. and \code{to_xmin} etc. respectively.) Or
-use the aesthetics to specify the magnification area within your data, e.g.
-by facet.
+\code{from} and \code{to} can be lists of length 4, like \code{list(xmin, ymin, xmax, ymax)}.
+These specify the bottom left and top right corners of the target area to
+magnify, and the area for the magnified inset.
 
-\emph{Note:} as of today, the code only allows one magnification per call to
-\code{geom_magnify()}. However, nothing stops you adding multiple calls to
-\code{geom_magnify()}
+Additionally, to magnify an arbitrary area, pass a \code{\link[grid:grid.grob]{grid::grob()}} or a data
+frame of x and y points into \code{from}. Points should be on the same scale as
+the data, with \code{default.units = "native"} in the grob. This is experimental.
+(Well, everything is experimental. This is just \emph{more} experimental.)
+
+Normally you'll set \code{from} and \code{to} in the call to \code{geom_magnify()}. You can
+specify them as aesthetics if you want different areas per facet. Note that
+only one area gets magnified per facet. If you want more than that, use
+multiple calls to \code{geom_magnify()}.
 }
 
 \subsection{Projection lines}{
@@ -149,15 +143,10 @@ corners of the target to the corners of the inset. \code{"corresponding"} always
 projects each corner of the target to the same corner of the inset.
 \code{"facing"} sometimes draws lines between facing corners, when this looks
 cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
-\code{"none"} draws no lines.
-}
+Unless \code{from} is \code{"rect"}, \code{"facing"} and
+\code{"corresponding"} are the same.
 
-\subsection{Arbitrary shapes}{
-
-To magnify an arbitrary area, pass a \code{\link[grid:grid.grob]{grid::grob()}} or a data frame of x and y
-points into \code{from}. Points should be on the same scale as the data,
-with \code{default.units = "native"} in the grob. This is experimental.
-(Well, everything is experimental. This is just \emph{more} experimental.)
+To draw no lines, set \code{proj.linetype = 0}.
 }
 
 \subsection{Limitations}{

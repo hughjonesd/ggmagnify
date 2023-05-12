@@ -5,39 +5,32 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
   geom_point()
 
-x <- 3.25
-width <- 0.5
-y <- 6.5
-height <- 1
+from1 <- c(3, 6, 3.5, 7)
+to1 <- c(2.4, 4.3, 3.2, 5.7)
 
-to_x <- 3.2
-to_y <- 5
-to_width <- 0.8
-to_height <- 1.2
 
-test_param <- function (name, ..., .ggplot = ggp) {
+test_param <- function (name, ..., from = from1, to = to1, .ggplot = ggp) {
   if (grepl("\\.", name)) warning("Dot in snapshot file name may cause testthat bug.")
   test_that(name, {
     expect_silent(
       ggm <- .ggplot +
         labs(title = name) +
-        geom_magnify_tile(x = x, width = width, y = y, height = height,
-                     to_x = to_x, to_y = to_y, to_width = to_width,
-                     to_height = to_height, ...)
+        geom_magnify(from = from, to = to, ...)
     )
     expect_silent(
       print(ggm)
     )
     skip_on_ci()
     filename <- paste0("test-params-", name, ".png")
-    expect_snapshot_file(ggsave(filename, ggm, width = 5, height = 5))
+    expect_snapshot_file(ggsave(filename, ggm, width = 4, height = 4))
   })
 }
 
 test_param("defaults")
-mask <- grid::polygonGrob(x = c(0, 0.5, 1, 0.5, 0.2), y = c(0, 0.1, 0.5, 1, 0.3))
+mask <- grid::polygonGrob(x = c(3, 3.5, 4, 3.5, 3.2),
+                          y = c(6, 6.3, 6.7, 6.6, 6.8), default.units = "native")
 test_param("from-mask", from = mask)
-test_param("expand", expand = FALSE)
+test_param("expand", expand = 0)
 test_param("aspect-fixed", aspect = "fixed")
 test_param("axes", axes = "xy")
 test_param("axes-x", axes = "x")

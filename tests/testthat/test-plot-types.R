@@ -4,28 +4,20 @@ library(ggplot2)
 
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species))
 ggp1d <- ggplot(iris, aes(Sepal.Width, color = Species, fill = Species))
-x = 3.25
-width = 0.5
-y = 7
-height = 1
-to_x = 2.7
-to_y = 5.2
-to_width = 1
-to_height = 2
+
 
 test_plot_type <- function(
                     name,
                     plot,
                     x = 3.25,
-                    width = .5,
+                    width = 0.5,
                     y = 7,
                     height = 1,
                     to_x = 2.7,
                     to_y = 5.2,
-                    to_width = 1,
-                    to_height = 2,
-                    ...
-                           ) {
+                    to_width = 0.75,
+                    to_height = 1.5,
+                    ...) {
   test_that(name, {
     expect_silent(
       ggm <- plot + geom_magnify_tile(x = x, width = width, y = y, height = height,
@@ -37,7 +29,7 @@ test_plot_type <- function(
     )
     skip_on_ci()
     expect_snapshot_file(
-      ggsave(sprintf("test-%s.png", name), ggm, width = 5, height = 5)
+      ggsave(sprintf("test-%s.png", name), ggm, width = 4, height = 4)
     )
   })
 }
@@ -60,12 +52,14 @@ test_plot_type("geom_violin",
   ggplot(iris, aes(Species, Sepal.Length, color = Species)) +
   geom_point() + geom_violin(fill = NA))
 
-test_plot_type("geom_histogram", ggp1d + geom_histogram(bins = 10))
+test_plot_type("geom_histogram", ggp1d + geom_histogram(bins = 10),
+               height = 6, to_height = 9, to_y = 20)
 test_plot_type("geom_density", ggp1d + geom_density(), x = 3.25, width = 0.5,
                y = 1, height = 0.2, to_y = 0.5, to_x = 2.7, to_width = 1,
                to_height = 0.4)
 
-test_plot_type("geom_dotplot", ggp1d + geom_dotplot(binwidth = 0.2))
+test_plot_type("geom_dotplot", ggp1d + geom_dotplot(binwidth = 0.2),
+               y = 2, to_y = 1)
 
 test_plot_type("geom_function",
   # for fun. `data` is required
