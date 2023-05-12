@@ -16,6 +16,8 @@ NULL
 #
 # - make date scales work
 #
+# - why is target linewidth too small?
+#
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
