@@ -14,8 +14,9 @@ NULL
 # - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
 #   meaningless mask
 #
-# - `rect_where()` and `hull_where()`, evaluated in the data, finds a rectangle
-#   or convex hull round some points.
+# - make geom_magnify_tile work again
+#
+# - get projection lines to work with grobs again
 #
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
@@ -32,12 +33,9 @@ NULL
 #'
 #' @inherit ggplot2::layer params
 #' @param mapping,data,stat,position,...,na.rm See e.g. [ggplot2::geom_point()].
-#' @param from Length 4 numeric: points `x0, y0, x1, y1` of the target area to magnify.
-#'   Alternatively, pass in a data frame or [grid::grob()] object, see below.
-#' @param to Length 4 numeric: points `x0, y0, x1, y1` of the magnified inset.
 #' @param aspect String. `"fixed"` to fix the aspect ratio (overrides `ymax`).
-#' @param expand Logical. Expand the limits of the target area by a small factor
-#'   in the inset plot. See [coord_cartesian()][ggplot2::coord_cartesian()].
+#' @param expand Number. Expand the target area and inset proportionally
+#'   by this amount.
 #' @param axes String. Which axes to plot in the inset? `""`, `"x"`, `"y"` or
 #'   `"xy"`.
 #' @param proj String. What style of projection lines to draw? `"facing"` (the
@@ -45,10 +43,12 @@ NULL
 #' @param shadow Logical. Draw a shadow behind the inset plot? Requires the
 #'   "ggfx" package.
 #' @param linetype,alpha,linewidth Linetype, alpha and linewidth for borders
-#'   and projection lines. Set `linetype = 0` for no lines.
+#'   and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
-#'   for specific components.
-#' @param shape `"rect"` to magnify a rectangle. `"ellipse"` to magnify an ellipse.
+#'   for specific components. Set to `0` for no lines.
+#' @param shape Shape of the area to be magnified. `"rect"` for a rectangle.
+#'   `"ellipse"` for an ellipse. `"hull"` for the convex hull of a set of points.
+#'   `"map"` for a map area. See below.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -67,25 +67,22 @@ NULL
 #' geom_magnify understand the following aesthetics (required aesthetics are in
 #' bold):
 #'
-#' - **xmin**
-#' - **xmax**
-#' - **ymin**
-#' - **ymax**
-#' - **to_xmin**
-#' - **to_xmax**
-#' - **to_ymin**
-#' - **to_ymax**
-#' - colour
+#' - **from**
+#' - **to**
 #'
-#' Normally you'll set these in the call to `geom_magnify()`, by specifying
-#' `from` and `to`, but you can set them directly if you prefer to be explicit.
-#' (`from` and `to` override `xmin` etc. and `to_xmin` etc. respectively.) Or
-#' use the aesthetics to specify the magnification area within your data, e.g.
-#' by facet.
+#' `from` and `to` can be lists of length 4, like `list(xmin, ymin, xmax, ymax)`.
+#' These specify the bottom left and top right corners of the target area to
+#' magnify, and the area for the magnified inset.
 #'
-#' *Note:* as of today, the code only allows one magnification per call to
-#' `geom_magnify()`. However, nothing stops you adding multiple calls to
-#' `geom_magnify()`
+#' Additionally, to magnify an arbitrary area, pass a [grid::grob()] or a data
+#' frame of x and y points into `from`. Points should be on the same scale as
+#' the data, with `default.units = "native"` in the grob. This is experimental.
+#' (Well, everything is experimental. This is just *more* experimental.)
+#'
+#' Normally you'll set `from` and `to` in the call to `geom_magnify()`. You can
+#' specify them as aesthetics if you want different areas per facet. Note that
+#' only one area gets magnified per facet. If you want more than that, use
+#' multiple calls to `geom_magnify()`.
 #'
 #' ## Projection lines
 #'
@@ -94,14 +91,10 @@ NULL
 #' projects each corner of the target to the same corner of the inset.
 #' `"facing"` sometimes draws lines between facing corners, when this looks
 #' cleaner. `"single"` draws a single line from the midpoint of facing sides.
-#' `"none"` draws no lines.
+#' Unless `from` is `"rect"`, `"facing"` and
+#' `"corresponding"` are the same.
 #'
-#' ## Arbitrary shapes
-#'
-#' To magnify an arbitrary area, pass a [grid::grob()] or a data frame of x and y
-#' points into `from`. Points should be on the same scale as the data,
-#' with `default.units = "native"` in the grob. This is experimental.
-#' (Well, everything is experimental. This is just *more* experimental.)
+#' To draw no lines, set `proj.linetype = 0`.
 #'
 #' ## Limitations
 #'
@@ -180,34 +173,36 @@ NULL
 #'
 geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                            position = "identity", ...,
-                           from = NULL,
-                           to = NULL,
-                           expand = TRUE,
+                           expand = 0.1,
                            aspect = c("free", "fixed"),
                            axes = "",
                            proj = c("facing", "corresponding", "single"),
                            shadow = FALSE,
+                           colour = "black",
                            linetype = 1,
                            target.linetype = linetype,
                            inset.linetype = linetype,
                            proj.linetype = 2,
                            alpha = 1,
                            linewidth = 0.4,
-                           shape = c("rect", "ellipse"),
+                           shape = c("rect", "ellipse", "hull", "map"),
                            plot = NULL,
                            shadow.args = list(sigma = 5, colour = "grey40",
                                               x_offset = 5, y_offset = 5),
                            recompute = FALSE,
                            scale.inset = 1,
                            na.rm = FALSE,
-                           inherit.aes = FALSE) {
+                           inherit.aes = TRUE) {
+  proj <- match.arg(proj)
+  shape <- match.arg(shape)
+  aspect <- match.arg(aspect)
 
   l <- layer(
          geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
-         params = list(from = from, to = to, expand = expand, aspect = aspect,
-                       axes = axes, proj = proj, shadow = shadow,
+         params = list(expand = expand, aspect = aspect,
+                       axes = axes, proj = proj, shadow = shadow, colour = colour,
                        linewidth = linewidth, linetype = linetype, alpha = alpha,
                        target.linetype = target.linetype,
                        proj.linetype = proj.linetype,
@@ -215,11 +210,18 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                        shape = shape, plot = plot,
                        shadow.args = shadow.args, recompute = recompute,
                        scale.inset = scale.inset,
-                       na.rm = na.rm,...)
+                       na.rm = na.rm, ...)
        )
   class(l) <- c("GeomMagnifyLayer", class(l))
 
   l
+}
+
+
+#' @export
+ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
+  object$geom$plot <- plot
+  NextMethod()
 }
 
 
@@ -229,67 +231,48 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
 #' @usage NULL
 #' @export
 GeomMagnify <- ggproto("GeomMagnify", Geom,
-  optional_aes = c("xmin", "xmax", "ymin", "ymax",
-                   "to_xmin", "to_xmax", "to_ymin", "to_ymax", "from"),
-  default_aes = aes(colour = "black"),
+  required_aes = c("xmin","ymin", "xmax", "ymax", "to_xmin", "to_ymin", "to_xmax",
+                   "to_ymax"),
   draw_key = draw_key_blank,
   plot = NULL,
   rename_size = FALSE,
 
   setup_params = function (data, params) {
-    params$proj <- match.arg(params$proj, c("facing", "corresponding", "single"))
-    params$shape <- match.arg(params$shape, c("rect", "ellipse"))
-
     if (params$shadow) {
       rlang::check_installed("ggfx")
     }
     if (params$axes != "" && ! identical(params$shape, "rect")) {
-      cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} with",
-                          "{.code shape != \"rect\"}"))
+      cli::cli_warn(paste("Setting {.code axes} to {.code \"\"} because",
+                          "{.code shape} is not \"rect\"}"))
       params$axes <- ""
     }
     if (length(params$scale.inset) == 1L) {
       params$scale.inset <- rep(params$scale.inset, 2)
     }
-    if (is.data.frame(params$from)) {
-      # we've got the xmin et al. from the grob in StatMagnify
-      params$from <- df_to_grob(params$from)
-    }
 
     params
   },
 
-  draw_panel = function (self, data, panel_params, coord, from = NULL, to,
-                         magnify, axes, proj, shadow,
+
+  draw_panel = function (self, data, panel_params, coord, from,
+                         magnify, axes, proj, shadow, colour,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
                          recompute, scale.inset
                          ) {
-    d1 <- data[1, , drop = FALSE]   # untransformed, for other geoms
-    if (grid::is.grob(from)) {
-      # this will be on scale of data
-      shape <- from
-      shape_cc <- as.data.frame(allcoords(shape))
-      shape_cc <- coord$transform(shape_cc, panel_params)
-      # this is rough, could we do better by rescaling?
-      shape <- polygonGrob(x = shape_cc$x, y = shape_cc$y,
-                        default.units = "native")
-    }
+    # StatMagnify has put xmin, to_xmin and inset_xmin into this
+    d1 <- data[1, , drop = FALSE]
+
     # create shape_grob for target border, inset border, and inset mask
     # this is scaled to 0, 1 in both directions, with
-    # default units "npc"
-    shape_grob <- if (grid::is.grob(shape)) {
-      scale01 <- function (x) (x - min(x))/(max(x) - min(x))
-      x_scaled <- scale01(as.numeric(shape$x))
-      y_scaled <- scale01(as.numeric(shape$y))
-      editGrob(shape, x = grid::unit(x_scaled, "npc"),
-                      y = grid::unit(y_scaled, "npc"))
-    } else if (shape == "ellipse"){
-      gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5,
-                             position.units = "npc", size.units = "npc")
-    } else {
-      grid::rectGrob()
-    }
+    # default units "npc", and has been transformed by the coords
+    from <- if ("from" %in% names(data) && ! is.null(data$from[[1]])) {
+              if (is.logical(data$from)) data$from else data$from[[1]]
+            }  else {
+              from
+            }
+    shape_grob <- compute_shape_grob(from, shape, data, coord, panel_params,
+                                     expand)
 
     # == create grob for border around target ==
     target_corners <- data.frame(
@@ -307,15 +290,15 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                           height = diff(target_y_rng),
                           default.units =  "native")
     target_grob <- editGrob(shape_grob, vp = target_vp,
-                            gp = gpar(fill = NA, col = alpha(d1$colour, alpha),
+                            gp = gpar(fill = NA, col = alpha(colour, alpha),
                                       lwd = linewidth * .pt,
                                       lty = target.linetype))
 
     # == create the magnified plot =======================================
 
     plot <- plot %||% self$plot
-    plot_gtable <- create_plot_gtable(plot, data = d1, expand = expand,
-                                      axes = axes, recompute = recompute,
+    plot_gtable <- create_plot_gtable(plot, data = d1, axes = axes,
+                                      recompute = recompute,
                                       scale.inset = scale.inset)
 
     # == create the viewport and mask for the inset plot ==============
@@ -342,13 +325,13 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                   name = paste0("ggmagnify-border-",
                                                      incremental_id()),
                                   gp = gpar(fill = NA,
-                                            col = alpha(d1$colour, alpha),
+                                            col = alpha(colour, alpha),
                                             lwd = linewidth * .pt,
                                             lty = inset.linetype
                                             ))
 
     # == create projection lines =====
-    proj_df <- if (identical(shape, "rect")) {
+    proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob")) {
       calculate_proj_df_rect(proj, d1, coord, panel_params)
     } else {
       calculate_proj_df(proj, target_grob, border_grob)
@@ -358,7 +341,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                               #vp = vp,
                               default.units = "native",
                               gp = gpar(
-                                col = alpha(d1$colour, alpha),
+                                col = alpha(colour, alpha),
                                 lty = proj.linetype,
                                 lwd = linewidth * .pt
                               ))
@@ -373,7 +356,88 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 )
 
 
-create_plot_gtable <- function (plot, data, expand, axes, recompute, scale.inset) {
+#' Compute a shape grob on scale 0-1 npc for use for borders,
+#' target lines and mask
+#'
+#' @param from Stripped of surrounding `list()`
+#' @param shape "rect", "ellipse", "hull", "map" (not done yet)
+#' @param data Data
+#' @param coord Coord object
+#' @param panel_params Opaque object
+#' @param expand Parameter for proportional expansion (not done yet)
+#'
+#' @return A [grid::grob()] object with units "npc" and data between 0 and
+#' 1 on screen scale. Coordinates have been transformed by `coord$transform(...)`.
+#' @noRd
+compute_shape_grob <- function (from, shape, data, coord, panel_params, expand) {
+  UseMethod("compute_shape_grob")
+}
+
+
+compute_shape_grob.grob <- function (from, shape, data, coord, panel_params,
+                                     expand) {
+  scale01 <- function (x) (x - min(x))/(max(x) - min(x))
+  from_cc <- allcoords(from)
+  # we don't transform for a raw grob. Note that if we're called from
+  # the data.frame method, we've already transformed.
+  x_scaled <- scale01(as.numeric(from_cc[, "x"]))
+  y_scaled <- scale01(as.numeric(from_cc[, "y"]))
+
+  grid::polygonGrob(x = grid::unit(x_scaled, "npc"),
+                    y = grid::unit(y_scaled, "npc"))
+}
+
+
+compute_shape_grob.data.frame <- function (from, shape, data, coord, panel_params,
+                                           expand) {
+  if (shape %in% c("rect", "ellipse")) {
+    # we just return a standardized rect or ellipse shape, since
+    # StatMagnify has decided the bounds already
+    return(compute_shape_grob.default(from, shape, data, coord, panel_params,
+                                      expand))
+  }
+
+  # this will be on scale of data
+  names(from) <- c("x", "y")
+  shape_cc <- coord$transform(from, panel_params)
+
+  if (shape == "hull") {
+    shape_cc <- hull_around(shape_cc$x, shape_cc$y, expand = expand)
+  } else { # shape == "map", for now we just take this as the points
+    shape_cc$x <- expand_by(shape_cc$x, expand)
+    shape_cc$y <- expand_by(shape_cc$y, expand)
+  }
+
+  from_grob <- polygonGrob(x = shape_cc$x, y = shape_cc$y,
+                            default.units = "native")
+  compute_shape_grob(from_grob, shape, data, coord, panel_params, expand = 0)
+}
+
+
+compute_shape_grob.logical <- function (from, shape, data, coord, panel_params,
+                                        expand) {
+  from_df <- data.frame(x = data$x[from], y = data$y[from])
+  # coordinate transformation done in the data.frame method
+  compute_shape_grob(from_df, shape, data, coord, panel_params, expand)
+}
+
+
+compute_shape_grob.default <- function (from, shape, data, coord, panel_params,
+                                        expand) {
+  if (shape == "rect") {
+    grid::rectGrob()
+  } else if (shape == "ellipse") {
+    gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5,
+                             position.units = "npc", size.units = "npc")
+  } else {
+    cli::cli_warn("Ignoring {.code shape = }{shape} since `from` only gave
+                  bounds for a rectangle")
+    grid::rectGrob()
+  }
+}
+
+
+create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
   plot_coord <- ggplot_build(plot)$layout$coord
   plot_limits <- plot_coord$limits
 
@@ -399,11 +463,11 @@ create_plot_gtable <- function (plot, data, expand, axes, recompute, scale.inset
   plot_coord <- constructor(plot_coord)
   suppressMessages(
     plot <- if (recompute) {
-      plot + do.call(plot_coord, list(expand = expand)) +
+      plot + do.call(plot_coord, list(expand = FALSE)) +
         lims(x = xlim_vals, y = ylim_vals)
     } else {
       plot + do.call(plot_coord,
-                     list(xlim = xlim_vals, ylim = ylim_vals, expand = expand))
+                     list(xlim = xlim_vals, ylim = ylim_vals, expand = FALSE))
     }
   )
   plot <- plot + inset_theme(axes = axes)
@@ -448,11 +512,4 @@ edit_to_panel <- function (plot_built, panel_id) {
   }
 
   plot_built
-}
-
-
-#' @export
-ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
-  object$geom$plot <- plot
-  NextMethod()
 }

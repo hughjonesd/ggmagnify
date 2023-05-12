@@ -30,7 +30,7 @@ remotes::install_github("hughjonesd/ggmagnify")
 library(ggplot2)
 library(ggmagnify)
 
-ggp <- ggplot(dv, aes(Position, NegLogP, color = cut)) + 
+ggp <- ggplot(dv, aes(Position, NegLogP)) + 
   geom_point(color = "darkblue", alpha = 0.8, size = 0.8) +
   labs(title = "GWAS p-values for cognitive function",
        subtitle = "Davies et al. (2018).", y = "-log(p)")
@@ -113,11 +113,19 @@ ggpi +
                     width = 1, height = 1,
                     to_x = 5, to_y = 5, to_width = 1.5, to_height = 1.5,
                     shadow = TRUE)
+#> Warning: Computation failed in `stat_magnify_tile()`
+#> Computation failed in `stat_magnify_tile()`
+#> Computation failed in `stat_magnify_tile()`
+#> Caused by error in `names(from) <- c("xmin", "ymin", "xmax", "ymax")`:
+#> ! 'names' attribute [4] must be the same length as the vector [0]
 ```
 
 <img src="man/figures/README-example-faceting-1.png" width="100%" />
 
 ## Magnify an arbitrary region (experimental)
+
+Specify a logical vector in `from` to select a set of points. Use
+`shape = "hull"` to draw their convex hull.
 
 ``` r
 
@@ -135,15 +143,17 @@ humans <- starwars |>
   filter(species == "Human") |> 
   select(mass, height) |> 
   na.omit()
-hhull <- hull_around(mass, height, data = humans, expand = 0.2)
 
-
-ggplot(starwars, aes(mass, height, color = species == "Human")) + 
-  geom_point() + xlim(0, 200) + ylim(0, 250) + 
-  scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "grey60")) + 
-  geom_magnify(from = hhull, to = c(30, 0, 200, 120), shadow = TRUE,
-               alpha = 0.8, colour = "darkgreen", linewidth = 0.6)
-#> Warning: Removed 29 rows containing missing values (`geom_point()`).
+starwars |> 
+  na.omit() |> 
+  mutate(Human = species == "Human") |> 
+ggplot(aes(mass, height, color = Human)) + 
+  geom_point() + xlim(0, 220) + ylim(0, 250) + 
+  theme_dark() + 
+  scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "white")) + 
+  geom_magnify(aes(from = Human), to = c(30, 0, 200, 120), shadow = TRUE,
+               alpha = 0.8, colour = "yellow", linewidth = 0.6, shape = "hull",
+               expand = 0.2)
 ```
 
 <img src="man/figures/README-example-mask-grob-1.png" width="100%" />
@@ -313,18 +323,22 @@ ggp2 + geom_magnify(from = c(-1.25, -1, 1.25, 1),
 ### Magnify within a magnify
 
 ``` r
+
+data <- data.frame(
+  x = runif(4000), 
+  y = runif(4000)
+)
 ggplot(
-  data.frame(x=runif(3000, 2,4.5),y= runif(3000, 4, 8)), 
+  data, 
   aes(x=x,y=y)) +
   coord_cartesian(expand = FALSE) +
   geom_density2d_filled(bins = 50, linewidth = 0) +
   geom_point(color='white', alpha = .5, size = .5) + 
   theme(legend.position = "none") +
-  geom_magnify(from = c(2.1, 4.1, 2.4, 4.4), to = c(2.5, 4.5, 3.4, 5.4), 
+  geom_magnify(from = c(0.05, 0.05, 0.15, 0.15), to = c(0.2, 0.2, 0.4, 0.4), 
                colour = "white", proj.linetype = 1, linewidth = 0.6) +
-  geom_magnify(from = c(2.8, 4.8, 3.1, 5.1), to = c(3,5.5,4.4,6.9), 
-               expand = FALSE, colour ="white", proj.linetype = 1, 
-               linewidth = 0.6)
+  geom_magnify(from = c(0.25, 0.25, 0.35, 0.35), to = c(0.45,0.45,0.85,0.85), 
+               expand = 0, colour ="white", proj.linetype = 1)
 ```
 
 <img src="man/figures/README-example-magnify-twice-1.png" width="100%" />
@@ -343,6 +357,7 @@ ggp <- data.frame(x = rnorm(1e5), y = rnorm(1e5),
                           axis.line = element_blank(), 
                           plot.background = element_rect(fill = "black"),
                           panel.background = element_rect(fill = "black"),
+                          title = element_text(colour = "white"),
                           legend.position = "none")
 
 ggpm <- ggp + 
@@ -362,7 +377,7 @@ ggp +
                expand = FALSE, colour = "white") +
   labs(title = "Normal data", 
        subtitle = "The distribution gets more uniform as you zoom in")
-#> Warning: Removed 566 rows containing missing values (`geom_point()`).
+#> Warning: Removed 570 rows containing missing values (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-and-so-ad-infinitum-1.png" width="100%" />

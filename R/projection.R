@@ -81,6 +81,12 @@ calculate_proj_midpoint <- function(grob1, grob2) {
 }
 
 
+#' Turn a grob into coordinates
+#'
+#' @param grob A grid::grob
+#'
+#' @return Matrix of x and y on the scale of data (default.units = "native")
+#' @noRd
 allcoords <- function (grob) {
   gc <- grid::grobCoords(grob, closed = TRUE)
   cc <- lapply(gc, function(l) as.data.frame(l[c("x", "y")]))

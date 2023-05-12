@@ -12,11 +12,12 @@ geom_magnify_tile <- function (mapping = NULL,
                                stat = StatMagnifyTile,
                                position = "identity",
                                ...,
-                               expand = TRUE,
+                               expand = 0.1,
                                aspect = c("free", "fixed"),
                                axes = "",
                                proj = "facing",
                                shadow = FALSE,
+                               colour = "black",
                                linetype = 1,
                                target.linetype = linetype,
                                inset.linetype = linetype,
@@ -38,7 +39,7 @@ geom_magnify_tile <- function (mapping = NULL,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
          params = list(na.rm = na.rm, expand = expand, aspect = aspect,
                        axes = axes,
-                       proj = proj, shadow = shadow,
+                       proj = proj, shadow = shadow, colour = colour,
                        linewidth = linewidth, linetype = linetype,
                        target.linetype = target.linetype,
                        proj.linetype = proj.linetype,
@@ -54,34 +55,29 @@ geom_magnify_tile <- function (mapping = NULL,
 
 
 StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
-  optional_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
+  required_aes = c("x", "y", "width", "height", "to_x", "to_y", "to_width",
                   "to_height"),
 
   # note: these parameters do magic by computing Stat$parameters()
   compute_panel = function (self, data, scales, x = NULL, y = NULL,
                             width = NULL, height = NULL,
                             to_x = NULL, to_y = NULL, to_width = NULL,
-                            to_height = NULL, aspect = NULL) {
-    # missing/get/assign are weird, maybe due to ggproto? Hence this
-    if (is.null(x)) x <- data$x
-    if (is.null(y)) y <- data$y
-    if (is.null(width)) width <- data$width
-    if (is.null(height)) height <- data$height
-    if (is.null(to_x)) to_x <- data$to_x
-    if (is.null(to_y)) to_y <- data$to_y
-    if (is.null(to_width)) to_width <- data$to_width
-    if (is.null(to_height)) to_height <- data$to_height
+                            to_height = NULL, aspect = NULL, expand) {
+    xmin <- x - width/2
+    xmax <- x + width/2
+    ymin <- y - height/2
+    ymax <- y + height/2
+    to_xmin <- to_x - to_width/2
+    to_xmax <- to_x + to_width/2
+    to_ymin <- to_y - to_height/2
+    to_ymax <- to_y + to_height/2
 
-    data$xmin = x - width/2
-    data$xmax = x + width/2
-    data$ymin = y - height/2
-    data$ymax = y + height/2
-    data$to_xmin = to_x - to_width/2
-    data$to_xmax = to_x + to_width/2
-    data$to_ymin = to_y - to_height/2
-    data$to_ymax = to_y + to_height/2
-
-    ggproto_parent(StatMagnify, self)$compute_panel(data = data, scales = scales)
+    from <- c(xmin, ymin, xmax, ymax)
+    to <- c(to_xmin, to_ymin, to_xmax, to_ymax)
+    data$from <- list(from)
+    ggproto_parent(StatMagnify, self)$compute_panel(data = data, scales = scales,
+                                                    from = from, to = to,
+                                                    expand = expand)
   }
 )
 
