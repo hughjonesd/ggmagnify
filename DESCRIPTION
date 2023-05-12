@@ -1,6 +1,6 @@
 Package: ggmagnify
 Title: Create a Magnified Inset of Part of a "ggplot" Object
-Version: 0.1.0
+Version: 0.2.0
 Author: David Hugh-Jones
 Maintainer: David Hugh-Jones <davidhughjones@gmail.com>
 Authors@R: 
