@@ -59,11 +59,13 @@ StatMagnify <- ggproto("StatMagnify", Stat,
     }
 
     for (prefix in c("x", "y", "to_x", "to_y", "inset_x", "inset_y")) {
-      names <- paste0(prefix, c("min", "max"))
-      expanded <- expand_by(data[1, names], expand)
+      blah_min <- paste0(prefix, "min")
+      blah_max <- paste0(prefix, "max")
+      row1 <- c(data[[1, blah_min]], data[[1, blah_max]]) # double brackets matter
+      expanded <- expand_by(row1, expand)
       # ugly way to do all rows at once
-      data[ names[1] ] <- expanded[1]
-      data[ names[2] ] <- expanded[2]
+      data[blah_min] <- expanded[1]
+      data[blah_max] <- expanded[2]
     }
 
     data
