@@ -167,7 +167,9 @@ To draw no lines, set \code{proj.linetype = 0}.
 a graphics device that supports masking. If you are using knitr, you may have
 luck with the \code{ragg_png} device.
 \item \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
-older (or newer!) versions of ggplot2.
+older, or newer, versions of ggplot2. If you don't need faceting, and want
+your code to be robust to upgrades, set \code{options(ggmagnify.safe_mode = TRUE)}
+to use slightly less magic.
 \item By design, \code{geom_magnify()} replots the original plot using new limits. It
 does not directly copy the target area pixels. The advantage is that you can
 e.g. add axes, plot points at an appropriate size, zoom in on data that's

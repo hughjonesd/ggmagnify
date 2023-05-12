@@ -114,7 +114,10 @@ NULL
 #'   luck with the `ragg_png` device.
 #'
 #' * `geom_magnify()` uses dark magic to deal with faceting. It may break with
-#'   older (or newer!) versions of ggplot2.
+#'   older, or newer, versions of ggplot2. If you don't need faceting, and want
+#'   your code to be robust to upgrades, set `options(ggmagnify.safe_mode = TRUE)`
+#'   to use slightly less magic.
+#'
 #'
 #' * By design, `geom_magnify()` replots the original plot using new limits. It
 #'   does not directly copy the target area pixels. The advantage is that you can
@@ -480,8 +483,10 @@ create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
     plot_built <- ggplot_build(plot)
   }))
 
-  panel_id <- as.numeric(data$PANEL[1])
-  plot_built <- edit_to_panel(plot_built, panel_id)
+  if (! getOption("ggmagnify.safe_mode", FALSE)) {
+    panel_id <- as.numeric(data$PANEL[1])
+    plot_built <- edit_to_panel(plot_built, panel_id)
+  }
 
   suppressWarnings(suppressMessages(
     plot_gtable <- ggplot_gtable(plot_built)

@@ -8,11 +8,9 @@ test_that("Doctest: rect_around", {
   library(ggplot2)
   to <- c(2, 6, 4.5, 8)
   setosas <- iris[iris$Species == "setosa", ]
-  expect_silent(ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
-    geom_point() + geom_magnify(to = to, from = rect_around(Sepal.Width,
-    Sepal.Length, data = setosas)))
-  expect_silent(ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
-    geom_point() + geom_magnify(to = to, from = hull_around(Sepal.Width,
-    Sepal.Length, data = setosas)))
+  expect_silent(ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + geom_point() +
+    geom_magnify(to = to, from = rect_around(Sepal.Width, Sepal.Length, data = setosas)))
+  expect_silent(ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) + geom_point() +
+    geom_magnify(to = to, from = hull_around(Sepal.Width, Sepal.Length, data = setosas)))
 })
 
