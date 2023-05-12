@@ -4,10 +4,10 @@
 test_that("Doctest: geom_magnify", {
   # Created from @doctest for `geom_magnify`
   # Source file: R/geom-magnify.R
-  # Source line: 131
+  # Source line: 133
   library(ggplot2)
-  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() +
-    xlim(c(2, 6))
+  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+    geom_point() + xlim(c(2, 6))
   expect_silent(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5)))
   expect_silent(if (getRversion() >= 4.2) {
     ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5), shape = "ellipse")
@@ -16,11 +16,11 @@ test_that("Doctest: geom_magnify", {
     ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5), shadow = TRUE)
   })
   expect_no_error(ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
-    geom_point() + xlim(c(2, 5)) + geom_magnify(aes(from = Species == "setosa"), to = c(3,
-    6, 5, 8), shape = "hull"))
-  expect_no_error(ggp + geom_smooth() + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5,
-    7, 6.5)))
-  expect_no_error(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7, 6.5)) +
-    geom_smooth())
+    geom_point() + xlim(c(2, 5)) + geom_magnify(aes(from = Species == "setosa"),
+  to = c(3, 6, 5, 8), shape = "hull"))
+  expect_no_error(ggp + geom_smooth() + geom_magnify(from = c(3, 6.5, 4, 7.5),
+  to = c(4, 5, 7, 6.5)))
+  expect_no_error(ggp + geom_magnify(from = c(3, 6.5, 4, 7.5), to = c(4, 5, 7,
+    6.5)) + geom_smooth())
 })
 

@@ -14,8 +14,6 @@ NULL
 # - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
 #   meaningless mask
 #
-# - make date scales work
-#
 # - why is target linewidth too small?
 #
 # NOT TODO
