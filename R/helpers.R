@@ -12,7 +12,7 @@ expand_by <- function (x, expand) {
 #' @param expand Amount to expand the data around its midpoint. Default is 10
 #'   per cenet.
 #'
-#' @return `rect_around()` returns a numeric vector with names `xmin`, `ymin`,
+#' @return `rect_around()` returns a list with names `xmin`, `ymin`,
 #'   `xmax` and `ymax`. `hull_around()` returns a data frame with columns
 #'   `x` and `y`.
 #'
@@ -44,7 +44,7 @@ rect_around <- function (x, y, data = NULL, expand = 0.1) {
   xr <- expand_by(range(x), expand)
   yr <- expand_by(range(y), expand)
 
-  c(xmin = xr[1], ymin = yr[1], xmax = xr[2], ymax = yr[2])
+  list(xmin = xr[1], ymin = yr[1], xmax = xr[2], ymax = yr[2])
 }
 
 
@@ -62,23 +62,3 @@ hull_around <- function (x, y, data = NULL, expand = 0.1) {
 
   data.frame(x = x, y = y)
 }
-
-
-# what I want
-# geom_magnify(from = hull_where(mpg > 5))
-# geom_magnify(from = rect_where(hp < 5))
-# evaluated per-facet, ideally
-# could we modify their environment
-# I think `eval_tidy(expr, data)` would
-# work but note that expr must be an expression.
-#
-# Neither geoms nor stats get the raw data, but they do get
-# aes's and can inherit them with inherit.aes = TRUE
-# So one approach would be to define `geom_magnify_where`
-# which defines an aesthetic:
-# geom_magnify_where(aes(target = Species == "setosa"), ...,
-# shape = c("rect", "hull", "ellipse"), expand = 0.1)
-# then you take the x and y from where target evaluates to TRUE
-# and built a rect/hull/ellipse around it.
-# Or, you could add this to default geom_magnify()...
-

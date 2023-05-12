@@ -18,7 +18,7 @@ hull_around(x, y, data = NULL, expand = 0.1)
 per cenet.}
 }
 \value{
-\code{rect_around()} returns a numeric vector with names \code{xmin}, \code{ymin},
+\code{rect_around()} returns a list with names \code{xmin}, \code{ymin},
 \code{xmax} and \code{ymax}. \code{hull_around()} returns a data frame with columns
 \code{x} and \code{y}.
 }

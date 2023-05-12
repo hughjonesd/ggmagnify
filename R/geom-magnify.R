@@ -14,9 +14,7 @@ NULL
 # - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
 #   meaningless mask
 #
-# - make geom_magnify_tile work again
-#
-# - get projection lines to work with grobs again
+# - make date scales work
 #
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
@@ -72,17 +70,30 @@ NULL
 #'
 #' `from` and `to` can be lists of length 4, like `list(xmin, ymin, xmax, ymax)`.
 #' These specify the bottom left and top right corners of the target area to
-#' magnify, and the area for the magnified inset.
+#' magnify, and the area for the magnified inset. The lists can optionally be
+#' named, like this: `list(xmin = 1, ymin = 2, xmax = 3, ymax = 4)`.
 #'
-#' Additionally, to magnify an arbitrary area, pass a [grid::grob()] or a data
-#' frame of x and y points into `from`. Points should be on the same scale as
-#' the data, with `default.units = "native"` in the grob. This is experimental.
-#' (Well, everything is experimental. This is just *more* experimental.)
+#' Alternatively, `from` can be:
+#'
+#' * A data frame of points with two columns for `x` and `y`. These points will
+#'   be surrounded by a rectangle, ellipse or convex hull depending on the
+#'   value of `shape`.
+#'
+#' * A [grid::grob()] object. This will be used as a mask. Points should be
+#'   on the same scale as the data, with `default.units = "native"` in the grob.
+#'   Note that only single polygons are supported at the moment. `shape` will
+#'   be ignored.
+#'
+#' * A logical vector. Points in the data where `from` is `TRUE` will be
+#'   surrounded by a rectangle, ellipse or convex hull.
 #'
 #' Normally you'll set `from` and `to` in the call to `geom_magnify()`. You can
-#' specify them as aesthetics if you want different areas per facet. Note that
-#' only one area gets magnified per facet. If you want more than that, use
-#' multiple calls to `geom_magnify()`.
+#' specify them as aesthetics, e.g. if you want different areas per facet. If
+#' so, you need to wrap them in a [list()] to make sure they are length one
+#' per row of data. Only the first row is used per panel.
+#'
+#' Note that only one area gets magnified per panel. To magnify multiple areas,
+#' use multiple calls to `geom_magnify()`.
 #'
 #' ## Projection lines
 #'
@@ -127,10 +138,6 @@ NULL
 #' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
 #'                      to = c(4, 5, 7, 6.5))
 #'
-#' # Inset axes
-#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                      to = c(4, 5, 7, 6.5), axes = TRUE)
-#'
 #' # Ellipse magnification
 #' @expect silent()
 #' if (getRversion() >= 4.2) {
@@ -145,13 +152,12 @@ NULL
 #'                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 #' }
 #'
-#' # Arbitrary shape using grid
-#' setosas <- iris[iris$Species == "setosa", ]
-#' setosa_hull <- hull_around(Sepal.Width, Sepal.Length, data = setosas)
+#' # Convex hull of points
 #' @expect no_error()
 #' ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 #'        geom_point() + xlim(c(2, 5)) +
-#'        geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8))
+#'        geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+#'                     shape = "hull")
 #'
 #' # Order matters
 #'

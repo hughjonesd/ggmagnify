@@ -11,7 +11,7 @@ geom_magnify(
   stat = StatMagnify,
   position = "identity",
   ...,
-  expand = 0.05,
+  expand = 0.1,
   aspect = c("free", "fixed"),
   axes = "",
   proj = c("facing", "corresponding", "single"),
@@ -38,7 +38,7 @@ geom_magnify_tile(
   stat = StatMagnifyTile,
   position = "identity",
   ...,
-  expand = TRUE,
+  expand = 0.1,
   aspect = c("free", "fixed"),
   axes = "",
   proj = "facing",
@@ -123,17 +123,29 @@ bold):
 
 \code{from} and \code{to} can be lists of length 4, like \code{list(xmin, ymin, xmax, ymax)}.
 These specify the bottom left and top right corners of the target area to
-magnify, and the area for the magnified inset.
+magnify, and the area for the magnified inset. The lists can optionally be
+named, like this: \code{list(xmin = 1, ymin = 2, xmax = 3, ymax = 4)}.
 
-Additionally, to magnify an arbitrary area, pass a \code{\link[grid:grid.grob]{grid::grob()}} or a data
-frame of x and y points into \code{from}. Points should be on the same scale as
-the data, with \code{default.units = "native"} in the grob. This is experimental.
-(Well, everything is experimental. This is just \emph{more} experimental.)
+Alternatively, \code{from} can be:
+\itemize{
+\item A data frame of points with two columns for \code{x} and \code{y}. These points will
+be surrounded by a rectangle, ellipse or convex hull depending on the
+value of \code{shape}.
+\item A \code{\link[grid:grid.grob]{grid::grob()}} object. This will be used as a mask. Points should be
+on the same scale as the data, with \code{default.units = "native"} in the grob.
+Note that only single polygons are supported at the moment. \code{shape} will
+be ignored.
+\item A logical vector. Points in the data where \code{from} is \code{TRUE} will be
+surrounded by a rectangle, ellipse or convex hull.
+}
 
 Normally you'll set \code{from} and \code{to} in the call to \code{geom_magnify()}. You can
-specify them as aesthetics if you want different areas per facet. Note that
-only one area gets magnified per facet. If you want more than that, use
-multiple calls to \code{geom_magnify()}.
+specify them as aesthetics, e.g. if you want different areas per facet. If
+so, you need to wrap them in a \code{\link[=list]{list()}} to make sure they are length one
+per row of data. Only the first row is used per panel.
+
+Note that only one area gets magnified per panel. To magnify multiple areas,
+use multiple calls to \code{geom_magnify()}.
 }
 
 \subsection{Projection lines}{
@@ -179,10 +191,6 @@ ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
                      to = c(4, 5, 7, 6.5))
 
-# Inset axes
-ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-                     to = c(4, 5, 7, 6.5), axes = TRUE)
-
 # Ellipse magnification
 if (getRversion() >= 4.2) {
   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
@@ -195,12 +203,11 @@ if (requireNamespace("ggfx", quietly = TRUE)) {
                      to = c(4, 5, 7, 6.5), shadow = TRUE)
 }
 
-# Arbitrary shape using grid
-setosas <- iris[iris$Species == "setosa", ]
-setosa_hull <- hull_around(Sepal.Width, Sepal.Length, data = setosas)
+# Convex hull of points
 ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
        geom_point() + xlim(c(2, 5)) +
-       geom_magnify(from = setosa_hull, to = c(3, 6, 5, 8))
+       geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+                    shape = "hull")
 
 # Order matters
 
