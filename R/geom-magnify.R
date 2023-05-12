@@ -40,8 +40,8 @@ NULL
 #'   default), `"corresponding"` or `"single"`. Can be abbreviated. See below.
 #' @param shadow Logical. Draw a shadow behind the inset plot? Requires the
 #'   "ggfx" package.
-#' @param linetype,alpha,linewidth Linetype, alpha and linewidth for borders
-#'   and projection lines.
+#' @param linetype,colour,alpha,linewidth Linetype, colour, alpha and linewidth
+#' for borders and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components. Set to `0` for no lines.
 #' @param shape Shape of the area to be magnified. `"rect"` for a rectangle.

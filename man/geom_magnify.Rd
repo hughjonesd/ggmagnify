@@ -76,8 +76,8 @@ default), \code{"corresponding"} or \code{"single"}. Can be abbreviated. See bel
 \item{shadow}{Logical. Draw a shadow behind the inset plot? Requires the
 "ggfx" package.}
 
-\item{linetype, alpha, linewidth}{Linetype, alpha and linewidth for borders
-and projection lines.}
+\item{linetype, colour, alpha, linewidth}{Linetype, colour, alpha and linewidth
+for borders and projection lines.}
 
 \item{target.linetype, inset.linetype, proj.linetype}{Linetypes
 for specific components. Set to \code{0} for no lines.}
