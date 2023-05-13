@@ -89,23 +89,21 @@ NULL
 #'
 #' Normally you'll set `from` and `to` in the call to `geom_magnify()`. You can
 #' specify them as aesthetics, e.g. if you want different areas per facet. If
-#' so, you need to wrap them in a [list()] to make sure they are length one
-#' per row of data. Only the first row is used per panel.
-#'
-#' Note that only one area gets magnified per panel. To magnify multiple areas,
-#' use multiple calls to `geom_magnify()`.
+#' so, you may need to wrap them in a [list()] to make sure they are length one
+#' per row of data. Only the first row per panel is used. (To magnify multiple
+#' areas in one panel, use multiple calls to `geom_magnify()`.)
 #'
 #' ## Projection lines
 #'
-#' `proj = "corresponding"` or `"facing"` draws projection lines from the
-#' corners of the target to the corners of the inset. `"corresponding"` always
-#' projects each corner of the target to the same corner of the inset.
-#' `"facing"` sometimes draws lines between facing corners, when this looks
-#' cleaner. `"single"` draws a single line from the midpoint of facing sides.
-#' Unless `from` is `"rect"`, `"facing"` and
-#' `"corresponding"` are the same.
-#'
-#' To draw no lines, set `proj.linetype = 0`.
+#' * `proj = "corresponding"` or `"facing"` draws projection lines from the
+#'   corners of the target to the corners of the inset.
+#'   * `"corresponding"` always projects each corner of the target to the same
+#'     corner of the inset.
+#'   * `"facing"` sometimes draws lines between facing corners, when this looks
+#'     cleaner.
+#'   * For non-rectangular insets, `"facing"` and `"corresponding"` are the same.
+#' * `"single"` draws a single line from the midpoint of facing sides.
+#' * To draw no lines, set `proj.linetype = 0`.
 #'
 #' ## Limitations
 #'
@@ -117,7 +115,6 @@ NULL
 #'   older, or newer, versions of ggplot2. If you don't need faceting, and want
 #'   your code to be robust to upgrades, set `options(ggmagnify.safe_mode = TRUE)`
 #'   to use slightly less magic.
-#'
 #'
 #' * By design, `geom_magnify()` replots the original plot using new limits. It
 #'   does not directly copy the target area pixels. The advantage is that you can
@@ -135,48 +132,33 @@ NULL
 #' library(ggplot2)
 #' ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 #'          geom_point() + xlim(c(2, 6))
+#' from <- list(3, 6.5, 4, 7.5)
+#' to <- list(4, 5, 7, 6.5)
 #'
-#' # Basic magnification
+#' # **Basic magnification**
 #' @expect silent()
-#' ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                      to = c(4, 5, 7, 6.5))
+#' ggp + geom_magnify(from = from, to = to)
 #'
-#' # Ellipse magnification
+#' # **Convex hull of points**
 #' @expect silent()
-#' if (getRversion() >= 4.2) {
-#'   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                      to = c(4, 5, 7, 6.5), shape = "ellipse")
-#' }
+#' ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+#'                    shape = "hull")
 #'
-#' # Shadow
-#' @expect silent()
-#' if (requireNamespace("ggfx", quietly = TRUE)) {
-#'   ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                      to = c(4, 5, 7, 6.5), shadow = TRUE)
-#' }
-#'
-#' # Convex hull of points
-#' @expect no_error()
-#' ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
-#'        geom_point() + xlim(c(2, 5)) +
-#'        geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
-#'                     shape = "hull")
-#'
-#' # Order matters
+#' # **Order matters**
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
-#' @expect no_error()
+#' @expect silent()
 #' ggp +
 #'   geom_smooth() +
-#'   geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                to = c(4, 5, 7, 6.5))
+#'   geom_magnify(from = from, to = to)
 #'
 #' # This will print the inset without the smooth:
 #' @expect no_error()
 #' ggp +
-#'   geom_magnify(from = c(3, 6.5, 4, 7.5),
-#'                to = c(4, 5, 7, 6.5)) +
+#'   geom_magnify(from = from, to = to) +
 #'   geom_smooth()
+#'
+#' # For more examples see https://github.com/hughjonesd/ggmagnify
 #'
 geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                            position = "identity", ...,

@@ -14,7 +14,8 @@ ggmagnify creates a magnified inset of part of a
 [ggplot](https://ggplot2.tidyverse.org/) object. Borders can be drawn
 around the target area and the inset, along with projection lines from
 one to the other. The inset can have a drop shadow. The magnified area
-can be a rectangle or an ellipse.
+can be a rectangle, an ellipse, a convex hull of points, or an arbitrary
+shape.
 
 You can install the development version of ggmagnify from
 [GitHub](https://github.com/) with:
@@ -43,29 +44,6 @@ ggp + geom_magnify(from = from, to = to)
 ```
 
 <img src="man/figures/README-example-basic-1.png" width="100%" />
-
-## Colours and lines
-
-``` r
-
-ggp + 
-  geom_magnify(from = from, to = to,
-               colour = "red", linewidth = 0.5, proj.linetype = 3)
-```
-
-<img src="man/figures/README-example-colours-1.png" width="100%" />
-
-## Axes
-
-``` r
-
-ggp + 
-  scale_x_continuous(labels = NULL) + 
-  geom_magnify(from = from, to = to, 
-               axes = "xy")
-```
-
-<img src="man/figures/README-example-axes-1.png" width="100%" />
 
 ## Inset with shadow
 
@@ -165,13 +143,73 @@ ggpm <- ggplot(usa) +
 texas <- usa[usa$ID == "texas",]
 texas <- sf::st_transform(texas, sf::st_crs(4326))
 texas <- sf::st_as_grob(sf::st_as_sfc(texas))
+
 ggpm + geom_magnify(from = texas,
-                    to = c(-120, 10, -95, 30), 
+                    to = c(-90, 10, -70, 30), 
                     shadow = TRUE, linewidth = 1, colour = "orange3",
-                    aspect = "fixed")
+                    aspect = "fixed") # keep aspect ratio the same
 ```
 
 <img src="man/figures/README-example-map-1.png" width="100%" />
+
+## Axes
+
+``` r
+
+ggp + 
+  scale_x_continuous(labels = NULL) + 
+  geom_magnify(from = from, to = to, 
+               axes = "xy")
+```
+
+<img src="man/figures/README-example-axes-1.png" width="100%" />
+
+## Projection lines and borders
+
+### Colour and linetype
+
+``` r
+
+ggp + 
+  geom_magnify(from = from, to = to,
+               colour = "red", linewidth = 0.5, proj.linetype = 3)
+```
+
+<img src="man/figures/README-example-colours-1.png" width="100%" />
+
+### Projection line styles
+
+``` r
+
+ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+              geom_point()
+from2 <- c(3, 6.5, 3.5, 7)
+to2 <- c(2.75, 5, 3.75, 6)
+
+ggpi + 
+  geom_magnify(from = from2, to = to2,
+               proj = "facing") # the default
+```
+
+<img src="man/figures/README-example-proj-1.png" width="100%" />
+
+``` r
+
+ggpi + 
+  geom_magnify(from = from2, to = to2,
+               proj = "corresponding") # always project corner to corner
+```
+
+<img src="man/figures/README-example-proj-2.png" width="100%" />
+
+``` r
+
+ggpi + 
+  geom_magnify(from = from2, to = to2,
+               proj = "single") # just one line
+```
+
+<img src="man/figures/README-example-proj-3.png" width="100%" />
 
 ## Tips and tricks
 

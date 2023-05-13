@@ -141,24 +141,25 @@ surrounded by a rectangle, ellipse or convex hull.
 
 Normally you'll set \code{from} and \code{to} in the call to \code{geom_magnify()}. You can
 specify them as aesthetics, e.g. if you want different areas per facet. If
-so, you need to wrap them in a \code{\link[=list]{list()}} to make sure they are length one
-per row of data. Only the first row is used per panel.
-
-Note that only one area gets magnified per panel. To magnify multiple areas,
-use multiple calls to \code{geom_magnify()}.
+so, you may need to wrap them in a \code{\link[=list]{list()}} to make sure they are length one
+per row of data. Only the first row per panel is used. (To magnify multiple
+areas in one panel, use multiple calls to \code{geom_magnify()}.)
 }
 
 \subsection{Projection lines}{
-
-\code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
-corners of the target to the corners of the inset. \code{"corresponding"} always
-projects each corner of the target to the same corner of the inset.
-\code{"facing"} sometimes draws lines between facing corners, when this looks
-cleaner. \code{"single"} draws a single line from the midpoint of facing sides.
-Unless \code{from} is \code{"rect"}, \code{"facing"} and
-\code{"corresponding"} are the same.
-
-To draw no lines, set \code{proj.linetype = 0}.
+\itemize{
+\item \code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
+corners of the target to the corners of the inset.
+\itemize{
+\item \code{"corresponding"} always projects each corner of the target to the same
+corner of the inset.
+\item \code{"facing"} sometimes draws lines between facing corners, when this looks
+cleaner.
+\item For non-rectangular insets, \code{"facing"} and \code{"corresponding"} are the same.
+}
+\item \code{"single"} draws a single line from the midpoint of facing sides.
+\item To draw no lines, set \code{proj.linetype = 0}.
+}
 }
 
 \subsection{Limitations}{
@@ -180,48 +181,38 @@ ggplot2 for now.
 }
 }
 
+\subsection{\code{geom_magnify_tile()}}{
+
 \code{geom_magnify_tile()} is a version of \code{geom_magnify()} which uses different
 aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x}, \code{to_width} \code{to_y},
 \code{to_height} to specify the target and inset location.
+}
 }
 \examples{
 library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
          geom_point() + xlim(c(2, 6))
+from <- list(3, 6.5, 4, 7.5)
+to <- list(4, 5, 7, 6.5)
 
-# Basic magnification
-ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-                     to = c(4, 5, 7, 6.5))
+# **Basic magnification**
+ggp + geom_magnify(from = from, to = to)
 
-# Ellipse magnification
-if (getRversion() >= 4.2) {
-  ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-                     to = c(4, 5, 7, 6.5), shape = "ellipse")
-}
+# **Convex hull of points**
+ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+                   shape = "hull")
 
-# Shadow
-if (requireNamespace("ggfx", quietly = TRUE)) {
-  ggp + geom_magnify(from = c(3, 6.5, 4, 7.5),
-                     to = c(4, 5, 7, 6.5), shadow = TRUE)
-}
-
-# Convex hull of points
-ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
-       geom_point() + xlim(c(2, 5)) +
-       geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
-                    shape = "hull")
-
-# Order matters
+# **Order matters**
 
 # `geom_magnify()` stores the plot when it is added to it:
 ggp +
   geom_smooth() +
-  geom_magnify(from = c(3, 6.5, 4, 7.5),
-               to = c(4, 5, 7, 6.5))
+  geom_magnify(from = from, to = to)
 
 # This will print the inset without the smooth:
 ggp +
-  geom_magnify(from = c(3, 6.5, 4, 7.5),
-               to = c(4, 5, 7, 6.5)) +
+  geom_magnify(from = from, to = to) +
   geom_smooth()
+
+# For more examples see https://github.com/hughjonesd/ggmagnify
 }
