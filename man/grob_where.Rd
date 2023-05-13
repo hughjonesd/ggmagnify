@@ -20,6 +20,7 @@ A \code{\link[grid:grid.grob]{grid::grob()}} which you can pass to \code{from}.
 Create a grob from a subset of sf data
 }
 \examples{
+library(ggplot2)
 if (requireNamespace("sf", quietly = TRUE) &&
   requireNamespace("maps", quietly = TRUE)) {
   usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot = FALSE))

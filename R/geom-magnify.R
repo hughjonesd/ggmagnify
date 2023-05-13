@@ -254,7 +254,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          ) {
     # StatMagnify has put xmin, to_xmin and inset_xmin into this
     d1 <- data[1, , drop = FALSE]
-
+browser()
     # create shape_grob for target border, inset border, and inset mask
     # this is scaled to 0, 1 in both directions, with
     # default units "npc", and has been transformed by the coords

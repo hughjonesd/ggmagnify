@@ -65,6 +65,7 @@ hull_around <- function (x, y, data = NULL, expand = 0.1) {
 #' @export
 #'
 #' @doctest
+#' library(ggplot2)
 #' if (requireNamespace("sf", quietly = TRUE) &&
 #'   requireNamespace("maps", quietly = TRUE)) {
 #'   usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot = FALSE))

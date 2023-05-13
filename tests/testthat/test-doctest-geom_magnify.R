@@ -6,13 +6,13 @@ test_that("Doctest: geom_magnify", {
   # Source file: R/geom-magnify.R
   # Source line: 134
   library(ggplot2)
-  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() +
-    xlim(c(2, 6))
+  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+    geom_point() + xlim(c(2, 6))
   from <- list(3, 4, 6.5, 7.5)
   to <- list(4, 7, 5, 6.5)
   expect_silent(ggp + geom_magnify(from = from, to = to))
-  expect_silent(ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5, 6, 8),
-  shape = "hull"))
+  expect_silent(ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5,
+    6, 8), shape = "hull"))
   expect_silent(ggp + geom_smooth() + geom_magnify(from = from, to = to))
   expect_no_error(ggp + geom_magnify(from = from, to = to) + geom_smooth())
 })
