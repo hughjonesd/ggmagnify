@@ -28,6 +28,7 @@ Suggests:
     ggforce,
     ggfx,
     hexbin,
+    maps,
     rmarkdown,
     sf,
     testthat (>= 3.0.0)
