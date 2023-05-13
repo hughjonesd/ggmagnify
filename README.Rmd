@@ -106,27 +106,33 @@ ggpi +
 Specify a logical vector in `from` to select a set of points. Use `shape = "hull"`
 to draw their convex hull.
 
-```{r example-mask-grob}
+```{r example-hull}
 
 library(dplyr)
 
-humans <- starwars |> 
-  filter(species == "Human") |> 
-  select(mass, height) |> 
-  na.omit()
-
-starwars |> 
-  na.omit() |> 
+starwars_plot <- starwars |> 
   mutate(Human = species == "Human") |> 
-ggplot(aes(mass, height, color = Human)) + 
-  geom_point() + xlim(0, 220) + ylim(0, 250) + 
-  theme_dark() + 
-  scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "white")) + 
+  select(mass, height, Human) |> 
+  na.omit() |> 
+  ggplot(aes(mass, height, color = Human)) + 
+    geom_point() + xlim(0, 220) + ylim(0, 250) + 
+    theme_dark() +
+    theme(panel.grid = element_line(linetype = 2, colour = "yellow"), 
+          axis.line = element_blank(), 
+          panel.background = element_rect(fill = "black"),
+          legend.key = element_rect(fill= "black"),
+          rect = element_rect(fill = "black"),
+          text = element_text(colour = "white")) +
+    scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "lightblue"))
+
+starwars_plot +
+  ggtitle("Mass and height of starwars characters.",
+          subtitle = "Humans magnified") +
   geom_magnify(aes(from = Human), to = c(30, 0, 200, 120), shadow = TRUE,
+               shadow.args = list(colour = "yellow", sigma = 10,
+                                  x_offset = 2, y_offset = 5),
                alpha = 0.8, colour = "yellow", linewidth = 0.6, shape = "hull",
                expand = 0.2)
-
-
 
 ```
 
@@ -149,9 +155,9 @@ texas <- sf::st_transform(texas, sf::st_crs(4326))
 texas <- sf::st_as_grob(sf::st_as_sfc(texas))
 
 ggpm + geom_magnify(from = texas,
-                    to = c(-90, 10, -70, 30), 
-                    shadow = TRUE, linewidth = 1, colour = "orange3",
-                    aspect = "fixed") # keep aspect ratio the same
+                    to = c(-125, 10, -98, 30), 
+                    shadow = TRUE, linewidth = 1, colour = "orange2",
+                    aspect = "fixed", expand = 0) # keep aspect ratio the same
 ```
 
 
