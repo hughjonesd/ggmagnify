@@ -16,9 +16,6 @@ NULL
 #
 # - why is target linewidth too small?
 #
-# - maybe just change to xmin,xmax,ymin,ymax, it's so much better esp
-#   for x and y scales which are very different
-#
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
@@ -316,7 +313,11 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                    height = diff(y_rng), default.units = "native",
                    mask = mask_grob)
     plot_gtable <- grid::editGrob(plot_gtable, vp = vp)
-    border_grob <- grid::editGrob(shape_grob, vp = vp,
+
+    # border_grob is already shaped like shape_grob; adding the mask
+    # just cuts off its borders narrower
+    border_vp <- grid::editViewport(vp, mask = "inherit")
+    border_grob <- grid::editGrob(shape_grob, vp = border_vp,
                                   name = paste0("ggmagnify-border-",
                                                      incremental_id()),
                                   gp = gpar(fill = NA,
@@ -325,7 +326,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                             lty = inset.linetype
                                             ))
 
-    # == create projection lines =====
+        # == create projection lines =====
     proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob")) {
       calculate_proj_df_rect(proj, d1, coord, panel_params)
     } else {
@@ -422,7 +423,7 @@ compute_shape_grob.default <- function (from, shape, data, coord, panel_params,
   if (shape == "rect") {
     grid::rectGrob()
   } else if (shape == "ellipse") {
-    gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5,
+    gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5, n = 180,
                              position.units = "npc", size.units = "npc")
   } else {
     cli::cli_warn("Ignoring {.code shape = }{shape} since `from` only gave

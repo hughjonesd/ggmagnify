@@ -61,7 +61,7 @@ ggp +
 
 ## Ellipse
 
-This requires R \>= 4.2.0 and an appropriate graphics device.
+This requires R 4.1 or higher, and an appropriate graphics device.
 
 ``` r
 
