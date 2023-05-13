@@ -4,8 +4,8 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species))
 ggp2 <- ggp + geom_point()
 
-from <- c(3, 6, 3.5, 7)
-to <- c(2.4, 4.3, 3.2, 5.7)
+from <- c(3, 3.5, 6, 7)
+to <- c(2.4, 3.2, 4.3, 5.7)
 
 test_that("limits", {
   ggp_limits_x <- ggp2 +
@@ -37,7 +37,7 @@ test_that("limits", {
 test_that("reverse", {
   ggp_reverse_x <- ggp2 +
     scale_x_reverse() +
-    geom_magnify(from = from[c(3,2,1,4)], to = to[c(3,2,1,4)])
+    geom_magnify(from = from[c(2,1,3,4)], to = to[c(2,1,3,4)])
 
   expect_silent(
     print(ggp_reverse_x)
@@ -45,7 +45,7 @@ test_that("reverse", {
 
   ggp_reverse_y <- ggp2 +
     scale_y_reverse() +
-    geom_magnify(from = from[c(1,4,3,2)], to = to[c(1,4,3,2)])
+    geom_magnify(from = from[c(1,2,4,3)], to = to[c(1,2,4,3)])
 
   expect_silent(
     print(ggp_reverse_y)
@@ -68,7 +68,7 @@ test_that("log", {
 
   ggp_log_x <- ggp_log +
     scale_x_log10() +
-    geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
+    geom_magnify(from = c(1, 10, 1, 10), to = c(15, 35, 35, 55))
 
   expect_silent(
     print(ggp_log_x)
@@ -77,7 +77,7 @@ test_that("log", {
   ggp_log_xy <- ggp_log +
     scale_x_log10() +
     scale_y_log10() +
-    geom_magnify(from = c(1, 1, 10, 10), to = c(15, 35, 35, 55))
+    geom_magnify(from = c(1, 10, 1, 10), to = c(15, 35, 35, 55))
 
   expect_silent(
     print(ggp_log_xy)
@@ -105,14 +105,14 @@ test_that("date", {
     ggm_date <- ggpd + geom_magnify(
       from = list(
         xmin = as.Date("1970-01-01"),
-        ymin = 0.018,
         xmax = as.Date("1974-01-01"),
+        ymin = 0.018,
         ymax = 0.025
       ),
       to = list(
         xmin = as.Date("1983-01-01"),
-        ymin = 0.06,
         xmax = as.Date("2013-01-01"),
+        ymin = 0.06,
         ymax = 0.08
       ),
       axes = "xy"
@@ -125,14 +125,14 @@ test_that("date", {
       geom_magnify(
         from = list(
           xmin = as.Date("1970-01-01"),
-          ymin = 0.018,
           xmax = as.Date("1974-01-01"),
+          ymin = 0.018,
           ymax = 0.025
         ),
         to = list(
           xmin = as.Date("1983-01-01"),
-          ymin = 0.06,
           xmax = as.Date("2013-01-01"),
+          ymin = 0.06,
           ymax = 0.08
         ),
         shape = "ellipse"
@@ -155,7 +155,7 @@ test_that("binned", {
   expect_silent(
     ggp2 +
       scale_x_binned(breaks = seq(2, 5, 0.5)) +
-      geom_magnify(from = c(2.7, 6.0, 3.3, 7.0), to = to)
+      geom_magnify(from = c(2.7, 3.3, 6.0, 7.0), to = to)
   )
 })
 

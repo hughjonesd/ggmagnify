@@ -36,10 +36,10 @@ ggp <- ggplot(dv, aes(Position, NegLogP)) +
   labs(title = "GWAS p-values for cognitive function",
        subtitle = "Davies et al. (2018).", y = "-log(p)")
 
-# x0, y0, x1, y1 of target:
-from <- c(9.75e7, 16, 9.95e7, 28)
-# x0, y0, x1, y1 of inset:
-to <- c(2e08 - 2e7, 10, 2e08 + 2e7,26)
+
+from <- c(xmin = 9.75e7, xmax = 9.95e7, ymin = 16, ymax = 28)
+# Or just
+to <- c(2e08 - 2e7, 2e08 + 2e7,10, 26)
 ggp + geom_magnify(from = from, to = to)
 ```
 
@@ -85,7 +85,7 @@ ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 ggpi +
   facet_wrap(vars(Species)) +
   geom_magnify(aes(from = Sepal.Length > 5 & Sepal.Length < 6.5 ), 
-                    to = c(4.5, 6, 6.0, 7.5),
+                    to = c(4.5, 6, 6, 7.5),
                     shadow = TRUE)
 ```
 
@@ -126,7 +126,7 @@ starwars_plot <- starwars |>
 starwars_plot +
   ggtitle("Mass and height of starwars characters.",
           subtitle = "Humans magnified") +
-  geom_magnify(aes(from = Human), to = c(30, 0, 200, 120), shadow = TRUE,
+  geom_magnify(aes(from = Human), to = c(30, 200, 0, 120), shadow = TRUE,
                shadow.args = list(colour = "yellow", sigma = 10,
                                   x_offset = 2, y_offset = 5),
                alpha = 0.8, colour = "yellow", linewidth = 0.6, shape = "hull",
@@ -154,7 +154,7 @@ texas <- sf::st_transform(texas, sf::st_crs(4326))
 texas <- sf::st_as_grob(sf::st_as_sfc(texas))
 
 ggpm + geom_magnify(from = texas,
-                    to = c(-125, 10, -98, 30), 
+                    to = c(-125, -98, 10, 30), 
                     shadow = TRUE, linewidth = 1, colour = "orange2",
                     aspect = "fixed", expand = 0) # keep aspect ratio the same
 ```
@@ -192,8 +192,8 @@ ggp +
 
 ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
               geom_point()
-from2 <- c(3, 6.5, 3.5, 7)
-to2 <- c(2.75, 5, 3.75, 6)
+from2 <- c(3, 3.5, 6.5, 7)
+to2 <- c(2.75, 3.75, 5, 6)
 
 ggpi + 
   geom_magnify(from = from2, to = to2,
@@ -231,9 +231,12 @@ matters:
 
 ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
               geom_point() + xlim(2, 6)
+
+from3 <-  c(2.5, 3.5, 6, 7)
+to3 <- c(4.7, 6.1, 4.3, 5.7)
 ggpi + 
   geom_smooth() + 
-  geom_magnify(from = c(2.5, 6, 3.5, 7), to = c(4.7, 4.3, 6.1, 5.7))
+  geom_magnify(from = from3, to = to3)
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 ```
@@ -243,7 +246,7 @@ ggpi +
 ``` r
 # Print the inset without the smooth:
 ggpi +
-  geom_magnify(from = c(2.5, 6, 3.5, 7), to = c(4.7, 4.3, 6.1, 5.7)) +
+  geom_magnify(from = from3, to = to3) +
   geom_smooth()
 #> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 ```
@@ -271,7 +274,7 @@ shadow.args <- list(
   sigma = 10
 )
 
-booms + geom_magnify(from = c(78, 4.0, 90, 4.8), to = c(70, 1.7, 90, 3.3),
+booms + geom_magnify(from = c(78, 90, 4.0, 4.8), to = c(70, 90, 1.7, 3.3),
                      colour = "white", shape = "ellipse",
                      shadow = TRUE, shadow.args = shadow.args,
                      plot = booms_inset)
@@ -286,7 +289,7 @@ booms + geom_magnify(from = c(78, 4.0, 90, 4.8), to = c(70, 1.7, 90, 3.3),
 ggp + 
   coord_cartesian(clip = "off") + 
   theme(plot.margin = ggplot2::margin(10, 60, 10, 10)) +
-  geom_magnify(from = from, to = to + c(0.5e8, 0, 0.5e8, 0), 
+  geom_magnify(from = from, to = to + c(0.5e8, 0.5e8, 0, 0), 
                shadow = TRUE)
 ```
 
@@ -307,7 +310,7 @@ ggp2 <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
 
 # different grid lines:
 ggp2 + 
-  geom_magnify(from = c(2.45, 5.9, 3.05, 6.6), to = c(3.4, 5.5 , 4.4, 6.6),
+  geom_magnify(from = c(2.45, 3.05, 5.9, 6.6), to = c(3.4, 4.4, 5.5, 6.6),
                shadow = TRUE) 
 ```
 
@@ -319,7 +322,7 @@ ggp2 +
 ggp2 +
   scale_x_continuous(breaks = seq(2, 5, 0.5)) + 
   scale_y_continuous(breaks = seq(5, 8, 0.5)) + 
-  geom_magnify(from = c(2.45, 5.9, 3.05, 6.6), to = c(3.4, 5.5 , 4.4, 6.6),
+  geom_magnify(from = c(2.45, 3.05, 5.9, 6.6), to = c(3.4, 4.4, 5.5, 6.6),
                shadow = TRUE) 
 ```
 
@@ -342,8 +345,8 @@ ggp2 <- ggplot(df, aes(x, y)) +
   ylim(-5, 5)
 
 # The default:
-ggp2 + geom_magnify(from = c(-1.25, -1, 1.25, 1),
-                    to = c(2, 1, 5, 5))
+ggp2 + geom_magnify(from = c(-1.25, 1.25, -1, 1),
+                    to = c(2, 5, 1, 5))
 ```
 
 <img src="man/figures/README-example-recompute-1.png" width="100%" />
@@ -351,8 +354,8 @@ ggp2 + geom_magnify(from = c(-1.25, -1, 1.25, 1),
 ``` r
 
 # Recomputing recalculates the smooth for the inset:
-ggp2 + geom_magnify(from = c(-1.25, -1, 1.25, 1),
-                    to = c(2, 1, 5, 5),
+ggp2 + geom_magnify(from = c(-1.25, 1.25, -1, 1),
+                    to = c(2, 5, 1, 5),
                     recompute = TRUE)
 ```
 
@@ -373,9 +376,9 @@ ggplot(
   geom_density2d_filled(bins = 50, linewidth = 0) +
   geom_point(color='white', alpha = .5, size = .5) + 
   theme(legend.position = "none") +
-  geom_magnify(from = c(0.05, 0.05, 0.15, 0.15), to = c(0.2, 0.2, 0.4, 0.4), 
+  geom_magnify(from = c(0.05, 0.15, 0.05, 0.15), to = c(0.2, 0.4, 0.2, 0.4), 
                colour = "white", proj.linetype = 1, linewidth = 0.6) +
-  geom_magnify(from = c(0.25, 0.25, 0.35, 0.35), to = c(0.45,0.45,0.85,0.85), 
+  geom_magnify(from = c(0.25, 0.35, 0.25, 0.35), to = c(0.45, 0.85, 0.45, 0.85), 
                expand = 0, colour ="white", proj.linetype = 1)
 ```
 
@@ -400,8 +403,8 @@ ggp <- data.frame(x = rnorm(1e5), y = rnorm(1e5),
 
 ggpm <- ggp + 
   lims(x = c(-0.3, 0.3), y = c(-0.3, 0.3)) + 
-  geom_magnify(from = c(-0.03, -0.03, 0.03, 0.03),
-               to = c(-0.3, -0.3, -0.1, -0.1),
+  geom_magnify(from = c(-0.03, 0.03, -0.03, 0.03),
+               to = c(-0.3, -0.1, -0.3, -0.1),
                expand = FALSE, colour = "white")
 #> Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
@@ -410,8 +413,8 @@ ggpm <- ggp +
 
 ggp + 
   geom_magnify(plot = ggpm, 
-               from = c(-0.3, -0.3, 0.3, 0.3),
-               to = c(-3, -3, -1, -1),
+               from = c(-0.3, 0.3, -0.3, 0.3),
+               to = c(-3, -1, -3, -1),
                expand = FALSE, colour = "white") +
   labs(title = "Normal data", 
        subtitle = "The distribution gets more uniform as you zoom in")

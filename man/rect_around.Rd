@@ -18,16 +18,15 @@ hull_around(x, y, data = NULL, expand = 0.1)
 per cenet.}
 }
 \value{
-\code{rect_around()} returns a list with names \code{xmin}, \code{ymin},
-\code{xmax} and \code{ymax}. \code{hull_around()} returns a data frame with columns
-\code{x} and \code{y}.
+\code{rect_around()} returns a list with names \code{xmin}, \code{xmax}, \code{ymin},
+and \code{ymax}. \code{hull_around()} returns a data frame with columns \code{x} and \code{y}.
 }
 \description{
 Helper functions to find rectangles or convex hulls of data
 }
 \examples{
 library(ggplot2)
-to <- c(2, 6, 4.5, 8)
+to <- c(2, 4.5, 6, 8)
 setosas <- iris[iris$Species == "setosa", ]
 ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
   geom_point() +

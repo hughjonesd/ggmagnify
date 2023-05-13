@@ -5,7 +5,7 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species))
 ggp2 <- ggp + geom_point()
 
-from <- c(2.5, 5.5, 3.0, 6.0)
+from <- c(2.5, 3.0, 5.5, 6.0)
 to <- c(3.5, 4.5, 4.5, 5.5)
 
 expect_plot <- function (expr) {

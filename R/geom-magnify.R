@@ -16,6 +16,9 @@ NULL
 #
 # - why is target linewidth too small?
 #
+# - maybe just change to xmin,xmax,ymin,ymax, it's so much better esp
+#   for x and y scales which are very different
+#
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
@@ -68,10 +71,13 @@ NULL
 #' - **from**
 #' - **to**
 #'
-#' `from` and `to` can be lists of length 4, like `list(xmin, ymin, xmax, ymax)`.
+#' `from` and `to` can be vectors of length 4, like `list(xmin, xmax, ymin, ymax)`.
 #' These specify the bottom left and top right corners of the target area to
 #' magnify, and the area for the magnified inset. The lists can optionally be
-#' named, like this: `list(xmin = 1, ymin = 2, xmax = 3, ymax = 4)`.
+#' named: `list(xmin = 1, xmax = 2, ymin = 3, ymax = 4)`.
+#'
+#' **Note**: very early versions of ggmagnify used a
+#' different order of coordinates: `list(xmin, ymin, xmax, ymax)`.
 #'
 #' Alternatively, `from` can be:
 #'
@@ -132,19 +138,19 @@ NULL
 #' library(ggplot2)
 #' ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 #'          geom_point() + xlim(c(2, 6))
-#' from <- list(3, 6.5, 4, 7.5)
-#' to <- list(4, 5, 7, 6.5)
+#' from <- list(3, 4, 6.5, 7.5)
+#' to <- list(4, 7, 5, 6.5)
 #'
-#' # **Basic magnification**
+#' # Basic magnification
 #' @expect silent()
 #' ggp + geom_magnify(from = from, to = to)
 #'
-#' # **Convex hull of points**
+#' # Convex hull of points
 #' @expect silent()
-#' ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+#' ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5, 6, 8),
 #'                    shape = "hull")
 #'
-#' # **Order matters**
+#' # Order matters
 #'
 #' # `geom_magnify()` stores the plot when it is added to it:
 #' @expect silent()
@@ -220,8 +226,8 @@ ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
 #' @usage NULL
 #' @export
 GeomMagnify <- ggproto("GeomMagnify", Geom,
-  required_aes = c("xmin","ymin", "xmax", "ymax", "to_xmin", "to_ymin", "to_xmax",
-                   "to_ymax"),
+  required_aes = c("xmin","xmax", "ymin", "ymax", "to_xmin", "to_xmax",
+                   "to_ymin", "to_ymax"),
   draw_key = draw_key_blank,
   plot = NULL,
   rename_size = FALSE,

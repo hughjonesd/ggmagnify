@@ -26,7 +26,7 @@ StatMagnify <- ggproto("StatMagnify", Stat,
 
     to <- data$to[[1]] %||% to
     if (is.null(names(to))) {
-      names(to) <- c("xmin", "ymin", "xmax", "ymax")
+      names(to) <- c("xmin", "xmax", "ymin", "ymax")
     }
     data$to_xmin <- to[["xmin"]]
     data$to_ymin <- to[["ymin"]]
@@ -101,7 +101,7 @@ find_bounds.logical <- function (from, shape, data) {
 
 find_bounds.numeric <- function (from, shape, data) {
   if (is.null(names(from))) {
-    names(from) <- c("xmin", "ymin", "xmax", "ymax")
+    names(from) <- c("xmin", "xmax", "ymin", "ymax")
   }
 
   as.list(from) # explicit conversion for .numeric also

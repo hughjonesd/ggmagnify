@@ -5,8 +5,8 @@ library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
   geom_point()
 
-from1 <- c(3, 6, 3.5, 7)
-to1 <- c(2.4, 4.3, 3.2, 5.7)
+from1 <- c(3, 3.5, 6, 7)
+to1 <- c(2.4, 3.2, 4.3, 5.7)
 
 
 test_param <- function (name, ..., from = from1, to = to1, .ggplot = ggp) {

@@ -121,10 +121,13 @@ bold):
 \item \strong{to}
 }
 
-\code{from} and \code{to} can be lists of length 4, like \code{list(xmin, ymin, xmax, ymax)}.
+\code{from} and \code{to} can be vectors of length 4, like \code{list(xmin, xmax, ymin, ymax)}.
 These specify the bottom left and top right corners of the target area to
 magnify, and the area for the magnified inset. The lists can optionally be
-named, like this: \code{list(xmin = 1, ymin = 2, xmax = 3, ymax = 4)}.
+named: \code{list(xmin = 1, xmax = 2, ymin = 3, ymax = 4)}.
+
+\strong{Note}: very early versions of ggmagnify used a
+different order of coordinates: \code{list(xmin, ymin, xmax, ymax)}.
 
 Alternatively, \code{from} can be:
 \itemize{
@@ -192,17 +195,17 @@ aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x},
 library(ggplot2)
 ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
          geom_point() + xlim(c(2, 6))
-from <- list(3, 6.5, 4, 7.5)
-to <- list(4, 5, 7, 6.5)
+from <- list(3, 4, 6.5, 7.5)
+to <- list(4, 7, 5, 6.5)
 
-# **Basic magnification**
+# Basic magnification
 ggp + geom_magnify(from = from, to = to)
 
-# **Convex hull of points**
-ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 6, 5, 8),
+# Convex hull of points
+ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5, 6, 8),
                    shape = "hull")
 
-# **Order matters**
+# Order matters
 
 # `geom_magnify()` stores the plot when it is added to it:
 ggp +

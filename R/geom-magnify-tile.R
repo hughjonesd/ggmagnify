@@ -75,8 +75,8 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
     to_ymin <- to_y - to_height/2
     to_ymax <- to_y + to_height/2
 
-    from <- c(xmin, ymin, xmax, ymax)
-    to <- c(to_xmin, to_ymin, to_xmax, to_ymax)
+    from <- c(xmin, xmax, ymin, ymax)
+    to <- c(to_xmin, to_xmax, to_ymin, to_ymax)
     data$from <- list(from)
     ggproto_parent(StatMagnify, self)$compute_panel(data = data, scales = scales,
                                                     from = from, to = to,

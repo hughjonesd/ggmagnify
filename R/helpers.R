@@ -12,16 +12,15 @@ expand_by <- function (x, expand) {
 #' @param expand Amount to expand the data around its midpoint. Default is 10
 #'   per cenet.
 #'
-#' @return `rect_around()` returns a list with names `xmin`, `ymin`,
-#'   `xmax` and `ymax`. `hull_around()` returns a data frame with columns
-#'   `x` and `y`.
+#' @return `rect_around()` returns a list with names `xmin`, `xmax`, `ymin`,
+#'   and `ymax`. `hull_around()` returns a data frame with columns `x` and `y`.
 #'
 #' @export
 #'
 #' @doctest
 #'
 #' library(ggplot2)
-#' to <- c(2, 6, 4.5, 8)
+#' to <- c(2, 4.5, 6, 8)
 #' setosas <- iris[iris$Species == "setosa", ]
 #'
 #' @expect silent()
@@ -44,7 +43,7 @@ rect_around <- function (x, y, data = NULL, expand = 0.1) {
   xr <- expand_by(range(x), expand)
   yr <- expand_by(range(y), expand)
 
-  list(xmin = xr[1], ymin = yr[1], xmax = xr[2], ymax = yr[2])
+  list(xmin = xr[1], xmax = xr[2], ymin = yr[1], ymax = yr[2])
 }
 
 
