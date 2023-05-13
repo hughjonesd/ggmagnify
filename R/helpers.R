@@ -24,17 +24,9 @@ expand_by <- function (x, expand) {
 #' setosas <- iris[iris$Species == "setosa", ]
 #'
 #' @expect silent()
-#' ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
-#'   geom_point() +
-#'   geom_magnify(to = to,
-#'                from = rect_around(Sepal.Width, Sepal.Length,
-#'                                   data = setosas))
+#' rect_around(Sepal.Width, Sepal.Length, data = setosas)
 #' @expect silent()
-#' ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species)) +
-#'   geom_point() +
-#'   geom_magnify(to = to,
-#'                from = hull_around(Sepal.Width, Sepal.Length,
-#'                                   data = setosas))
+#' hull_around(Sepal.Width, Sepal.Length, data = setosas)
 rect_around <- function (x, y, data = NULL, expand = 0.1) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
@@ -60,4 +52,34 @@ hull_around <- function (x, y, data = NULL, expand = 0.1) {
   y <- expand_by(y[ch], expand)
 
   data.frame(x = x, y = y)
+}
+
+
+#' Create a grob from a subset of sf data
+#'
+#' @param where Logical condition to be evaluated in `sf`.
+#' @param sf An object of class [sf][sf::sf].
+#' @param crs Optional [coordinate reference system][sf::st_crs].
+#'
+#' @return A [grid::grob()] which you can pass to `from`.
+#' @export
+#'
+#' @doctest
+#' if (requireNamespace("sf", quietly = TRUE) &&
+#'   requireNamespace("maps", quietly = TRUE)) {
+#'   usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot = FALSE))
+#' @snap
+#'   texas <- grob_where(ID == "texas", usa, crs = sf::st_crs(4326))
+#'   ggplot(usa) + coord_sf(crs = sf::st_crs(4326)) + geom_sf() +
+#'     geom_magnify(from = texas, to = c(-90, -70, 25, 35), colour = "red",
+#'     aspect = "fixed", expand = 0)
+#' }
+#'
+grob_where <- function (where, sf, crs = NULL) {
+  where <- rlang::enquo(where)
+  rlang::check_installed("sf", reason = "to use `grob_where()`.")
+  where <- rlang::eval_tidy(where, sf)
+  sf <- sf[where, ]
+  if (is.null(crs)) sf <- sf::st_transform(sf, crs = crs)
+  sf::st_as_grob(sf::st_as_sfc(sf))
 }

@@ -80,7 +80,7 @@ StatMagnifyTile <- ggproto("StatMagnifyTile", StatMagnify,
     data$from <- list(from)
     ggproto_parent(StatMagnify, self)$compute_panel(data = data, scales = scales,
                                                     from = from, to = to,
-                                                    expand = expand)
+                                                    expand = expand, aspect = aspect)
   }
 )
 

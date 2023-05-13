@@ -147,11 +147,9 @@ ggpm <- ggplot(usa) +
           coord_sf(default_crs = sf::st_crs(4326), ylim = c(10, 50)) + 
           theme(legend.position = "none") +
           scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "steelblue4"))
-          
-
-texas <- usa[usa$ID == "texas",]
-texas <- sf::st_transform(texas, sf::st_crs(4326))
-texas <- sf::st_as_grob(sf::st_as_sfc(texas))
+  
+# grob_where() is a helper function:       
+texas <- grob_where(ID == "texas", usa, crs = sf::st_crs(4326))
 
 ggpm + geom_magnify(from = texas,
                     to = c(-125, -98, 10, 30), 

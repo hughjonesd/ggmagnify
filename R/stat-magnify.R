@@ -3,7 +3,8 @@ StatMagnify <- ggproto("StatMagnify", Stat,
   required_aes = c("from", "to"),
 
   # note: these parameters do magic by computing Stat$parameters()
-  compute_panel = function (data, scales, from, to, shape, expand, aspect = NULL) {
+  compute_panel = function (data, scales, from, to, shape, expand,
+                            aspect) {
     # we use only the first line of data$from *unless* it's a logical vector when
     # we use all of it
     # a bit hacky?
