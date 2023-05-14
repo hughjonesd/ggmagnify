@@ -40,8 +40,7 @@ compute_shape_grob.data.frame <- function (from, shape, data, coord, panel_param
                                            expand) {
   # this will be on scale of data
   names(from) <- c("x", "y")
-  shape_cc <- coord$transform(from, panel_params)
-  from_grob <- polygonGrob(x = shape_cc$x, y = shape_cc$y,
+  from_grob <- polygonGrob(x = from$x, y = from$y,
                             default.units = "native")
   compute_shape_grob(from_grob, shape, data, coord, panel_params, expand)
 }

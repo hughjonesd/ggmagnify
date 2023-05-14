@@ -145,6 +145,20 @@ starwars_plot +
 ```
 
 
+Use a grob or data frame to magnify any shape:
+
+```{r example-grob}
+
+s <- seq(0, 2*pi, length = 7)
+hex <- grid::polygonGrob(x = 3 + sin(s)/2, y = 6 + cos(s)/2, 
+                         default.units = "native") 
+
+ggpi + geom_magnify(from = hex, 
+                    to = c(4, 6, 5, 7), shadow = TRUE, aspect = "fixed")
+
+```
+
+
 ## Maps (experimental)
 
 With maps, `shape = "outline"` magnifies just the selected map polygons:
@@ -158,6 +172,7 @@ ggpm <- ggplot(usa) +
           coord_sf(default_crs = sf::st_crs(4326), ylim = c(10, 50)) + 
           theme(legend.position = "none") +
           scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "steelblue4"))
+
 
 ggpm + geom_magnify(aes(from = ID == "texas"),
                     to = c(-125, -98, 10, 30), 
@@ -187,7 +202,7 @@ ggp +
 
 ggp + 
   geom_magnify(from = from, to = to,
-               colour = "red", linewidth = 0.5, proj.linetype = 3)
+               colour = "darkgreen", linewidth = 0.5, proj.linetype = 3)
 ```
 
 
