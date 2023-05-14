@@ -23,7 +23,7 @@ geom_magnify(
   proj.linetype = 2,
   alpha = 1,
   linewidth = 0.4,
-  shape = c("rect", "ellipse", "hull", "map"),
+  shape = c("rect", "ellipse", "outline"),
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
@@ -83,8 +83,8 @@ for borders and projection lines.}
 for specific components. Set to \code{0} for no lines.}
 
 \item{shape}{Shape of the area to be magnified. \code{"rect"} for a rectangle.
-\code{"ellipse"} for an ellipse. \code{"hull"} for the convex hull of a set of points.
-\code{"map"} for a map area. See below.}
+\code{"ellipse"} for an ellipse. \code{"outline"} for the convex hull of points in the
+target area, or for map polygons.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}
@@ -149,6 +149,17 @@ per row of data. Only the first row per panel is used. (To magnify multiple
 areas in one panel, use multiple calls to \code{geom_magnify()}.)
 }
 
+\subsection{Shapes}{
+
+If \code{shape = "ellipse"} an elliptical area is magnified. This may not include
+all points within the target area given by \code{from}.
+
+If \code{shape = "outline"} then a convex hull will be drawn around points in
+the target area. This only works if you are using \code{\link[=geom_point]{geom_point()}} or some other
+geom with aesthetics \code{x} and \code{y}. If you are plotting a map, then
+\code{"outline"} magnifies exactly the map features selected by \code{from}.
+}
+
 \subsection{Projection lines}{
 \itemize{
 \item \code{proj = "corresponding"} or \code{"facing"} draws projection lines from the
@@ -181,6 +192,8 @@ invisible in the main plot, or recompute derived graphics. If you want an
 exact pixel-by-pixel copy, use a different tool.
 \item \code{geom_magnify()} may break with discrete scales. This is a limitation in
 ggplot2 for now.
+\item Selecting multiple polygons in maps doesn't work very well yet. Selecting
+polygons within a bounding box also gives bad results.
 }
 }
 
@@ -203,7 +216,7 @@ ggp + geom_magnify(from = from, to = to)
 
 # Convex hull of points
 ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5, 6, 8),
-                   shape = "hull")
+                   shape = "outline")
 
 # Order matters
 

@@ -7,7 +7,7 @@ expand_by <- function (x, expand) {
 
 #' Helper functions to find rectangles or convex hulls of data
 #'
-#' @param x,y Unquoted names of expressions
+#' @param x,y Unquoted names or expressions
 #' @param data A data frame
 #' @param expand Amount to expand the data around its midpoint. Default is 10
 #'   per cenet.
@@ -27,7 +27,7 @@ expand_by <- function (x, expand) {
 #' rect_around(Sepal.Width, Sepal.Length, data = setosas)
 #' @expect silent()
 #' hull_around(Sepal.Width, Sepal.Length, data = setosas)
-rect_around <- function (x, y, data = NULL, expand = 0.1) {
+rect_around <- function (x, y, data = NULL, expand = 0) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   x <- rlang::eval_tidy(x, data = data)
@@ -41,7 +41,7 @@ rect_around <- function (x, y, data = NULL, expand = 0.1) {
 
 #' @rdname rect_around
 #' @export
-hull_around <- function (x, y, data = NULL, expand = 0.1) {
+hull_around <- function (x, y, data = NULL, expand = 0) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   x <- rlang::eval_tidy(x, data = data)
@@ -81,6 +81,6 @@ grob_where <- function (where, sf, crs = NULL) {
   rlang::check_installed("sf", reason = "to use `grob_where()`.")
   where <- rlang::eval_tidy(where, sf)
   sf <- sf[where, ]
-  if (is.null(crs)) sf <- sf::st_transform(sf, crs = crs)
+  if (! is.null(crs)) sf <- sf::st_transform(sf, crs = crs)
   sf::st_as_grob(sf::st_as_sfc(sf))
 }

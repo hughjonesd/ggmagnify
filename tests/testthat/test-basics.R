@@ -77,28 +77,25 @@ test_that("shape = \"ellipse\"", {
   )
   expect_plot(
     ggp2 + geom_magnify(aes(from = Species == "versicolor" & Sepal.Length < 6),
-                        to = to, shape = "hull")
+                        to = to, shape = "outline")
   )
 })
 
 
-test_that("shape = \"hull\"", {
+test_that("shape = \"outline\"", {
   expect_plot(
     ggp2 + geom_magnify(aes(from = Species == "versicolor" & Sepal.Length < 6),
-                        to = to, shape = "hull")
+                        to = to, shape = "outline")
   )
 
   svsl6 <- iris$Species == "versicolor" & iris$Sepal.Length < 6
   d <- data.frame(x = iris$Sepal.Width[svsl6], y = iris$Sepal.Length[svsl6])
   expect_plot(
-    ggp2 + geom_magnify(from = d, to = to, shape = "hull")
+    ggp2 + geom_magnify(from = d, to = to, shape = "outline")
   )
 
-  expect_silent(
-    ggp2 + geom_magnify(from = from, to = to, shape = "hull")
-  )
-  expect_warning(
-    print(last_plot())
+  expect_plot(
+    ggp2 + geom_magnify(from = from, to = to, shape = "outline")
   )
 })
 

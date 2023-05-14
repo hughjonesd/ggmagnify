@@ -72,15 +72,23 @@ ggp +
 
 <img src="man/figures/README-example-ellipse-1.png" width="100%" />
 
-## Faceting (experimental)
+## Pick points to magnify
 
-Faceting involves dark magic with ggplot2 internals. Use at your own
-risk.
+To choose points to magnify, map `from` in an `aes()`:
 
 ``` r
-
 ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
               geom_point() + xlim(c(1.5, 6))
+
+ggpi + geom_magnify(aes(from = Species == "setosa" & Sepal.Length < 5), 
+                    to = c(4, 6, 6, 7.5), aspect = "fixed")
+```
+
+<img src="man/figures/README-example-logical-from-1.png" width="100%" />
+
+## Faceting
+
+``` r
 
 ggpi +
   facet_wrap(vars(Species)) +
@@ -93,20 +101,11 @@ ggpi +
 
 ## Magnify an arbitrary region (experimental)
 
-Specify a logical vector in `from` to select a set of points. Use
-`shape = "hull"` to draw their convex hull.
+Use `shape = "outline"` to magnify the convex hull of a set of points:
 
 ``` r
 
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 
 starwars_plot <- starwars |> 
   mutate(Human = species == "Human") |> 
@@ -121,22 +120,24 @@ starwars_plot <- starwars |>
           legend.key = element_rect(fill= "black"),
           rect = element_rect(fill = "black"),
           text = element_text(colour = "white")) +
-    scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "lightblue"))
+    scale_colour_manual(values = c("TRUE" = "red", "FALSE" = "lightblue")) +
+    ggtitle("Mass and height of Star Wars characters",
+            subtitle = "Humans magnified")
 
 starwars_plot +
-  ggtitle("Mass and height of starwars characters.",
-          subtitle = "Humans magnified") +
   geom_magnify(aes(from = Human), to = c(30, 200, 0, 120), shadow = TRUE,
                shadow.args = list(colour = "yellow", sigma = 10,
                                   x_offset = 2, y_offset = 5),
-               alpha = 0.8, colour = "yellow", linewidth = 0.6, shape = "hull",
-               expand = 0.2)
+               alpha = 0.8, colour = "yellow", linewidth = 0.6, 
+               shape = "outline", expand = 0.2)
 #> Warning: Removed 1 rows containing missing values (`geom_point()`).
 ```
 
-<img src="man/figures/README-example-hull-1.png" width="100%" />
+<img src="man/figures/README-example-outline-1.png" width="100%" />
 
 ## Maps (experimental)
+
+With maps, `shape = "outline"` magnifies just the selected map polygons:
 
 ``` r
 
@@ -147,14 +148,13 @@ ggpm <- ggplot(usa) +
           coord_sf(default_crs = sf::st_crs(4326), ylim = c(10, 50)) + 
           theme(legend.position = "none") +
           scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "steelblue4"))
-  
-# grob_where() is a helper function:       
-texas <- grob_where(ID == "texas", usa, crs = sf::st_crs(4326))
 
-ggpm + geom_magnify(from = texas,
+ggpm + geom_magnify(aes(from = ID == "texas"),
                     to = c(-125, -98, 10, 30), 
                     shadow = TRUE, linewidth = 1, colour = "orange2",
-                    aspect = "fixed", expand = 0) # keep aspect ratio the same
+                    shape = "outline", 
+                    aspect = "fixed", 
+                    expand = 0) 
 ```
 
 <img src="man/figures/README-example-map-1.png" width="100%" />

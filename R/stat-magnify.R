@@ -94,9 +94,16 @@ find_bounds.data.frame <- function (from, shape, data) {
 
 
 find_bounds.logical <- function (from, shape, data) {
-  x <- data$x[from]
-  y <- data$y[from]
-  list(xmin = min(x), ymin = min(y), xmax = max(x), ymax = max(y))
+  if (is.null(data$x) && inherits(data$geometry, "sfc")) {
+    rlang::check_installed("sf")
+    bb <- sf::st_bbox(data$geometry[from])
+    bb <- as.list(bb)
+    bb[c("xmin", "xmax", "ymin", "ymax")]
+  } else {
+    x <- data$x[from]
+    y <- data$y[from]
+    list(xmin = min(x), ymin = min(y), xmax = max(x), ymax = max(y))
+  }
 }
 
 
@@ -105,7 +112,7 @@ find_bounds.numeric <- function (from, shape, data) {
     names(from) <- c("xmin", "xmax", "ymin", "ymax")
   }
 
-  as.list(from) # explicit conversion for .numeric also
+  as.list(from)
 }
 
 
