@@ -2,7 +2,6 @@
 
 calculate_proj_df <- function (proj, grob1, grob2) {
   if (proj == "single") {
-    # get rid of the non-single branch
     calculate_proj_midpoint(grob1, grob2)
   }  else {
     calculate_proj_chull(grob1, grob2)

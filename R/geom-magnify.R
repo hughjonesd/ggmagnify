@@ -339,7 +339,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                             ))
 
     # == create projection lines =====
-    proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob")) {
+    proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob") &&
+                   ! inherits(from, "data.frame")) {
       calculate_proj_df_rect(proj, d1, coord, panel_params)
     } else {
       calculate_proj_df(proj, target_grob, border_grob)
