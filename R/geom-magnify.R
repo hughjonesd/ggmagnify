@@ -138,8 +138,7 @@ NULL
 #' * `geom_magnify()` may break with discrete scales. This is a limitation in
 #'   ggplot2 for now.
 #'
-#' * Selecting multiple polygons in maps doesn't work very well yet. Selecting
-#'   polygons within a bounding box also gives bad results.
+#' * Find a bug? Report it at <https://github.com/hughjonesd/ggmagnify/issues/>
 #'
 #' @export
 #'

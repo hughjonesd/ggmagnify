@@ -120,7 +120,7 @@ find_bounds.list <- find_bounds.numeric
 
 
 find_bounds.grob <- function (from, shape, data) {
-  from <- allcoords(from)
+  from <- allcoords(from, bind = TRUE)
   list(xmin = min(from[, "x"]), ymin = min(from[, "y"]),
        xmax = max(from[, "x"]), ymax = max(from[, "y"]))
 }

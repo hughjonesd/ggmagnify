@@ -25,14 +25,20 @@ compute_shape_grob <- function (from, shape, data, coord, panel_params, expand) 
 compute_shape_grob.grob <- function (from, shape, data, coord, panel_params,
                                      expand) {
   scale01 <- function (x) (x - min(x))/(max(x) - min(x))
-  from_cc <- allcoords(from)
-  # we don't transform for a raw grob; and we've expanded the bounding box
-  # already
-  x_scaled <- scale01(as.numeric(from_cc[, "x"]))
-  y_scaled <- scale01(as.numeric(from_cc[, "y"]))
+  scalexy <- function(mx) {
+    # we don't transform for a raw grob; and we've expanded the bounding box
+    # already
+    x_scaled <- scale01(as.numeric(mx[, "x"]))
+    y_scaled <- scale01(as.numeric(mx[, "y"]))
+    cbind(x = x_scaled, y = y_scaled)
+  }
 
-  grid::polygonGrob(x = grid::unit(x_scaled, "npc"),
-                    y = grid::unit(y_scaled, "npc"))
+  from_list_cc <- allcoords(from, bind = FALSE) # list of matrices
+  lens <- vapply(from_list_cc, nrow, numeric(1L))
+  from_cc <- do.call(rbind, from_list_cc)
+  from_cc <- scalexy(from_cc)
+  grid::polygonGrob(x = grid::unit(from_cc[, "x"], "npc"),
+                    y = grid::unit(from_cc[, "y"], "npc"), id.lengths = lens)
 }
 
 

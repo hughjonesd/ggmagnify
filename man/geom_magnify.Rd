@@ -192,8 +192,7 @@ invisible in the main plot, or recompute derived graphics. If you want an
 exact pixel-by-pixel copy, use a different tool.
 \item \code{geom_magnify()} may break with discrete scales. This is a limitation in
 ggplot2 for now.
-\item Selecting multiple polygons in maps doesn't work very well yet. Selecting
-polygons within a bounding box also gives bad results.
+\item Find a bug? Report it at \url{https://github.com/hughjonesd/ggmagnify/issues/}
 }
 }
 

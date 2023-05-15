@@ -10,8 +10,8 @@ calculate_proj_df <- function (proj, grob1, grob2) {
 
 
 calculate_proj_chull <- function(grob1, grob2) {
-  c1 <- allcoords(grob1)
-  c2 <- allcoords(grob2)
+  c1 <- allcoords(grob1, bind = TRUE)
+  c2 <- allcoords(grob2, bind = TRUE)
 
   both <- rbind(c1, c2)
   on_chull <- grDevices::chull(both)
@@ -37,8 +37,8 @@ calculate_proj_chull <- function(grob1, grob2) {
 
 
 calculate_proj_midpoint <- function(grob1, grob2) {
-  c1 <- allcoords(grob1)
-  c2 <- allcoords(grob2)
+  c1 <- allcoords(grob1, bind = TRUE)
+  c2 <- allcoords(grob2, bind = TRUE)
   stopifnot(nrow(c1) == nrow(c2))
 
   # this is how grid defines "centre" for xDetails
@@ -83,18 +83,24 @@ calculate_proj_midpoint <- function(grob1, grob2) {
 #' Turn a grob into coordinates
 #'
 #' @param grob A grid::grob
+#' @param bind TRUE to rbind the matrices together.
 #'
-#' @return Matrix of x and y on the scale of data (default.units = "native")
+#' @return (List of) matrices of x and y on the scale of data
+#' (default.units = "native"). One matrix per polygon.
 #' @noRd
-allcoords <- function (grob) {
+allcoords <- function (grob, bind) {
   gc <- grid::grobCoords(grob, closed = TRUE)
-  cc <- lapply(gc, function(l) as.data.frame(l[c("x", "y")]))
-  cc <- do.call(rbind, cc)
-  cc1 <- unit(cc[, 1], "inches") # can't store units in a matrix
-  cc2 <- unit(cc[, 2], "inches")
-  cc1 <- convertX(cc1, "native", valueOnly = TRUE)
-  cc2 <- convertY(cc2, "native", valueOnly = TRUE)
-  cbind(x = cc1, y = cc2)
+  list_cc <- lapply(gc, function(l) as.data.frame(l[c("x", "y")]))
+  convert_units <- function (cc) {
+    cc1 <- unit(cc[, 1], "inches") # can't store units in a matrix
+    cc2 <- unit(cc[, 2], "inches")
+    cc1 <- convertX(cc1, "native", valueOnly = TRUE)
+    cc2 <- convertY(cc2, "native", valueOnly = TRUE)
+    cbind(x = cc1, y = cc2)
+  }
+
+  list_cc <- lapply(list_cc, convert_units)
+  if (bind) do.call(rbind, list_cc) else list_cc
 }
 
 #' Vectors of "rejections"   at 90 deg to line through `vec` & `origin`
