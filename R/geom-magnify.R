@@ -14,8 +14,6 @@ NULL
 # - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
 #   meaningless mask
 #
-# - why is target linewidth too small?
-#
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
 #   - but it's a very rare use case and overplotting will become a pain...
@@ -78,17 +76,14 @@ NULL
 #'
 #' Alternatively, `from` can be:
 #'
-#' * A data frame of points with two columns for `x` and `y`. These points will
-#'   be surrounded by a rectangle, ellipse or convex hull depending on the
-#'   value of `shape`.
-#'
-#' * A [grid::grob()] object. This will be used as a mask. Points should be
+#' * A data frame of points with two columns for `x` and `y`, or a [grid::grob()]
+#'   object. Points within the grob region (a polygon spanned by the data frame)
+#'   will be magnified. Points should be
 #'   on the same scale as the data, with `default.units = "native"` in the grob.
-#'   Note that only single polygons are supported at the moment. `shape` will
-#'   be ignored.
+#'   `shape` will be ignored.
 #'
 #' * A logical vector. Points in the data where `from` is `TRUE` will be
-#'   surrounded by a rectangle, ellipse or convex hull.
+#'   surrounded by a rectangle, ellipse or outline.
 #'
 #' Normally you'll set `from` and `to` in the call to `geom_magnify()`. You can
 #' specify them as aesthetics, e.g. if you want different areas per facet. If
@@ -163,14 +158,14 @@ NULL
 #' # `geom_magnify()` stores the plot when it is added to it:
 #' @expect silent()
 #' ggp +
-#'   geom_smooth() +
+#'   scale_color_brewer() +
 #'   geom_magnify(from = from, to = to)
 #'
-#' # This will print the inset without the smooth:
+#' # This will print the inset without the new scale:
 #' @expect no_error()
 #' ggp +
 #'   geom_magnify(from = from, to = to) +
-#'   geom_smooth()
+#'   scale_color_brewer()
 #'
 #' # For more examples see https://github.com/hughjonesd/ggmagnify
 #'

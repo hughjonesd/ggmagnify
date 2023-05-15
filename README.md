@@ -52,9 +52,8 @@ ggp + geom_magnify(from = from, to = to)
 loadNamespace("ggfx")
 #> <environment: namespace:ggfx>
 
-ggp + 
-  geom_magnify(from = from, to = to, 
-               shadow = TRUE)
+ggp + geom_magnify(from = from, to = to, 
+                   shadow = TRUE)
 ```
 
 <img src="man/figures/README-example-shadow-1.png" width="100%" />
@@ -65,9 +64,8 @@ This requires R 4.1 or higher, and an appropriate graphics device.
 
 ``` r
 
-ggp + 
-  geom_magnify(from = from, to = to, 
-               shape = "ellipse", shadow = TRUE)
+ggp + geom_magnify(from = from, to = to, 
+                   shape = "ellipse", shadow = TRUE)
 ```
 
 <img src="man/figures/README-example-ellipse-1.png" width="100%" />
@@ -81,7 +79,7 @@ ggpi <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
               geom_point() + xlim(c(1.5, 6))
 
 ggpi + geom_magnify(aes(from = Species == "setosa" & Sepal.Length < 5), 
-                    to = c(4, 6, 6, 7.5), aspect = "fixed")
+                    to = c(4, 6, 6, 7.5))
 ```
 
 <img src="man/figures/README-example-logical-from-1.png" width="100%" />
@@ -92,7 +90,7 @@ ggpi + geom_magnify(aes(from = Species == "setosa" & Sepal.Length < 5),
 
 ggpi +
   facet_wrap(vars(Species)) +
-  geom_magnify(aes(from = Sepal.Length > 5 & Sepal.Length < 6.5 ), 
+  geom_magnify(aes(from = Sepal.Length > 5 & Sepal.Length < 6.5), 
                     to = c(4.5, 6, 6, 7.5),
                     shadow = TRUE)
 ```
@@ -140,8 +138,7 @@ Use a grob or data frame to magnify any shape:
 ``` r
 
 s <- seq(0, 2*pi, length = 7)
-hex <- grid::polygonGrob(x = 3 + sin(s)/2, y = 6 + cos(s)/2, 
-                         default.units = "native") 
+hex <- data.frame(x = 3 + sin(s)/2, y = 6 + cos(s)/2) 
 
 ggpi + geom_magnify(from = hex, 
                     to = c(4, 6, 5, 7), shadow = TRUE, aspect = "fixed")

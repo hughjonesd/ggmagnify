@@ -131,15 +131,13 @@ different order of coordinates: \code{list(xmin, ymin, xmax, ymax)}.
 
 Alternatively, \code{from} can be:
 \itemize{
-\item A data frame of points with two columns for \code{x} and \code{y}. These points will
-be surrounded by a rectangle, ellipse or convex hull depending on the
-value of \code{shape}.
-\item A \code{\link[grid:grid.grob]{grid::grob()}} object. This will be used as a mask. Points should be
+\item A data frame of points with two columns for \code{x} and \code{y}, or a \code{\link[grid:grid.grob]{grid::grob()}}
+object. Points within the grob region (a polygon spanned by the data frame)
+will be magnified. Points should be
 on the same scale as the data, with \code{default.units = "native"} in the grob.
-Note that only single polygons are supported at the moment. \code{shape} will
-be ignored.
+\code{shape} will be ignored.
 \item A logical vector. Points in the data where \code{from} is \code{TRUE} will be
-surrounded by a rectangle, ellipse or convex hull.
+surrounded by a rectangle, ellipse or outline.
 }
 
 Normally you'll set \code{from} and \code{to} in the call to \code{geom_magnify()}. You can
@@ -221,13 +219,13 @@ ggp + geom_magnify(aes(from = Species == "setosa"), to = c(3, 5, 6, 8),
 
 # `geom_magnify()` stores the plot when it is added to it:
 ggp +
-  geom_smooth() +
+  scale_color_brewer() +
   geom_magnify(from = from, to = to)
 
-# This will print the inset without the smooth:
+# This will print the inset without the new scale:
 ggp +
   geom_magnify(from = from, to = to) +
-  geom_smooth()
+  scale_color_brewer()
 
 # For more examples see https://github.com/hughjonesd/ggmagnify
 }
