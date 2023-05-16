@@ -8,6 +8,8 @@
   - Before: `xmin, ymin, xmax, ymax`.
   - Now: `xmin, xmax, ymin, ymax`. This is much easier to think about.
   - You can name the arguments to avoid confusion.
+* Added a `proj.combine` argument to draw combined or separate projection lines
+  for multiple target areas.
 * Added some helper functions to find rectangles, convex hulls and grobs.
 * Added a `NEWS.md` file to track changes to the package.
 

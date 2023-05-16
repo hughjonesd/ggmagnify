@@ -56,6 +56,9 @@ NULL
 #' @param scale.inset Length 1 or 2 numeric. Normally, exactly the target area
 #'   is shown on the inset. Sometimes you may wish to rescale the plot in the
 #'   inset. Use 2 numbers to scale width and height separately.
+#' @param proj.combine Logical. How to draw projection lines when more than
+#'   one polygon/map area is magnified? `FALSE` draws one set of projection
+#'   lines for each area. `TRUE` draws a single set of lines for all the areas.
 #'
 #' @details
 #' ## Aesthetics
@@ -189,6 +192,7 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                                               x_offset = 5, y_offset = 5),
                            recompute = FALSE,
                            scale.inset = 1,
+                           proj.combine = TRUE,
                            na.rm = FALSE,
                            inherit.aes = TRUE) {
   proj <- match.arg(proj)
@@ -207,7 +211,7 @@ geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
                        inset.linetype = inset.linetype,
                        shape = shape, plot = plot,
                        shadow.args = shadow.args, recompute = recompute,
-                       scale.inset = scale.inset,
+                       scale.inset = scale.inset, proj.combine = proj.combine,
                        na.rm = na.rm, ...)
        )
   class(l) <- c("GeomMagnifyLayer", class(l))
@@ -256,7 +260,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          magnify, axes, proj, shadow, colour,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
-                         recompute, scale.inset
+                         recompute, scale.inset, proj.combine
                          ) {
     # StatMagnify has put xmin, to_xmin and inset_xmin into this
     d1 <- data[1, , drop = FALSE]
@@ -337,7 +341,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                    ! inherits(from, "data.frame")) {
       calculate_proj_df_rect(proj, d1, coord, panel_params)
     } else {
-      calculate_proj_df(proj, target_grob, border_grob)
+      calculate_proj_df(proj, proj.combine, target_grob, border_grob)
     }
 
     proj_grob <- segmentsGrob(proj_df$x, proj_df$y, proj_df$xend, proj_df$yend,

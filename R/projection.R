@@ -1,18 +1,23 @@
 
 
-calculate_proj_df <- function (proj, grob1, grob2) {
-  if (proj == "single") {
-    calculate_proj_midpoint(grob1, grob2)
-  }  else {
-    calculate_proj_chull(grob1, grob2)
+calculate_proj_df <- function (proj, proj.combine, grob1, grob2) {
+  c1 <- allcoords(grob1, bind = proj.combine)
+  c2 <- allcoords(grob2, bind = proj.combine)
+  if (proj.combine) {
+    c1 <- list(c1)
+    c2 <- list(c2)
   }
+
+  calculate_proj <- if (proj == "single") calculate_proj_midpoint else
+                                          calculate_proj_chull
+  proj_line_list <- lapply(seq_along(c1),
+                           function (i) calculate_proj(c1[[i]], c2[[i]])
+                    )
+  do.call(rbind, proj_line_list)
 }
 
 
-calculate_proj_chull <- function(grob1, grob2) {
-  c1 <- allcoords(grob1, bind = TRUE)
-  c2 <- allcoords(grob2, bind = TRUE)
-
+calculate_proj_chull <- function (c1, c2) {
   both <- rbind(c1, c2)
   on_chull <- grDevices::chull(both)
   both <- as.data.frame(both)
@@ -36,9 +41,7 @@ calculate_proj_chull <- function(grob1, grob2) {
 }
 
 
-calculate_proj_midpoint <- function(grob1, grob2) {
-  c1 <- allcoords(grob1, bind = TRUE)
-  c2 <- allcoords(grob2, bind = TRUE)
+calculate_proj_midpoint <- function(c1, c2) {
   stopifnot(nrow(c1) == nrow(c2))
 
   # this is how grid defines "centre" for xDetails

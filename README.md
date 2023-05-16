@@ -371,7 +371,7 @@ ggp2 + geom_magnify(from = c(-1.25, 1.25, -1, 1),
 
 <img src="man/figures/README-example-recompute-2.png" width="100%" />
 
-### Magnify within a magnify
+### Magnify twice
 
 ``` r
 
@@ -379,13 +379,14 @@ data <- data.frame(
   x = runif(4000), 
   y = runif(4000)
 )
-ggplot(
-  data, 
-  aes(x=x,y=y)) +
-  coord_cartesian(expand = FALSE) +
-  geom_density2d_filled(bins = 50, linewidth = 0) +
-  geom_point(color='white', alpha = .5, size = .5) + 
-  theme(legend.position = "none") +
+ggm_unif <- ggplot(data, aes(x, y)) +
+            coord_cartesian(expand = FALSE) +
+            geom_density2d_filled(bins = 50, linewidth = 0, n = 200) +
+            geom_point(color='white', alpha = .5, size = .5) + 
+            theme(legend.position = "none")
+
+
+ggm_unif + 
   geom_magnify(from = c(0.05, 0.15, 0.05, 0.15), to = c(0.2, 0.4, 0.2, 0.4), 
                colour = "white", proj.linetype = 1, linewidth = 0.6) +
   geom_magnify(from = c(0.25, 0.35, 0.25, 0.35), to = c(0.45, 0.85, 0.45, 0.85), 

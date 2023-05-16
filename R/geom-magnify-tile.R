@@ -33,6 +33,7 @@ geom_magnify_tile <- function (mapping = NULL,
                                                   x_offset = 5, y_offset = 5),
                                recompute = FALSE,
                                scale.inset = 1,
+                               proj.combine = TRUE,
                                na.rm = FALSE,
                                inherit.aes = FALSE) {
 
@@ -49,7 +50,8 @@ geom_magnify_tile <- function (mapping = NULL,
                        inset.linetype = inset.linetype,
                        shape = shape, alpha = alpha, plot = plot,
                        shadow.args = shadow.args, recompute = recompute,
-                       scale.inset = scale.inset, ...)
+                       scale.inset = scale.inset, proj.combine = proj.combine,
+                       ...)
        )
   class(l) <- c("GeomMagnifyLayer", class(l))
 
