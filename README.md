@@ -5,6 +5,7 @@
 
 <!-- badges: start -->
 
+[![r-universe](https://hughjonesd.r-universe.dev/badges/ggmagnify)](https://hughjonesd.r-universe.dev/ggmagnify)
 [![R-CMD-check](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -442,7 +443,7 @@ making [these plots](https://github.com/hughjonesd/academic-bias).
 
 Data for the GWAS plots comes from:
 
-Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
 independent genetic loci influencing general cognitive function.’
 *Nature Communications*.
 
