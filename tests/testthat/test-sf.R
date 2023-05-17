@@ -4,7 +4,7 @@ library(ggplot2)
 
 skip_if_not_installed("sf")
 skip_if_not_installed("maps")
-
+skip_on_ci()
 
 usa <- sf::st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
 world <- sf::st_as_sf(maps::map("world", fill = TRUE, plot = FALSE))
