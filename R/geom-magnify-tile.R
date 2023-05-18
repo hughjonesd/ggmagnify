@@ -15,6 +15,7 @@ geom_magnify_tile <- function (mapping = NULL,
                                stat = StatMagnifyTile,
                                position = "identity",
                                ...,
+                               shape = c("rect", "ellipse", "outline"),
                                expand = 0.1,
                                aspect = c("free", "fixed"),
                                axes = "",
@@ -27,7 +28,6 @@ geom_magnify_tile <- function (mapping = NULL,
                                proj.linetype = 2,
                                alpha = 1,
                                linewidth = 0.4,
-                               shape = "rect",
                                plot = NULL,
                                shadow.args = list(sigma = 5, colour = "grey40",
                                                   x_offset = 5, y_offset = 5),
@@ -36,6 +36,9 @@ geom_magnify_tile <- function (mapping = NULL,
                                proj.combine = TRUE,
                                na.rm = FALSE,
                                inherit.aes = FALSE) {
+  proj <- match.arg(proj)
+  shape <- match.arg(shape)
+  aspect <- match.arg(aspect)
 
   l <- layer(
          geom = ggproto(NULL, GeomMagnify), # we clone because self$plot holds state

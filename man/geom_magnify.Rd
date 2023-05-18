@@ -11,6 +11,7 @@ geom_magnify(
   stat = StatMagnify,
   position = "identity",
   ...,
+  shape = c("rect", "ellipse", "outline"),
   expand = 0.1,
   aspect = c("free", "fixed"),
   axes = "",
@@ -23,7 +24,6 @@ geom_magnify(
   proj.linetype = 2,
   alpha = 1,
   linewidth = 0.4,
-  shape = c("rect", "ellipse", "outline"),
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
@@ -39,6 +39,7 @@ geom_magnify_tile(
   stat = StatMagnifyTile,
   position = "identity",
   ...,
+  shape = c("rect", "ellipse", "outline"),
   expand = 0.1,
   aspect = c("free", "fixed"),
   axes = "",
@@ -51,7 +52,6 @@ geom_magnify_tile(
   proj.linetype = 2,
   alpha = 1,
   linewidth = 0.4,
-  shape = "rect",
   plot = NULL,
   shadow.args = list(sigma = 5, colour = "grey40", x_offset = 5, y_offset = 5),
   recompute = FALSE,
@@ -63,6 +63,10 @@ geom_magnify_tile(
 }
 \arguments{
 \item{mapping, data, stat, position, ..., na.rm}{See e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.}
+
+\item{shape}{Shape of the area to be magnified. \code{"rect"} for a rectangle.
+\code{"ellipse"} for an ellipse. \code{"outline"} for the convex hull of points in the
+target area, or for map polygons.}
 
 \item{expand}{Number. Expand the target area and inset proportionally
 by this amount.}
@@ -83,10 +87,6 @@ for borders and projection lines.}
 
 \item{target.linetype, inset.linetype, proj.linetype}{Linetypes
 for specific components. Set to \code{0} for no lines.}
-
-\item{shape}{Shape of the area to be magnified. \code{"rect"} for a rectangle.
-\code{"ellipse"} for an ellipse. \code{"outline"} for the convex hull of points in the
-target area, or for map polygons.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
 ggplot object to which \code{geom_magnify()} is added.}

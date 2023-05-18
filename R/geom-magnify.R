@@ -29,6 +29,9 @@ NULL
 #'
 #' @inherit ggplot2::layer params
 #' @param mapping,data,stat,position,...,na.rm See e.g. [ggplot2::geom_point()].
+#' @param shape Shape of the area to be magnified. `"rect"` for a rectangle.
+#'   `"ellipse"` for an ellipse. `"outline"` for the convex hull of points in the
+#'   target area, or for map polygons.
 #' @param aspect String. `"fixed"` to fix the aspect ratio (overrides `ymax`).
 #' @param expand Number. Expand the target area and inset proportionally
 #'   by this amount.
@@ -42,9 +45,6 @@ NULL
 #' for borders and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components. Set to `0` for no lines.
-#' @param shape Shape of the area to be magnified. `"rect"` for a rectangle.
-#'   `"ellipse"` for an ellipse. `"outline"` for the convex hull of points in the
-#'   target area, or for map polygons.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -172,29 +172,32 @@ NULL
 #'
 #' # For more examples see https://github.com/hughjonesd/ggmagnify
 #'
-geom_magnify <- function (mapping = NULL, data = NULL, stat = StatMagnify,
-                           position = "identity", ...,
-                           expand = 0.1,
-                           aspect = c("free", "fixed"),
-                           axes = "",
-                           proj = c("facing", "corresponding", "single"),
-                           shadow = FALSE,
-                           colour = "black",
-                           linetype = 1,
-                           target.linetype = linetype,
-                           inset.linetype = linetype,
-                           proj.linetype = 2,
-                           alpha = 1,
-                           linewidth = 0.4,
-                           shape = c("rect", "ellipse", "outline"),
-                           plot = NULL,
-                           shadow.args = list(sigma = 5, colour = "grey40",
-                                              x_offset = 5, y_offset = 5),
-                           recompute = FALSE,
-                           scale.inset = 1,
-                           proj.combine = TRUE,
-                           na.rm = FALSE,
-                           inherit.aes = TRUE) {
+geom_magnify <- function (mapping = NULL,
+                          data = NULL,
+                          stat = StatMagnify,
+                          position = "identity",
+                          ...,
+                          shape = c("rect", "ellipse", "outline"),
+                          expand = 0.1,
+                          aspect = c("free", "fixed"),
+                          axes = "",
+                          proj = c("facing", "corresponding", "single"),
+                          shadow = FALSE,
+                          colour = "black",
+                          linetype = 1,
+                          target.linetype = linetype,
+                          inset.linetype = linetype,
+                          proj.linetype = 2,
+                          alpha = 1,
+                          linewidth = 0.4,
+                          plot = NULL,
+                          shadow.args = list(sigma = 5, colour = "grey40",
+                                             x_offset = 5, y_offset = 5),
+                          recompute = FALSE,
+                          scale.inset = 1,
+                          proj.combine = TRUE,
+                          na.rm = FALSE,
+                          inherit.aes = TRUE) {
   proj <- match.arg(proj)
   shape <- match.arg(shape)
   aspect <- match.arg(aspect)
