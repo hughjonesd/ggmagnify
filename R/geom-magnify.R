@@ -322,6 +322,17 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                 gp = gpar(fill = rgb(0, 0, 0, 1)))
     # should be fine but needs testing
     # if (identical(shape, "rect")) mask_grob <- "inherit"
+    mask_cap <- grDevices::dev.capabilities("mask")$masks
+    if (isFALSE(mask_cap)) {
+      cli::cli_warn(c("Device cannot use masks.",
+                    "!" = "Only `shape = \"rect\"` will work correctly.",
+                    "!" = "Inset will not be clipped to the plot area.",
+                    "i" = "Try using a \"cairo\" graphics device."))
+      mask_grob <- FALSE
+    }
+    # What if it's NA? Need to then check for length 1, since it may be
+    # not NA, but length 2
+    # This is the worst API :-P
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
                    height = diff(y_rng), default.units = "native",
                    mask = mask_grob)
