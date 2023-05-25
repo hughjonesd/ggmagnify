@@ -1,5 +1,6 @@
 # ggmagnify 0.2.0
 
+* First CRAN release.
 * `from` and `to` can now be mapped to aesthetics, allowing different targets in
   different facets.
   - `from` can now be a logical vector of points to select.
