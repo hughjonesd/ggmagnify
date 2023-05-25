@@ -10,7 +10,7 @@ expand_by <- function (x, expand) {
 #' @param x,y Unquoted names or expressions
 #' @param data A data frame
 #' @param expand Amount to expand the data around its midpoint. Default is 10
-#'   per cenet.
+#'   per cent.
 #'
 #' @return `rect_around()` returns a list with names `xmin`, `xmax`, `ymin`,
 #'   and `ymax`. `hull_around()` returns a data frame with columns `x` and `y`.

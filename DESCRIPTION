@@ -1,7 +1,7 @@
 Package: ggmagnify
-Title: Create a Magnified Inset of Part of a "ggplot" Object
+Title: Create a Magnified Inset of Part of a "Ggplot" Object
 Version: 0.2.0
-Author: David Hugh-Jones
+Author: David Hugh-Jones [aut, cre]
 Maintainer: David Hugh-Jones <davidhughjones@gmail.com>
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", role = c("aut", "cre"))

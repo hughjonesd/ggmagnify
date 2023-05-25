@@ -15,7 +15,7 @@ hull_around(x, y, data = NULL, expand = 0)
 \item{data}{A data frame}
 
 \item{expand}{Amount to expand the data around its midpoint. Default is 10
-per cenet.}
+per cent.}
 }
 \value{
 \code{rect_around()} returns a list with names \code{xmin}, \code{xmax}, \code{ymin},
