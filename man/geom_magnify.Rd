@@ -3,7 +3,7 @@
 \name{geom_magnify}
 \alias{geom_magnify}
 \alias{geom_magnify_tile}
-\title{Magnified inset of a plot}
+\title{Create a magnified inset of a plot}
 \usage{
 geom_magnify(
   mapping = NULL,
@@ -113,9 +113,11 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 }
 \description{
-\code{geom_magnify()} creates a magnified inset of part of a plot. Optional
+\code{geom_magnify()} creates a magnified inset of part of a ggplot. Optional
 borders are drawn around the target and inset, along with projection lines
-from one to the other.
+from one to the other. \code{from} gives the location of the target area,
+and \code{to} gives the location of the inset. Usually, these are specified as
+\code{c(xmin, xmax, ymin, ymax)}.
 }
 \details{
 \subsection{Aesthetics}{
@@ -196,7 +198,7 @@ invisible in the main plot, or recompute derived graphics. If you want an
 exact pixel-by-pixel copy, use a different tool.
 \item \code{geom_magnify()} may break with discrete scales. This is a limitation in
 ggplot2 for now.
-\item Find a bug? Report it at \url{https://github.com/hughjonesd/ggmagnify/issues/}
+\item Find a bug? Report it at \url{https://github.com/hughjonesd/ggmagnify/issues/}.
 }
 }
 

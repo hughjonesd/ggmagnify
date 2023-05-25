@@ -11,8 +11,6 @@ NULL
 # - make binned & discrete scales work (as and when ggplot2 faces reality...)
 # - why isn't geom_abline() working when recompute = FALSE?
 #
-# - remove R > 4.1 dependency unless shape != "rect", i.e. get rid of the
-#   meaningless mask
 #
 # NOT TODO
 # - if you have aes() at all, it makes sense to allow multiple on one plot
@@ -21,11 +19,13 @@ NULL
 #     Not worth it
 
 
-#' Magnified inset of a plot
+#' Create a magnified inset of a plot
 #'
-#' `geom_magnify()` creates a magnified inset of part of a plot. Optional
+#' `geom_magnify()` creates a magnified inset of part of a ggplot. Optional
 #' borders are drawn around the target and inset, along with projection lines
-#' from one to the other.
+#' from one to the other. `from` gives the location of the target area,
+#' and `to` gives the location of the inset. Usually, these are specified as
+#' `c(xmin, xmax, ymin, ymax)`.
 #'
 #' @inherit ggplot2::layer params
 #' @param mapping,data,stat,position,...,na.rm See e.g. [ggplot2::geom_point()].
@@ -136,7 +136,7 @@ NULL
 #' * `geom_magnify()` may break with discrete scales. This is a limitation in
 #'   ggplot2 for now.
 #'
-#' * Find a bug? Report it at <https://github.com/hughjonesd/ggmagnify/issues/>
+#' * Find a bug? Report it at <https://github.com/hughjonesd/ggmagnify/issues/>.
 #'
 #' @export
 #'
