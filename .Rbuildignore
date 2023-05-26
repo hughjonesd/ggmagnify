@@ -5,3 +5,4 @@
 ^\.github$
 .*Davies.*
 ^cran-comments\.md$
+^CRAN-SUBMISSION$

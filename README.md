@@ -26,6 +26,13 @@ You can install the development version of ggmagnify from
 remotes::install_github("hughjonesd/ggmagnify")
 ```
 
+Alternatively, install ggmagnify from
+r-universe:
+
+``` r
+install.packages('ggmagnify', repos = c('https://hughjonesd.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
 ## Basic inset
 
 ``` r
