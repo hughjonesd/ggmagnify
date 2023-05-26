@@ -30,8 +30,11 @@ Alternatively, install ggmagnify from
 r-universe:
 
 ``` r
-install.packages('ggmagnify', repos = c('https://hughjonesd.r-universe.dev', 'https://cloud.r-project.org'))
+install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev", 
+                 "https://cloud.r-project.org"))
 ```
+
+This will install the latest github release.
 
 ## Basic inset
 
