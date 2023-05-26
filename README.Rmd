@@ -13,6 +13,9 @@ knitr::opts_chunk$set(
   out.width = "100%",
   dev = "ragg_png"
 )
+
+latest <- gh::gh("/repos/hughjonesd/ggmagnify/releases/latest")$name
+
 set.seed(103121)
 dv <- vroom::vroom("Davies_NC_2018/Davies2018_subset.txt")
 
@@ -48,7 +51,7 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release.
+This will install the latest github release (currently `r latest`)
 
 ## Basic inset
 
