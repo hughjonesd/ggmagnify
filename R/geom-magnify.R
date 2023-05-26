@@ -144,8 +144,8 @@ NULL
 #' library(ggplot2)
 #' ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 #'          geom_point() + xlim(c(2, 6))
-#' from <- list(3, 4, 6.5, 7.5)
-#' to <- list(4, 7, 5, 6.5)
+#' from <- list(2.5, 3.5, 6, 7)
+#' to <- list(4, 6, 5, 7)
 #'
 #' # Basic magnification
 #' @expect silent()
