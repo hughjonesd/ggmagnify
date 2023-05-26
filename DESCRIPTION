@@ -32,7 +32,8 @@ Suggests:
     rmarkdown,
     sf,
     testthat (>= 3.0.0)
-URL: https://github.com/hughjonesd/ggmagnify
+URL: https://github.com/hughjonesd/ggmagnify,
+    https://hughjonesd.github.io/ggmagnify/
 BugReports: https://github.com/hughjonesd/ggmagnify/issues
 Config/testthat/edition: 3
 Collate: 
