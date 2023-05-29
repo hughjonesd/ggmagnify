@@ -23,8 +23,7 @@ dv$NegLogP <- -log10(dv$`P-value`)
 
 ```
 
-# ggmagnify
-
+# ggmagnify <a href="https://hughjonesd.github.io/ggmagnify/"><img src="man/figures/logo.png" align="right" height="139" /></a>
 <!-- badges: start -->
 [![r-universe](https://hughjonesd.r-universe.dev/badges/ggmagnify)](https://hughjonesd.r-universe.dev/ggmagnify)
 [![R-CMD-check](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hughjonesd/ggmagnify/actions/workflows/R-CMD-check.yaml)
@@ -65,10 +64,10 @@ ggp <- ggplot(dv, aes(Position, NegLogP)) +
   labs(title = "GWAS p-values for cognitive function",
        subtitle = "Davies et al. (2018).", y = "-log(p)")
 
-
 from <- c(xmin = 9.75e7, xmax = 9.95e7, ymin = 16, ymax = 28)
-# Or just
+# Names xmin, xmax, ymin, ymax are optional:
 to <- c(2e08 - 2e7, 2e08 + 2e7,10, 26)
+
 ggp + geom_magnify(from = from, to = to)
 ```
 

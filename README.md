@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ggmagnify
+# ggmagnify <a href="https://hughjonesd.github.io/ggmagnify/"><img src="man/figures/logo.png" align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -26,8 +26,7 @@ You can install the development version of ggmagnify from
 remotes::install_github("hughjonesd/ggmagnify")
 ```
 
-Alternatively, install ggmagnify from
-r-universe:
+Alternatively, install ggmagnify from r-universe:
 
 ``` r
 install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev", 
@@ -47,10 +46,10 @@ ggp <- ggplot(dv, aes(Position, NegLogP)) +
   labs(title = "GWAS p-values for cognitive function",
        subtitle = "Davies et al. (2018).", y = "-log(p)")
 
-
 from <- c(xmin = 9.75e7, xmax = 9.95e7, ymin = 16, ymax = 28)
-# Or just
+# Names xmin, xmax, ymin, ymax are optional:
 to <- c(2e08 - 2e7, 2e08 + 2e7,10, 26)
+
 ggp + geom_magnify(from = from, to = to)
 ```
 
@@ -453,7 +452,7 @@ making [these plots](https://github.com/hughjonesd/academic-bias).
 
 Data for the GWAS plots comes from:
 
-Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
 independent genetic loci influencing general cognitive function.’
 *Nature Communications*.
 
