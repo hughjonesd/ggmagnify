@@ -90,10 +90,12 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggmagnify"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://hughjonesd.r-universe.dev"</span>, </span>
 <span>                 <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>This will install the latest github release (currently v0.2.0)</p>
+<p>This will install the latest github release (currently 0.2.0).</p>
 <div class="section level2">
 <h2 id="basic-inset">Basic inset<a class="anchor" aria-label="anchor" href="#basic-inset"></a>
 </h2>
+<p>To create an inset, use <code>geom_magnify(from, to)</code>. <code>from</code> can be a list giving the four corners of the area to magnify: <code>from = c(xmin, xmax, ymin, ymax)</code>. Optionally you can use the names <code>xmin</code>, etc.</p>
+<p>Similarly, <code>to</code> specifies where the magnified inset should go: <code>to = c(xmin, xmax, ymin, ymax)</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hughjonesd/ggmagnify" class="external-link">ggmagnify</a></span><span class="op">)</span></span>
