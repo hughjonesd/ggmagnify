@@ -26,16 +26,24 @@ You can install the development version of ggmagnify from
 remotes::install_github("hughjonesd/ggmagnify")
 ```
 
-Alternatively, install ggmagnify from r-universe:
+Alternatively, install ggmagnify from
+r-universe:
 
 ``` r
 install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev", 
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release (currently v0.2.0)
+This will install the latest github release (currently 0.2.0).
 
 ## Basic inset
+
+To create an inset, use `geom_magnify(from, to)`. `from` can be a list
+giving the four corners of the area to magnify: `from = c(xmin, xmax,
+ymin, ymax)`. Optionally you can use the names `xmin`, etc.
+
+Similarly, `to` specifies where the magnified inset should go: `to =
+c(xmin, xmax, ymin, ymax)`.
 
 ``` r
 library(ggplot2)
@@ -452,7 +460,7 @@ making [these plots](https://github.com/hughjonesd/academic-bias).
 
 Data for the GWAS plots comes from:
 
-Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
 independent genetic loci influencing general cognitive function.’
 *Nature Communications*.
 

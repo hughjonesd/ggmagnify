@@ -186,7 +186,9 @@ cleaner.
 \itemize{
 \item \code{geom_magnify()} uses masks. This requires R version 4.1.0 or higher, and
 a graphics device that supports masking. If you are using knitr, you may have
-luck with the \code{ragg_png} device.
+luck with the \code{ragg_png} device. If your device doesn't support masks,
+only \code{shape = "rect"} will work, and the plot inset will not be clipped
+to the panel area.
 \item \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
 older, or newer, versions of ggplot2. If you don't need faceting, and want
 your code to be robust to upgrades, set \code{options(ggmagnify.safe_mode = TRUE)}

@@ -120,7 +120,9 @@ NULL
 #'
 #' * `geom_magnify()` uses masks. This requires R version 4.1.0 or higher, and
 #'   a graphics device that supports masking. If you are using knitr, you may have
-#'   luck with the `ragg_png` device.
+#'   luck with the `ragg_png` device. If your device doesn't support masks,
+#'   only `shape = "rect"` will work, and the plot inset will not be clipped
+#'   to the panel area.
 #'
 #' * `geom_magnify()` uses dark magic to deal with faceting. It may break with
 #'   older, or newer, versions of ggplot2. If you don't need faceting, and want

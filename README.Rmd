@@ -50,10 +50,16 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release (currently `r latest`)
+This will install the latest github release (currently `r latest`).
 
 ## Basic inset
 
+To create an inset, use `geom_magnify(from, to)`. `from` can
+be a list giving the four corners of the area to magnify:
+`from = c(xmin, xmax, ymin, ymax)`. Optionally you can use the names
+`xmin`, etc.
+
+Similarly, `to` specifies where the magnified inset should go: `to = c(xmin, xmax, ymin, ymax)`.
 
 ```{r example-basic}
 library(ggplot2)
