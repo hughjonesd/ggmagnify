@@ -74,7 +74,7 @@ StatMagnify <- ggproto("StatMagnify", Stat,
 )
 
 
-#' Calculate `xmin,ymin,xmax,ymax` from the `from` aes
+#' Calculate `xmin, ymin, xmax, ymax` from the `from` aes
 #'
 #' @param from Original aes, can be logical, data frame, list, vector or grob
 #' @param shape Parameter from `geom_magnify`
