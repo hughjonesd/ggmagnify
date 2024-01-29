@@ -19,7 +19,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     cli,
-    ggforce,
+    ggforce (>= 0.4.1.9000),
     ggplot2 (>= 3.3.4),
     grid,
     gridExtra,
@@ -45,3 +45,5 @@ Collate:
     'helpers.R'
     'inset-theme.R'
     'projection.R'
+Remotes:  
+    thomasp85/ggforce
