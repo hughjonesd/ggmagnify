@@ -19,13 +19,13 @@ Depends:
     R (>= 4.1.0)
 Imports:
     cli,
+    ggforce,
     ggplot2 (>= 3.3.4),
     grid,
     gridExtra,
     rlang
 Suggests: 
     doctest,
-    ggforce,
     ggfx,
     hexbin,
     maps,

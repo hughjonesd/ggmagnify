@@ -41,8 +41,8 @@ NULL
 #'   default), `"corresponding"` or `"single"`. Can be abbreviated. See below.
 #' @param shadow Logical. Draw a shadow behind the inset plot? Requires the
 #'   "ggfx" package.
-#' @param corners Numeric. Radius of rounded corners for the target area and inset.
-#'   Only used if shape is `"rect"`.
+#' @param corners Numeric between 0 and 1. Radius of rounded corners for the
+#'   target area and inset. Only used if `shape` is `"rect"`.
 #' @param linetype,colour,alpha,linewidth Linetype, colour, alpha and linewidth
 #' for borders and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes

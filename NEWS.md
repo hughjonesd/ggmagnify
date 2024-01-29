@@ -1,6 +1,11 @@
+
+# ggmagnify (development version)
+
+* New `corners` argument sets corner radius on target and inset.
+  - We now depend on the "ggforce" package.
+
 # ggmagnify 0.2.0
 
-* First CRAN release.
 * `from` and `to` can now be mapped to aesthetics, allowing different targets in
   different facets.
   - `from` can now be a logical vector of points to select.
