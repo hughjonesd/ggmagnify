@@ -359,7 +359,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     # == create projection lines =====
     proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob") &&
                    ! inherits(from, "data.frame")) {
-      calculate_proj_df_rect(proj, d1, coord, panel_params)
+      calculate_proj_df_rect(proj, d1, corners, coord, panel_params)
     } else {
       calculate_proj_df(proj, proj.combine, target_grob, border_grob)
     }
@@ -381,6 +381,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
   }
 )
+
 
 create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
   plot_coord <- ggplot_build(plot)$layout$coord

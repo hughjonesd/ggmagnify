@@ -151,7 +151,7 @@ in_bbox <- function(pts, p1, p2) {
 }
 
 
-calculate_proj_df_rect <- function(proj, data, coord, panel_params) {
+calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
   # using mean allows Dates and maybe other things
   xmin <- data$xmin
   xmax <- data$xmax
@@ -162,13 +162,31 @@ calculate_proj_df_rect <- function(proj, data, coord, panel_params) {
   to_ymin <- data$to_ymin
   to_ymax <- data$to_ymax
 
+  if (corners > 0 && ! identical(proj, "single")) {
+    # the 1 - 1/sqrt(2) adjustment gets to the midpoint of the
+    # rounded corner (at a 45 degree angle), calculated via Pythagoras.
+    # Not perfect.
+    adj <- 1 - 1/sqrt(2)
+    corn_adj_x <- corners * (xmax - xmin) * adj
+    corn_adj_y <- corners * (ymax - ymin) * adj
+    to_corn_adj_x <- corners * (to_xmax - to_xmin) * adj
+    to_corn_adj_y <- corners * (to_ymax - to_ymin) * adj
+    xmin <- xmin + corn_adj_x
+    xmax <- xmax - corn_adj_x
+    ymin <- ymin + corn_adj_y
+    ymax <- ymax - corn_adj_y
+    to_xmin <- to_xmin + to_corn_adj_x
+    to_xmax <- to_xmax - to_corn_adj_x
+    to_ymin <- to_ymin + to_corn_adj_y
+    to_ymax <- to_ymax - to_corn_adj_y
+  }
 
   x <- mean(c(xmin, xmax))
   y <- mean(c(ymin, ymax))
   to_x <- mean(c(to_xmin, to_xmax))
   to_y <- mean(c(to_ymin, to_ymax))
 
-  if (proj %in% c("auto", "corresponding", "facing")) {
+  if (proj %in% c("corresponding", "facing")) {
     # which of the four lines connecting the four corners can we draw?
     can_top_left  <- sign(xmin - to_xmin) == sign(ymax - to_ymax)
     can_bot_right <- sign(xmax - to_xmax) == sign(ymin - to_ymin)

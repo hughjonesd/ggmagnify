@@ -57,11 +57,10 @@ compute_shape_grob.data.frame <- function (from, shape, corners, data, coord,
 compute_shape_grob.default <- function (from, shape, corners, data, coord,
                                         panel_params, expand) {
   if (shape == "rect") {
-    # grid::rectGrob()
     ggforce::shapeGrob(x = c(0, 0, 1, 1),
                        y = c(0, 1, 1, 0), radius = corners)
   } else if (shape == "ellipse") {
-    # resist the temptation to replace this with cirleGrob. You need to
+    # resist the temptation to replace this with circleGrob. You need to
     # mess with it later.
     gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5, n = 180,
                              position.units = "npc", size.units = "npc")
