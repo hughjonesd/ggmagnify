@@ -18,16 +18,7 @@ one to the other. The inset can have a drop shadow. The magnified area
 can be a rectangle, an ellipse, a convex hull of points, or an arbitrary
 shape.
 
-You can install the development version of ggmagnify from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("remotes")
-remotes::install_github("hughjonesd/ggmagnify")
-```
-
-Alternatively, install ggmagnify from
-r-universe:
+You can install ggmagnify from r-universe:
 
 ``` r
 install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev", 
@@ -36,14 +27,22 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
 
 This will install the latest github release (currently 0.2.0).
 
+Or install the development version from [GitHub](https://github.com/)
+with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("hughjonesd/ggmagnify")
+```
+
 ## Basic inset
 
-To create an inset, use `geom_magnify(from, to)`. `from` can be a list
-giving the four corners of the area to magnify: `from = c(xmin, xmax,
-ymin, ymax)`. Optionally you can use the names `xmin`, etc.
+To create an inset, use `geom_magnify(from, to)`. `from` can be a vector
+giving the four corners of the area to magnify:
+`from = c(xmin, xmax, ymin, ymax)`.
 
-Similarly, `to` specifies where the magnified inset should go: `to =
-c(xmin, xmax, ymin, ymax)`.
+Similarly, `to` specifies where the magnified inset should go:
+`to = c(xmin, xmax, ymin, ymax)`.
 
 ``` r
 library(ggplot2)
@@ -56,7 +55,7 @@ ggp <- ggplot(dv, aes(Position, NegLogP)) +
 
 from <- c(xmin = 9.75e7, xmax = 9.95e7, ymin = 16, ymax = 28)
 # Names xmin, xmax, ymin, ymax are optional:
-to <- c(2e08 - 2e7, 2e08 + 2e7,10, 26)
+to <- c(2e8 - 2e7, 2e8 + 2e7,10, 26)
 
 ggp + geom_magnify(from = from, to = to)
 ```
@@ -75,6 +74,18 @@ ggp + geom_magnify(from = from, to = to,
 ```
 
 <img src="man/figures/README-example-shadow-1.png" width="100%" />
+
+## Rounded corners
+
+New in version 0.3.0, use `corners` to give a proportional radius for
+rounded corners.
+
+``` r
+ggp + geom_magnify(from = from, to = to, 
+                   corners = 0.1, shadow = TRUE)
+```
+
+<img src="man/figures/README-example-corners-1.png" width="100%" />
 
 ## Ellipse
 
@@ -460,7 +471,7 @@ making [these plots](https://github.com/hughjonesd/academic-bias).
 
 Data for the GWAS plots comes from:
 
-Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
+Davies et al. (2018) ‘Study of 300,486 individuals identifies 148
 independent genetic loci influencing general cognitive function.’
 *Nature Communications*.
 

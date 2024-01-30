@@ -36,14 +36,7 @@ target area and the inset, along with projection lines from one to the other.
 The inset can have a drop shadow. The magnified area can be a rectangle, 
 an ellipse, a convex hull of points, or an arbitrary shape.
 
-You can install the development version of ggmagnify from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("remotes")
-remotes::install_github("hughjonesd/ggmagnify")
-```
-
-Alternatively, install ggmagnify from r-universe:
+You can install ggmagnify from r-universe:
 
 ``` r
 install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev", 
@@ -52,12 +45,19 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
 
 This will install the latest github release (currently `r latest`).
 
+Or install the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("hughjonesd/ggmagnify")
+```
+
+
 ## Basic inset
 
 To create an inset, use `geom_magnify(from, to)`. `from` can
-be a list giving the four corners of the area to magnify:
-`from = c(xmin, xmax, ymin, ymax)`. Optionally you can use the names
-`xmin`, etc.
+be a vector giving the four corners of the area to magnify:
+`from = c(xmin, xmax, ymin, ymax)`.
 
 Similarly, `to` specifies where the magnified inset should go: `to = c(xmin, xmax, ymin, ymax)`.
 
@@ -72,7 +72,7 @@ ggp <- ggplot(dv, aes(Position, NegLogP)) +
 
 from <- c(xmin = 9.75e7, xmax = 9.95e7, ymin = 16, ymax = 28)
 # Names xmin, xmax, ymin, ymax are optional:
-to <- c(2e08 - 2e7, 2e08 + 2e7,10, 26)
+to <- c(2e8 - 2e7, 2e8 + 2e7,10, 26)
 
 ggp + geom_magnify(from = from, to = to)
 ```
@@ -88,6 +88,15 @@ ggp + geom_magnify(from = from, to = to,
                    shadow = TRUE)
 ```
 
+## Rounded corners
+
+New in version 0.3.0, use `corners` to give a proportional radius for rounded
+corners.
+
+```{r example-corners}
+ggp + geom_magnify(from = from, to = to, 
+                   corners = 0.1, shadow = TRUE)
+```
 
 ## Ellipse
 

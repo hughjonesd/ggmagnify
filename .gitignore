@@ -3,6 +3,5 @@
 .Rdata
 .httr-oauth
 .DS_Store
-Davies*/*
 tests/testthat/Rplots.pdf
 docs
