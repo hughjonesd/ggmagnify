@@ -280,6 +280,11 @@
 <h2 id="tips-and-tricks">Tips and tricks<a class="anchor" aria-label="anchor" href="#tips-and-tricks"></a>
 </h2>
 <div class="section level3">
+<h3 id="graphics-devices">Graphics devices<a class="anchor" aria-label="anchor" href="#graphics-devices"></a>
+</h3>
+<p><code><a href="reference/geom_magnify.html">geom_magnify()</a></code> uses masks. This requires R version 4.1.0 or higher, and a graphics device that supports masking. If you are using knitr, you may have luck with the <code>ragg_png</code> device (which was used to create this README). If your device doesn’t support masks, only <code>shape = "rect"</code> will work, and the plot inset will not be clipped to the panel area.</p>
+</div>
+<div class="section level3">
 <h3 id="adding-layers-to-the-inset">Adding layers to the inset<a class="anchor" aria-label="anchor" href="#adding-layers-to-the-inset"></a>
 </h3>
 <p><code><a href="reference/geom_magnify.html">geom_magnify()</a></code> stores the plot when it is added to it. So, order matters:</p>
