@@ -189,6 +189,9 @@ a graphics device that supports masking. If you are using knitr, you may have
 luck with the \code{ragg_png} device. If your device doesn't support masks,
 only \code{shape = "rect"} will work, and the plot inset will not be clipped
 to the panel area.
+\item R graphics devices are not very predictable. My current recommendations
+are: \code{ragg_png} for knitr; \code{cairo_pdf} for PDF output; RStudio \code{AGG}
+backend for interactive output. Your mileage may vary.
 \item \code{geom_magnify()} uses dark magic to deal with faceting. It may break with
 older, or newer, versions of ggplot2. If you don't need faceting, and want
 your code to be robust to upgrades, set \code{options(ggmagnify.safe_mode = TRUE)}

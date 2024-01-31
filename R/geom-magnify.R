@@ -124,6 +124,10 @@ NULL
 #'   only `shape = "rect"` will work, and the plot inset will not be clipped
 #'   to the panel area.
 #'
+#' * R graphics devices are not very predictable. My current recommendations
+#'   are: `ragg_png` for knitr; `cairo_pdf` for PDF output; RStudio `AGG`
+#'   backend for interactive output. Your mileage may vary.
+#'
 #' * `geom_magnify()` uses dark magic to deal with faceting. It may break with
 #'   older, or newer, versions of ggplot2. If you don't need faceting, and want
 #'   your code to be robust to upgrades, set `options(ggmagnify.safe_mode = TRUE)`
@@ -349,8 +353,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                   gp = gpar(fill = NA,
                                             col = alpha(colour, alpha),
                                             lwd = linewidth * .pt,
-                                            lty = inset.linetype
-                                            ))
+                                            lty = inset.linetype))
 
     # == create projection lines =====
     proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob") &&
