@@ -19,7 +19,6 @@ Depends:
     R (>= 4.1.0)
 Imports:
     cli,
-    ggforce (>= 0.4.1.9000),
     ggplot2 (>= 3.3.4),
     grid,
     gridExtra,

@@ -163,22 +163,28 @@ calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
   to_ymax <- data$to_ymax
 
   if (corners > 0 && ! identical(proj, "single")) {
-    # the 1 - 1/sqrt(2) adjustment gets to the midpoint of the
+    # a 1 - 1/sqrt(2) adjustment, c. 0.29, would get to the midpoint of the
     # rounded corner (at a 45 degree angle), calculated via Pythagoras.
-    # Not perfect.
-    adj <- 1 - 1/sqrt(2)
-    corn_adj_x <- corners * (xmax - xmin) * adj
-    corn_adj_y <- corners * (ymax - ymin) * adj
-    to_corn_adj_x <- corners * (to_xmax - to_xmin) * adj
-    to_corn_adj_y <- corners * (to_ymax - to_ymin) * adj
-    xmin <- xmin + corn_adj_x
-    xmax <- xmax - corn_adj_x
-    ymin <- ymin + corn_adj_y
-    ymax <- ymax - corn_adj_y
-    to_xmin <- to_xmin + to_corn_adj_x
-    to_xmax <- to_xmax - to_corn_adj_x
-    to_ymin <- to_ymin + to_corn_adj_y
-    to_ymax <- to_ymax - to_corn_adj_y
+    # This isn't perfect because lines don't always come in at 45 deg.
+    # An adj of 0.2 is a bit "looser" and should give fewer cases
+    # where projection lines end up inside the target area.
+    # The use of min() below reflects that corners is in "snpc" units:
+    # see ?grid::unit.
+    size <- min(xmax - xmin, ymax - ymin)
+    to_size <- min(to_xmax - to_xmin, to_ymax - to_ymin)
+    adj <- 0.2 # 1 - 1/sqrt(2)
+    corn_adj <- corners * size * adj
+    to_corn_adj <- corners * to_size * adj
+
+    xmin <- xmin + corn_adj
+    xmax <- xmax - corn_adj
+    ymin <- ymin + corn_adj
+    ymax <- ymax - corn_adj
+
+    to_xmin <- to_xmin + to_corn_adj
+    to_xmax <- to_xmax - to_corn_adj
+    to_ymin <- to_ymin + to_corn_adj
+    to_ymax <- to_ymax - to_corn_adj
   }
 
   x <- mean(c(xmin, xmax))

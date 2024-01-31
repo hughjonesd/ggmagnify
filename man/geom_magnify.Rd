@@ -85,7 +85,8 @@ default), \code{"corresponding"} or \code{"single"}. Can be abbreviated. See bel
 "ggfx" package.}
 
 \item{corners}{Numeric between 0 and 1. Radius of rounded corners for the
-target area and inset. Only used if \code{shape} is \code{"rect"}.}
+target area and inset. Only used if \code{shape} is \code{"rect"}. 0.1 is a good
+starting value.}
 
 \item{linetype, colour, alpha, linewidth}{Linetype, colour, alpha and linewidth
 for borders and projection lines.}

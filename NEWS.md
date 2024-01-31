@@ -1,8 +1,8 @@
 
 # ggmagnify (development version)
 
-* New `corners` argument sets corner radius on target and inset.
-  - We now depend on the "ggforce" package.
+* New `corners` argument sets corner radius on target and inset. Thanks
+  to @thomasp85 for help with this.
 
 # ggmagnify 0.2.0
 
