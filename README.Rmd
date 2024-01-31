@@ -255,6 +255,15 @@ ggpi +
 
 ## Tips and tricks
 
+### Graphics devices
+
+`geom_magnify()` uses masks. This requires R version 4.1.0 or higher, and a
+graphics device that supports masking. If you are using knitr, you may have
+luck with the `ragg_png` device (which was used to create this README). If your
+device doesn't support masks, only `shape = "rect"` will work, and the plot
+inset will not be clipped to the panel area.
+
+
 ### Adding layers to the inset
 
 `geom_magnify()` stores the plot when it is added to it. So, order matters:
