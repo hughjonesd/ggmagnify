@@ -25,7 +25,6 @@ Imports:
     rlang
 Suggests: 
     doctest,
-    ggforce,
     ggfx,
     hexbin,
     maps,
@@ -45,3 +44,5 @@ Collate:
     'helpers.R'
     'inset-theme.R'
     'projection.R'
+Remotes:  
+    thomasp85/ggforce

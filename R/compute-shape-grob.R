@@ -2,17 +2,19 @@
 #' Compute a shape grob on scale 0-1 npc for use for borders,
 #' target lines and mask
 #'
-#' @param from Stripped of surrounding `list()`
-#' @param shape "rect", "ellipse", "outline"
-#' @param data Data
-#' @param coord Coord object
-#' @param panel_params Opaque object
-#' @param expand Parameter for proportional expansion (not done yet)
+#' @param from Stripped of surrounding `list()`.
+#' @param shape "rect", "ellipse", "outline".
+#' @param corners Numeric. Radius of corners for "rect" shape.
+#' @param data Data.
+#' @param coord Coord object.
+#' @param panel_params Opaque object.
+#' @param expand Parameter for proportional expansion (not done yet).
 #'
 #' @return A [grid::grob()] object with units "npc" and data between 0 and
 #' 1 on screen scale. Coordinates have been transformed by `coord$transform(...)`.
 #' @noRd
-compute_shape_grob <- function (from, shape, data, coord, panel_params, expand) {
+compute_shape_grob <- function (from, shape, corners, data, coord,
+                                panel_params, expand) {
   UseMethod("compute_shape_grob")
   # if from is a grob, use it directly (after rescaling). If from is a data
   # frame, make a grob
@@ -22,8 +24,8 @@ compute_shape_grob <- function (from, shape, data, coord, panel_params, expand) 
 }
 
 
-compute_shape_grob.grob <- function (from, shape, data, coord, panel_params,
-                                     expand) {
+compute_shape_grob.grob <- function (from, shape, corners, data, coord,
+                                     panel_params, expand) {
   scale01 <- function (x) (x - min(x))/(max(x) - min(x))
   scalexy <- function(mx) {
     # we don't transform for a raw grob; and we've expanded the bounding box
@@ -42,22 +44,22 @@ compute_shape_grob.grob <- function (from, shape, data, coord, panel_params,
 }
 
 
-compute_shape_grob.data.frame <- function (from, shape, data, coord, panel_params,
-                                           expand) {
+compute_shape_grob.data.frame <- function (from, shape, corners, data, coord,
+                                           panel_params, expand) {
   # this will be on scale of data
   names(from) <- c("x", "y")
   from_grob <- polygonGrob(x = from$x, y = from$y,
                             default.units = "native")
-  compute_shape_grob(from_grob, shape, data, coord, panel_params, expand)
+  compute_shape_grob(from_grob, shape, corners, data, coord, panel_params, expand)
 }
 
 
-compute_shape_grob.default <- function (from, shape, data, coord, panel_params,
-                                        expand) {
+compute_shape_grob.default <- function (from, shape, corners, data, coord,
+                                        panel_params, expand) {
   if (shape == "rect") {
-    grid::rectGrob()
+    grid::roundrectGrob(r = unit(corners, "snpc"))
   } else if (shape == "ellipse") {
-    # resist the temptation to replace this with cirleGrob. You need to
+    # resist the temptation to replace this with circleGrob. You need to
     # mess with it later.
     gridExtra::ellipseGrob(x = 0.5, y = 0.5, size = 0.5, n = 180,
                              position.units = "npc", size.units = "npc")
@@ -69,7 +71,7 @@ compute_shape_grob.default <- function (from, shape, data, coord, panel_params,
     if (! is.null(data$geometry) && inherits(data$geometry, "sfc")) {
       rlang::check_installed("sf")
       from <- sf::st_as_grob(data$geometry)
-      compute_shape_grob(from, shape, data, coord, panel_params, expand)
+      compute_shape_grob(from, shape, corners, data, coord, panel_params, expand)
     } else if ("x" %in% names(data) && "y" %in% names(data)){
       # only here we use the actual x and y points
       from_df <- hull_around(data$x, data$y, expand = 0)
@@ -77,22 +79,27 @@ compute_shape_grob.default <- function (from, shape, data, coord, panel_params,
 
       from_grob <- polygonGrob(x = from_df$x, y = from_df$y,
                                default.units = "native")
-      compute_shape_grob(from_grob, shape, data, coord, panel_params, expand = 0)
+      compute_shape_grob(from_grob, shape, corners, data, coord, panel_params,
+                         expand = 0)
     } else {
       cli::cli_warn(c("Couldn't find `x` and `y` to build convex hull.",
                       "Falling back to shape = \"rect\""))
-      grid::rectGrob()
+      compute_shape_grob(from_grob, shape = "rect", corners, data, coord,
+                         panel_params, expand = 0)
     }
   }
 }
+
 
 subset_by_from <- function (from, data) {
   UseMethod("subset_by_from")
 }
 
+
 subset_by_from.logical <- function (from, data) {
   data[from,]
 }
+
 
 subset_by_from.default <- function (from, data) {
   if (is.null(names(from))) names(from) <- c("xmin", "xmax", "ymin", "ymax")
@@ -110,5 +117,3 @@ subset_by_from.default <- function (from, data) {
     data[cond,]
   }
 }
-
-

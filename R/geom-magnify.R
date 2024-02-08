@@ -41,6 +41,9 @@ NULL
 #'   default), `"corresponding"` or `"single"`. Can be abbreviated. See below.
 #' @param shadow Logical. Draw a shadow behind the inset plot? Requires the
 #'   "ggfx" package.
+#' @param corners Numeric between 0 and 1. Radius of rounded corners for the
+#'   target area and inset. Only used if `shape` is `"rect"`. 0.1 is a good
+#'   starting value.
 #' @param linetype,colour,alpha,linewidth Linetype, colour, alpha and linewidth
 #' for borders and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
@@ -189,6 +192,7 @@ geom_magnify <- function (mapping = NULL,
                           axes = "",
                           proj = c("facing", "corresponding", "single"),
                           shadow = FALSE,
+                          corners = 0,
                           colour = "black",
                           linetype = 1,
                           target.linetype = linetype,
@@ -213,7 +217,8 @@ geom_magnify <- function (mapping = NULL,
          mapping = mapping, data = data, stat = stat,
          position = "identity", show.legend = FALSE, inherit.aes = inherit.aes,
          params = list(expand = expand, aspect = aspect,
-                       axes = axes, proj = proj, shadow = shadow, colour = colour,
+                       axes = axes, proj = proj, shadow = shadow,
+                       corners = corners, colour = colour,
                        linewidth = linewidth, linetype = linetype, alpha = alpha,
                        target.linetype = target.linetype,
                        proj.linetype = proj.linetype,
@@ -266,7 +271,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
 
   draw_panel = function (self, data, panel_params, coord, from,
-                         magnify, axes, proj, shadow, colour,
+                         magnify, axes, proj, shadow, corners, colour,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
                          recompute, scale.inset, proj.combine
@@ -282,18 +287,18 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
             }  else {
               from
             }
-    shape_grob <- compute_shape_grob(from, shape, data, coord, panel_params,
+    shape_grob <- compute_shape_grob(from, shape, corners, data, coord, panel_params,
                                      expand)
 
     # == create grob for border around target ==
-    target_corners <- data.frame(
+    target_limits <- data.frame(
                        x = c(d1$xmin, d1$xmax),
                        y = c(d1$ymin, d1$ymax)
                      )
 
-    target_corners_t <- coord$transform(target_corners, panel_params)
-    target_x_rng <- range(target_corners_t$x, na.rm = TRUE)
-    target_y_rng <- range(target_corners_t$y, na.rm = TRUE)
+    target_limits_t <- coord$transform(target_limits, panel_params)
+    target_x_rng <- range(target_limits_t$x, na.rm = TRUE)
+    target_y_rng <- range(target_limits_t$y, na.rm = TRUE)
 
     target_vp <- viewport(x = mean(target_x_rng),
                           y = mean(target_y_rng),
@@ -314,13 +319,13 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     # == create the viewport and mask for the inset plot ==============
 
-    corners <- data.frame(
+    limits <- data.frame(
       x = c(d1$to_xmin, d1$to_xmax),
       y = c(d1$to_ymin, d1$to_ymax)
     )
-    corners_t <- coord$transform(corners, panel_params)
-    x_rng <- range(corners_t$x, na.rm = TRUE)
-    y_rng <- range(corners_t$y, na.rm = TRUE)
+    limits_t <- coord$transform(limits, panel_params)
+    x_rng <- range(limits_t$x, na.rm = TRUE)
+    y_rng <- range(limits_t$y, na.rm = TRUE)
     # we use a mask here instead of clipping because gtable doesn't inherit
     # clip, and grid doesn't nest clips (so I guess ggplot needs its own
     # clipping, presumably when grid.draw is called on it?)
@@ -358,7 +363,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     # == create projection lines =====
     proj_df <- if (identical(shape, "rect") && ! inherits(from, "grob") &&
                    ! inherits(from, "data.frame")) {
-      calculate_proj_df_rect(proj, d1, coord, panel_params)
+      calculate_proj_df_rect(proj, d1, corners, coord, panel_params)
     } else {
       calculate_proj_df(proj, proj.combine, target_grob, border_grob)
     }
@@ -380,6 +385,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
           children = gList(target_grob, proj_grob, plot_gtable, border_grob))
   }
 )
+
 
 create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
   plot_coord <- ggplot_build(plot)$layout$coord

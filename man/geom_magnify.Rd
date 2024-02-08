@@ -17,6 +17,7 @@ geom_magnify(
   axes = "",
   proj = c("facing", "corresponding", "single"),
   shadow = FALSE,
+  corners = 0,
   colour = "black",
   linetype = 1,
   target.linetype = linetype,
@@ -45,6 +46,7 @@ geom_magnify_tile(
   axes = "",
   proj = "facing",
   shadow = FALSE,
+  corners = 0,
   colour = "black",
   linetype = 1,
   target.linetype = linetype,
@@ -81,6 +83,10 @@ default), \code{"corresponding"} or \code{"single"}. Can be abbreviated. See bel
 
 \item{shadow}{Logical. Draw a shadow behind the inset plot? Requires the
 "ggfx" package.}
+
+\item{corners}{Numeric between 0 and 1. Radius of rounded corners for the
+target area and inset. Only used if \code{shape} is \code{"rect"}. 0.1 is a good
+starting value.}
 
 \item{linetype, colour, alpha, linewidth}{Linetype, colour, alpha and linewidth
 for borders and projection lines.}

@@ -151,7 +151,7 @@ in_bbox <- function(pts, p1, p2) {
 }
 
 
-calculate_proj_df_rect <- function(proj, data, coord, panel_params) {
+calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
   # using mean allows Dates and maybe other things
   xmin <- data$xmin
   xmax <- data$xmax
@@ -162,13 +162,37 @@ calculate_proj_df_rect <- function(proj, data, coord, panel_params) {
   to_ymin <- data$to_ymin
   to_ymax <- data$to_ymax
 
+  if (corners > 0 && ! identical(proj, "single")) {
+    # a 1 - 1/sqrt(2) adjustment, c. 0.29, would get to the midpoint of the
+    # rounded corner (at a 45 degree angle), calculated via Pythagoras.
+    # This isn't perfect because lines don't always come in at 45 deg.
+    # An adj of 0.2 is a bit "looser" and should give fewer cases
+    # where projection lines end up inside the target area.
+    # The use of min() below reflects that corners is in "snpc" units:
+    # see ?grid::unit.
+    size <- min(xmax - xmin, ymax - ymin)
+    to_size <- min(to_xmax - to_xmin, to_ymax - to_ymin)
+    adj <- 0.2 # 1 - 1/sqrt(2)
+    corn_adj <- corners * size * adj
+    to_corn_adj <- corners * to_size * adj
+
+    xmin <- xmin + corn_adj
+    xmax <- xmax - corn_adj
+    ymin <- ymin + corn_adj
+    ymax <- ymax - corn_adj
+
+    to_xmin <- to_xmin + to_corn_adj
+    to_xmax <- to_xmax - to_corn_adj
+    to_ymin <- to_ymin + to_corn_adj
+    to_ymax <- to_ymax - to_corn_adj
+  }
 
   x <- mean(c(xmin, xmax))
   y <- mean(c(ymin, ymax))
   to_x <- mean(c(to_xmin, to_xmax))
   to_y <- mean(c(to_ymin, to_ymax))
 
-  if (proj %in% c("auto", "corresponding", "facing")) {
+  if (proj %in% c("corresponding", "facing")) {
     # which of the four lines connecting the four corners can we draw?
     can_top_left  <- sign(xmin - to_xmin) == sign(ymax - to_ymax)
     can_bot_right <- sign(xmax - to_xmax) == sign(ymin - to_ymin)

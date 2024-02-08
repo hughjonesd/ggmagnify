@@ -53,10 +53,10 @@ test_that("facet_grid", {
 test_that("facet_zoom", {
   skip("Not working yet")
   skip_if_not_installed("ggforce")
-  ggp2 + ggforce::facet_zoom(x = Species == 'versicolor') +
-    geom_magnify_tile(x = 15, width = 4, y = 18, height = 2,
-                      to_x = 30, to_y = 21, to_width = 8,
-                      to_height = 4)
+  # ggp2 + ggforce::facet_zoom(x = Species == 'versicolor') +
+  #   geom_magnify_tile(x = 15, width = 4, y = 18, height = 2,
+  #                     to_x = 30, to_y = 21, to_width = 8,
+  #                     to_height = 4)
 
 })
 
