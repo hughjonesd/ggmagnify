@@ -25,7 +25,7 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release (currently 0.2.0).
+This will install the latest github release (currently ggmagnify 0.3.0).
 
 Or install the development version from [GitHub](https://github.com/)
 with:
