@@ -75,6 +75,7 @@ and <code>to</code> gives the location of the inset. Usually, these are specifie
 <span>  axes <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  proj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"facing"</span>, <span class="st">"corresponding"</span>, <span class="st">"single"</span><span class="op">)</span>,</span>
 <span>  shadow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  corners <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  colour <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  linetype <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  target.linetype <span class="op">=</span> <span class="va">linetype</span>,</span>
@@ -103,6 +104,7 @@ and <code>to</code> gives the location of the inset. Usually, these are specifie
 <span>  axes <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  proj <span class="op">=</span> <span class="st">"facing"</span>,</span>
 <span>  shadow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  corners <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  colour <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  linetype <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  target.linetype <span class="op">=</span> <span class="va">linetype</span>,</span>
@@ -154,6 +156,12 @@ default), <code>"corresponding"</code> or <code>"single"</code>. Can be abbrevia
 <dt>shadow</dt>
 <dd><p>Logical. Draw a shadow behind the inset plot? Requires the
 "ggfx" package.</p></dd>
+
+
+<dt>corners</dt>
+<dd><p>Numeric between 0 and 1. Radius of rounded corners for the
+target area and inset. Only used if <code>shape</code> is <code>"rect"</code>. 0.1 is a good
+starting value.</p></dd>
 
 
 <dt>linetype, colour, alpha, linewidth</dt>
