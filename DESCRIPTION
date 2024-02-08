@@ -1,6 +1,6 @@
 Package: ggmagnify
 Title: Create a Magnified Inset of Part of a "Ggplot" Object
-Version: 0.2.0.9000
+Version: 0.3.0
 Author: David Hugh-Jones [aut, cre]
 Maintainer: David Hugh-Jones <davidhughjones@gmail.com>
 Authors@R: 
@@ -44,5 +44,5 @@ Collate:
     'helpers.R'
     'inset-theme.R'
     'projection.R'
-Remotes:  
+Remotes: 
     thomasp85/ggforce
