@@ -30,6 +30,7 @@ geom_magnify(
   recompute = FALSE,
   scale.inset = 1,
   proj.combine = TRUE,
+  proj.fill = NULL,
   na.rm = FALSE,
   inherit.aes = TRUE
 )
@@ -59,6 +60,7 @@ geom_magnify_tile(
   recompute = FALSE,
   scale.inset = 1,
   proj.combine = TRUE,
+  proj.fill = NULL,
   na.rm = FALSE,
   inherit.aes = FALSE
 )
@@ -112,6 +114,10 @@ inset. Use 2 numbers to scale width and height separately.}
 \item{proj.combine}{Logical. How to draw projection lines when more than
 one polygon/map area is magnified? \code{FALSE} draws one set of projection
 lines for each area. \code{TRUE} draws a single set of lines for all the areas.}
+
+\item{proj.fill}{\code{NULL} for no fill, or a colour to fill between the
+projection lines. Add alpha using e.g. \code{\link[scales:alpha]{scales::alpha()}}. Ignored when
+\code{proj = "single"}.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions

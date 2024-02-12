@@ -37,7 +37,13 @@ calculate_proj_chull <- function (c1, c2) {
   from <- both[switching, c("x", "y")]
   to <- both[switched, c("x", "y")] # if row 1 is
   names(to) <- c("xend", "yend")
-  cbind(from, to)
+  proj_df <- cbind(from, to)
+
+  # lastly we switch the start-end order of the second line
+  # to make both lines go in the same direction
+  # this makes our life easier when filling
+  proj_df[2,] <- proj_df[2, c("xend", "yend", "x", "y")]
+  proj_df
 }
 
 

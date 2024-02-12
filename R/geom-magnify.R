@@ -62,6 +62,9 @@ NULL
 #' @param proj.combine Logical. How to draw projection lines when more than
 #'   one polygon/map area is magnified? `FALSE` draws one set of projection
 #'   lines for each area. `TRUE` draws a single set of lines for all the areas.
+#' @param proj.fill `NULL` for no fill, or a colour to fill between the
+#'   projection lines. Add alpha using e.g. [scales::alpha()]. Ignored when
+#'   `proj = "single"`.
 #'
 #' @details
 #' ## Aesthetics
@@ -206,6 +209,7 @@ geom_magnify <- function (mapping = NULL,
                           recompute = FALSE,
                           scale.inset = 1,
                           proj.combine = TRUE,
+                          proj.fill = NULL,
                           na.rm = FALSE,
                           inherit.aes = TRUE) {
   proj <- match.arg(proj)
@@ -225,7 +229,8 @@ geom_magnify <- function (mapping = NULL,
                        inset.linetype = inset.linetype,
                        shape = shape, plot = plot,
                        shadow.args = shadow.args, recompute = recompute,
-                       scale.inset = scale.inset, proj.combine = proj.combine,
+                       scale.inset = scale.inset,
+                       proj.combine = proj.combine, proj.fill = proj.fill,
                        na.rm = na.rm, ...)
        )
   class(l) <- c("GeomMagnifyLayer", class(l))
@@ -274,7 +279,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                          magnify, axes, proj, shadow, corners, colour,
                          linetype, target.linetype, proj.linetype, inset.linetype,
                          linewidth, alpha, shape, expand, plot, shadow.args,
-                         recompute, scale.inset, proj.combine
+                         recompute, scale.inset, proj.combine, proj.fill
                          ) {
     # StatMagnify has put xmin, to_xmin and inset_xmin into this
     d1 <- data[1, , drop = FALSE]
@@ -369,20 +374,49 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     }
 
     proj_grob <- segmentsGrob(proj_df$x, proj_df$y, proj_df$xend, proj_df$yend,
-                              #vp = vp,
                               default.units = "native",
                               gp = gpar(
                                 col = alpha(colour, alpha),
                                 lty = proj.linetype,
-                                lwd = linewidth * .pt
-                              ))
+                                lwd = linewidth * .pt))
+
+    proj_fill_grob <- if (is.null(proj.fill) || identical(proj, "single")) {
+      NULL
+    } else {
+      line_pair_idx <- seq(1L, nrow(proj_df), by = 2L)
+      proj_fill_grobs <- lapply(line_pair_idx,
+                                function (idx) {
+        x <- c(proj_df$x[idx], proj_df$xend[idx],
+               proj_df$xend[idx + 1], proj_df$x[idx + 1])
+        y <- c(proj_df$y[idx], proj_df$yend[idx],
+               proj_df$yend[idx + 1], proj_df$y[idx + 1])
+        proj_fill_grob <- polygonGrob(x = x, y = y,
+                                 default.units = "native",
+                                 gp = gpar(
+                                   col  = "transparent",
+                                   fill = proj.fill,
+                                   lty  = proj.linetype,
+                                   lwd  = linewidth * .pt))
+        proj_mask_grob <- gTree(children = gList(rectGrob(), target_grob))
+        proj_mask_grob <- fillGrob(proj_mask_grob, rule = "evenodd",
+                                   gp = gpar(col = "black", fill = "black"))
+        proj_vp <- viewport(default.units = "native",
+                            mask = proj_mask_grob)
+        proj_fill_grob <- grid::editGrob(proj_fill_grob, vp = proj_vp)
+        proj_fill_grob
+      })
+      grob_glist <- do.call(gList, proj_fill_grobs)
+      gTree(children = grob_glist)
+      # TODO check with grobs, maps etc
+      # TODO how to handle crashes with agg_png? See bug you filed
+    }
 
     if (shadow) {
       plot_gtable <- do.call(ggfx::with_shadow, c(list(x = plot_gtable), shadow.args))
     }
 
     grid::gTree(name = paste0("ggmagnify-", incremental_id()),
-          children = gList(target_grob, proj_grob, plot_gtable, border_grob))
+          children = gList(target_grob, proj_fill_grob, proj_grob, plot_gtable, border_grob))
   }
 )
 
