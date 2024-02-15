@@ -384,31 +384,31 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
       NULL
     } else {
       line_pair_idx <- seq(1L, nrow(proj_df), by = 2L)
+      # each 2 rows of proj_df define a pair of matched projection lines
       proj_fill_grobs <- lapply(line_pair_idx,
                                 function (idx) {
+        # the two lines go in opposite directions (would be nice to clarify
+        # or remove this brittle long-range dependency)
+        # this lets us easily define a polygon
         x <- c(proj_df$x[idx], proj_df$xend[idx],
                proj_df$xend[idx + 1], proj_df$x[idx + 1])
         y <- c(proj_df$y[idx], proj_df$yend[idx],
                proj_df$yend[idx + 1], proj_df$y[idx + 1])
+
         proj_fill_grob <- polygonGrob(x = x, y = y,
-                                 default.units = "native",
-                                 gp = gpar(
+                                 default.units = "native")
+        proj_fill_grob <- gridGeometry::polyclipGrob(proj_fill_grob, target_grob,
+                                                     op = "minus",
+                                                     gp = gpar(
                                    col  = "transparent",
                                    fill = proj.fill,
                                    lty  = proj.linetype,
                                    lwd  = linewidth * .pt))
-        proj_mask_grob <- gTree(children = gList(rectGrob(), target_grob))
-        proj_mask_grob <- fillGrob(proj_mask_grob, rule = "evenodd",
-                                   gp = gpar(col = "black", fill = "black"))
-        proj_vp <- viewport(default.units = "native",
-                            mask = proj_mask_grob)
-        proj_fill_grob <- grid::editGrob(proj_fill_grob, vp = proj_vp)
         proj_fill_grob
       })
       grob_glist <- do.call(gList, proj_fill_grobs)
       gTree(children = grob_glist)
       # TODO check with grobs, maps etc
-      # TODO how to handle crashes with agg_png? See bug you filed
     }
 
     if (shadow) {
@@ -416,7 +416,8 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     }
 
     grid::gTree(name = paste0("ggmagnify-", incremental_id()),
-          children = gList(target_grob, proj_fill_grob, proj_grob, plot_gtable, border_grob))
+          children = gList(proj_fill_grob, target_grob, proj_grob,
+                           plot_gtable, border_grob))
   }
 )
 
