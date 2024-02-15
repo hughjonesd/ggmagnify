@@ -39,7 +39,7 @@
     
     <a class="navbar-brand me-2" href="index.html">ggmagnify</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -284,6 +284,22 @@
 <span>               proj <span class="op">=</span> <span class="st">"single"</span><span class="op">)</span> <span class="co"># just one line</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-proj-3.png" width="100%"></p>
 </div>
+<div class="section level3">
+<h3 id="projection-fill">Projection fill<a class="anchor" aria-label="anchor" href="#projection-fill"></a>
+</h3>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">ggpi</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">from2</span>, to <span class="op">=</span> <span class="va">to2</span>,</span>
+<span>               proj.fill <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span> <span class="co"># fill between the lines</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-proj-fill-1.png" width="100%"></p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">ggpi</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">from2</span>, to <span class="op">=</span> <span class="va">to2</span>, shape <span class="op">=</span> <span class="st">"ellipse"</span>,</span>
+<span>               proj.fill <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span> <span class="co"># works with any shape</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-proj-fill-2.png" width="100%"></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="tips-and-tricks">Tips and tricks<a class="anchor" aria-label="anchor" href="#tips-and-tricks"></a>
@@ -297,7 +313,7 @@
 <h3 id="adding-layers-to-the-inset">Adding layers to the inset<a class="anchor" aria-label="anchor" href="#adding-layers-to-the-inset"></a>
 </h3>
 <p><code><a href="reference/geom_magnify.html">geom_magnify()</a></code> stores the plot when it is added to it. So, order matters:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ggpi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">iris</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Sepal.Width</span>, <span class="va">Sepal.Length</span>, colour <span class="op">=</span> <span class="va">Species</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">xlim</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span></span>
@@ -310,7 +326,7 @@
 <span><span class="co">#&gt; `geom_smooth()` using method = 'loess' and formula = 'y ~ x'</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using method = 'loess' and formula = 'y ~ x'</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-order-1.png" width="100%"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print the inset without the smooth:</span></span>
 <span><span class="va">ggpi</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">from3</span>, to <span class="op">=</span> <span class="va">to3</span><span class="op">)</span> <span class="op">+</span></span>
@@ -318,7 +334,7 @@
 <span><span class="co">#&gt; `geom_smooth()` using method = 'loess' and formula = 'y ~ x'</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-order-2.png" width="100%"></p>
 <p>For complex modifications to the inset, set <code>plot</code> explicitly:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">booms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">faithfuld</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">waiting</span>, <span class="va">eruptions</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">geom_contour_filled</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>z <span class="op">=</span> <span class="va">density</span><span class="op">)</span>, bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span></span>
@@ -346,7 +362,7 @@
 <div class="section level3">
 <h3 id="draw-an-inset-outside-the-plot-region">Draw an inset outside the plot region<a class="anchor" aria-label="anchor" href="#draw-an-inset-outside-the-plot-region"></a>
 </h3>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ggp</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>clip <span class="op">=</span> <span class="st">"off"</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -359,7 +375,7 @@
 <h3 id="keep-grid-lines-the-same">Keep grid lines the same<a class="anchor" aria-label="anchor" href="#keep-grid-lines-the-same"></a>
 </h3>
 <p>To make sure the inset uses the same grid lines as the main graph, set <code>breaks</code> in <code>scale_x</code> and <code>scale_y</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ggp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">iris</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Sepal.Width</span>, <span class="va">Sepal.Length</span>, color <span class="op">=</span> <span class="va">Species</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -372,7 +388,7 @@
 <span>  <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.45</span>, <span class="fl">3.05</span>, <span class="fl">5.9</span>, <span class="fl">6.6</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.4</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span><span class="op">)</span>,</span>
 <span>               shadow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-example-gridlines-1.png" width="100%"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># fix the grid lines:</span></span>
 <span><span class="va">ggp2</span> <span class="op">+</span></span>
@@ -386,7 +402,7 @@
 <h3 id="recomputing-data">Recomputing data<a class="anchor" aria-label="anchor" href="#recomputing-data"></a>
 </h3>
 <p>Use <code>recompute</code> if you want to recompute smoothers, densities, etc. in the inset.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> </span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">df</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -401,7 +417,7 @@
 <span><span class="va">ggp2</span> <span class="op">+</span> <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.25</span>, <span class="fl">1.25</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                    to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-recompute-1.png" width="100%"></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Recomputing recalculates the smooth for the inset:</span></span>
 <span><span class="va">ggp2</span> <span class="op">+</span> <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.25</span>, <span class="fl">1.25</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -412,7 +428,7 @@
 <div class="section level3">
 <h3 id="magnify-twice">Magnify twice<a class="anchor" aria-label="anchor" href="#magnify-twice"></a>
 </h3>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">4000</span><span class="op">)</span>, </span>
@@ -432,7 +448,7 @@
 <span>               expand <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span><span class="st">"white"</span>, proj.linetype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-magnify-twice-1.png" width="100%"></p>
 <p>An inset <em>within</em> an inset is a bit more complex, but also doable:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ggp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1e5</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1e5</span><span class="op">)</span>, </span>
 <span>                  colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">8L</span>, <span class="fl">1e5</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
