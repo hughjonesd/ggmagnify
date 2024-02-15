@@ -252,6 +252,20 @@ ggpi +
                proj = "single") # just one line
 ```
 
+### Projection fill
+
+```{r example-proj-fill}
+
+ggpi + 
+  geom_magnify(from = from2, to = to2,
+               proj.fill = alpha("yellow", 0.2)) # fill between the lines
+
+ggpi + 
+  geom_magnify(from = from2, to = to2, shape = "ellipse",
+               proj.fill = alpha("orange", 0.2)) # works with any shape
+
+
+```
 
 ## Tips and tricks
 

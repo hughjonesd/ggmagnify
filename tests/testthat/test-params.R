@@ -61,6 +61,6 @@ test_param("shadow-args", shadow = TRUE,
            shadow.args = list(x_offset = -10, y_offset = -10, colour = "pink"))
 test_param("shadow-ellipse", shadow = TRUE, shape = "ellipse")
 
-#test_param("proj-fill", proj.fill = alpha("yellow", 0.2))
+test_param("proj-fill", proj.fill = alpha("yellow", 0.2))
 
 file.remove(list.files(pattern = "test-params.*.png"))

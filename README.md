@@ -259,6 +259,26 @@ ggpi +
 
 <img src="man/figures/README-example-proj-3.png" width="100%" />
 
+### Projection fill
+
+``` r
+
+ggpi + 
+  geom_magnify(from = from2, to = to2,
+               proj.fill = alpha("yellow", 0.2)) # fill between the lines
+```
+
+<img src="man/figures/README-example-proj-fill-1.png" width="100%" />
+
+``` r
+
+ggpi + 
+  geom_magnify(from = from2, to = to2, shape = "ellipse",
+               proj.fill = alpha("orange", 0.2)) # works with any shape
+```
+
+<img src="man/figures/README-example-proj-fill-2.png" width="100%" />
+
 ## Tips and tricks
 
 ### Graphics devices
