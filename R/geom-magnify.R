@@ -383,32 +383,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     proj_fill_grob <- if (is.null(proj.fill) || identical(proj, "single")) {
       NULL
     } else {
-      line_pair_idx <- seq(1L, nrow(proj_df), by = 2L)
-      # each 2 rows of proj_df define a pair of matched projection lines
-      proj_fill_grobs <- lapply(line_pair_idx,
-                                function (idx) {
-        # the two lines go in opposite directions (would be nice to clarify
-        # or remove this brittle long-range dependency)
-        # this lets us easily define a polygon
-        x <- c(proj_df$x[idx], proj_df$xend[idx],
-               proj_df$xend[idx + 1], proj_df$x[idx + 1])
-        y <- c(proj_df$y[idx], proj_df$yend[idx],
-               proj_df$yend[idx + 1], proj_df$y[idx + 1])
-
-        proj_fill_grob <- polygonGrob(x = x, y = y,
-                                 default.units = "native")
-        proj_fill_grob <- gridGeometry::polyclipGrob(proj_fill_grob, target_grob,
-                                                     op = "minus",
-                                                     gp = gpar(
-                                   col  = "transparent",
-                                   fill = proj.fill,
-                                   lty  = proj.linetype,
-                                   lwd  = linewidth * .pt))
-        proj_fill_grob
-      })
-      grob_glist <- do.call(gList, proj_fill_grobs)
-      gTree(children = grob_glist)
-      # TODO check with grobs, maps etc
+      make_proj_fill_grob(proj_df, target_grob, proj.fill)
     }
 
     if (shadow) {

@@ -274,3 +274,37 @@ calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
   df <- data.frame(x = proj_x, y = proj_y, xend = proj_xend, yend = proj_yend)
   coord$transform(df, panel_params)
 }
+
+
+#' Creates a grob to fill between the projection lines
+#'
+#' @param proj_df Data frame returned from calculate_proj_df_*.
+#'   This should have n pairs of matched projection lines,
+#'   both going in the same direction (i.e. from target to inset or vice versa)
+#' @param target_grob From [draw_panel()].
+#' @param fill The fill colour
+#'
+#' @return The grob, excluding the target grob.
+#' @noRd
+make_proj_fill_grob <- function (proj_df, target_grob, fill) {
+  line_pair_idx <- seq(1L, nrow(proj_df), by = 2L)
+
+  proj_fill_grobs <- lapply(line_pair_idx,
+                            function (idx) {
+    x <- c(proj_df$x[idx],
+           proj_df$xend[idx],
+           proj_df$xend[idx + 1],
+           proj_df$x[idx + 1])
+    y <- c(proj_df$y[idx],
+           proj_df$yend[idx],
+           proj_df$yend[idx + 1],
+           proj_df$y[idx + 1])
+
+    unclipped_grob <- polygonGrob(x = x, y = y, default.units = "native")
+    gridGeometry::polyclipGrob(unclipped_grob, target_grob, op = "minus",
+                               gp = gpar(col  = "transparent", fill = fill))
+  })
+
+  proj_fill_grobs <- do.call(gList, proj_fill_grobs)
+  gTree(children = proj_fill_grobs)
+}
