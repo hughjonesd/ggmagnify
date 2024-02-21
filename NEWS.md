@@ -1,3 +1,5 @@
+# ggmagnify (development version)
+
 # ggmagnify 0.4.0
 
 * New `proj.fill` argument to fill the area between the projection lines.
