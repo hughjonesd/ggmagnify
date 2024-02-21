@@ -48,6 +48,9 @@ NULL
 #' for borders and projection lines.
 #' @param target.linetype,inset.linetype,proj.linetype Linetypes
 #'   for specific components. Set to `0` for no lines.
+#' @param proj.fill Colour to fill between the projection lines. `NULL` for no
+#'   fill. Add alpha using e.g. [scales::alpha()]. Ignored when
+#'   `proj = "single"`.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
 #'   ggplot object to which `geom_magnify()` is added.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
@@ -62,9 +65,6 @@ NULL
 #' @param proj.combine Logical. How to draw projection lines when more than
 #'   one polygon/map area is magnified? `FALSE` draws one set of projection
 #'   lines for each area. `TRUE` draws a single set of lines for all the areas.
-#' @param proj.fill `NULL` for no fill, or a colour to fill between the
-#'   projection lines. Add alpha using e.g. [scales::alpha()]. Ignored when
-#'   `proj = "single"`.
 #'
 #' @details
 #' ## Aesthetics
@@ -203,13 +203,13 @@ geom_magnify <- function (mapping = NULL,
                           proj.linetype = 2,
                           alpha = 1,
                           linewidth = 0.4,
+                          proj.fill = NULL,
                           plot = NULL,
                           shadow.args = list(sigma = 5, colour = "grey40",
                                              x_offset = 5, y_offset = 5),
                           recompute = FALSE,
                           scale.inset = 1,
                           proj.combine = TRUE,
-                          proj.fill = NULL,
                           na.rm = FALSE,
                           inherit.aes = TRUE) {
   proj <- match.arg(proj)
