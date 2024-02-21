@@ -12,11 +12,11 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 ggmagnify creates a magnified inset of part of a
-[ggplot](https://ggplot2.tidyverse.org/) object. Borders can be drawn
-around the target area and the inset, along with projection lines from
-one to the other. The inset can have a drop shadow. The magnified area
-can be a rectangle, an ellipse, a convex hull of points, or an arbitrary
-shape.
+[ggplot](https://ggplot2.tidyverse.org/) object. The magnified area can
+be a (rounded) rectangle, an ellipse, a convex hull of points, or an
+arbitrary shape. Borders can be drawn around the target area and the
+inset, along with projection lines and/or shading between the two. The
+inset can have a drop shadow.
 
 You can install ggmagnify from r-universe:
 
