@@ -346,7 +346,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                     "i" = "Try using a \"cairo\" graphics device."))
       mask_grob <- FALSE
     }
-    # What if it's NA? Need to then check for length 1, since it may be
+    # What if `mask_cap` is NA? Need to then check for length 1, since it may be
     # not NA, but length 2
     # This is the worst API :-P
     vp <- viewport(x = mean(x_rng), y = mean(y_rng), width = diff(x_rng),
@@ -380,6 +380,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
                                 lty = proj.linetype,
                                 lwd = linewidth * .pt))
 
+    # == create projection background fill ====
     proj_fill_grob <- if (is.null(proj.fill) || identical(proj, "single")) {
       NULL
     } else {
