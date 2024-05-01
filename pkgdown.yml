@@ -1,8 +1,8 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-03-23T13:18Z
+last_built: 2024-05-01T16:35Z
 urls:
   reference: https://hughjonesd.github.io/ggmagnify/reference
   article: https://hughjonesd.github.io/ggmagnify/articles
