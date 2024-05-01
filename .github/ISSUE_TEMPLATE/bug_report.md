@@ -13,7 +13,7 @@ GitHub issues are for bugs and enhancement requests. **Please don't use GitHub i
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior. Ideally, include a self-contained, reproducible example, i.e. some code that I can run and immediately see the problem.  Consider using the `{reprex}` package to help with this.
+Steps to reproduce the behavior. Ideally, include a self-contained, reproducible example, i.e. some code that I can copy, paste and run on my machine.  Consider using the `{reprex}` package to help with this. Note: **if an example uses data which I don't have, or uses functions from a package which isn't loaded via `library()`, then it's not reproducible.** 
 
 
 **Expected behavior**
