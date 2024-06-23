@@ -101,7 +101,8 @@ fill. Add alpha using e.g. \code{\link[scales:alpha]{scales::alpha()}}. Ignored 
 \code{proj = "single"}.}
 
 \item{plot}{Ggplot object to plot in the inset. If \code{NULL}, defaults to the
-ggplot object to which \code{geom_magnify()} is added.}
+ggplot object to which \code{geom_magnify()} is added. Overrides \code{axes} if set.
+Use \code{\link[=inset_theme]{inset_theme()}} to give \code{plot} an appropriate theme.}
 
 \item{shadow.args}{List. Arguments to \code{\link[ggfx:with_shadow]{ggfx::with_shadow()}}.}
 

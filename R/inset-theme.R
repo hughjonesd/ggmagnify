@@ -31,12 +31,25 @@ inset_blanks <- function (..., axes) {
 
 #' Create a theme suitable for an inset ggplot
 #'
+#' Use `inset_theme()` to add a suitable theme to a manually-created inset
+#' plot.
+#'
 #' @param blank Character vector of theme elements to blank. See [ggplot2::theme()].
 #' @param margin Margin around the plot. See `plot.margin` in [ggplot2::theme()].
 #' @inherit geom_magnify params
 #'
 #' @return A ggplot theme object
 #' @export
+#' @doctest
+#' library(ggplot2)
+#' ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+#'          geom_point() + xlim(c(2, 6))
+#' from <- list(2.5, 3.5, 6, 7)
+#' to <- list(4, 6, 5, 7)
+#'
+#' inset <- ggp + geom_density2d() + inset_theme(axes = "")
+#' @expect silent()
+#' ggp + geom_magnify(from = from, to = to, plot = inset)
 inset_theme <- function (
     blank = inset_blanks(axes = axes),
     axes,

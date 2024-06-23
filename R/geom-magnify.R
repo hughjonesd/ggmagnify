@@ -52,7 +52,8 @@ NULL
 #'   fill. Add alpha using e.g. [scales::alpha()]. Ignored when
 #'   `proj = "single"`.
 #' @param plot Ggplot object to plot in the inset. If `NULL`, defaults to the
-#'   ggplot object to which `geom_magnify()` is added.
+#'   ggplot object to which `geom_magnify()` is added. Overrides `axes` if set.
+#'   Use [inset_theme()] to give `plot` an appropriate theme.
 #' @param shadow.args List. Arguments to [ggfx::with_shadow()].
 #' @param recompute Logical. If `TRUE`, use [lims()][ggplot2::lims()] to
 #'   replot the inset. Statistics, e.g. smoothing lines, will be
@@ -317,8 +318,11 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 
     # == create the magnified plot =======================================
 
-    plot <- plot %||% self$plot
-    plot_gtable <- create_plot_gtable(plot, data = d1, axes = axes,
+    if (is.null(plot)) {
+      plot <- self$plot
+      plot <- plot + inset_theme(axes = axes)
+    }
+    plot_gtable <- create_plot_gtable(plot, data = d1,
                                       recompute = recompute,
                                       scale.inset = scale.inset)
 
@@ -398,7 +402,7 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
 )
 
 
-create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
+create_plot_gtable <- function (plot, data, recompute, scale.inset) {
   plot_coord <- ggplot_build(plot)$layout$coord
   plot_limits <- plot_coord$limits
 
@@ -431,7 +435,6 @@ create_plot_gtable <- function (plot, data, axes, recompute, scale.inset) {
                      list(xlim = xlim_vals, ylim = ylim_vals, expand = FALSE))
     }
   )
-  plot <- plot + inset_theme(axes = axes)
 
   suppressWarnings(suppressMessages({
     plot_built <- ggplot_build(plot)

@@ -22,5 +22,16 @@ inset_theme(
 A ggplot theme object
 }
 \description{
-Create a theme suitable for an inset ggplot
+Use \code{inset_theme()} to add a suitable theme to a manually-created inset
+plot.
+}
+\examples{
+library(ggplot2)
+ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+         geom_point() + xlim(c(2, 6))
+from <- list(2.5, 3.5, 6, 7)
+to <- list(4, 6, 5, 7)
+
+inset <- ggp + geom_density2d() + inset_theme(axes = "")
+ggp + geom_magnify(from = from, to = to, plot = inset)
 }
