@@ -6,7 +6,7 @@
 #'
 #' @return A character vector.
 #' @export
-inset_blanks <- function (..., axes) {
+inset_blanks <- function (..., axes = c("", "x", "y", "xy")) {
   res <- c("plot.title", "plot.subtitle", "plot.caption", "plot.tag",
               "axis.title", "axis.title.x", "axis.title.y",
               "strip.background", "strip.background.x", "strip.background.y",
@@ -14,7 +14,7 @@ inset_blanks <- function (..., axes) {
               "strip.text.x.bottom", "strip.text.x.top",
               "strip.text.y.left", "strip.text.y.right",
            ...)
-
+  axes <- rlang::arg_match(axes)
   axis_suffixes_to_blank <- switch(paste0("+", axes), # avoid "zero-length name"
                                    "+" = c("", ".x", ".y"),
                                    "+x" = ".y",
@@ -52,9 +52,11 @@ inset_blanks <- function (..., axes) {
 #' ggp + geom_magnify(from = from, to = to, plot = inset)
 inset_theme <- function (
     blank = inset_blanks(axes = axes),
-    axes,
+    axes = c("", "x", "y", "xy"),
     margin = if (axes == "") 0 else 8
   ) {
+  # We put this before using `blank`, since it is part of the default argument.
+  axes <- rlang::arg_match(axes)
   blank_elements <- lapply(blank, function (x) {
     ggplot2::element_blank()
   })
