@@ -1,5 +1,8 @@
 # ggmagnify (development version)
 
+* Bugfix: `inset_theme()` was overridden in explicitly passed-in inset `plot` objects. Thanks
+  @XanderDes
+
 # ggmagnify 0.4.0
 
 * New `proj.fill` argument to fill the area between the projection lines.
