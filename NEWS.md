@@ -1,7 +1,8 @@
 # ggmagnify 0.4.1
 
-* Bugfix: `inset_theme()` was overridden in explicitly passed-in inset `plot` objects. Thanks
-  @XanderDes
+* Bugfix: `inset_theme()` was overridden in explicitly passed-in inset `plot` 
+  objects. Thanks @XanderDes.
+  
 
 # ggmagnify 0.4.0
 

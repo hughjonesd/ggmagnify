@@ -2,13 +2,16 @@
 % Please edit documentation in R/inset-theme.R
 \name{inset_theme}
 \alias{inset_theme}
+\alias{inset_blanks}
 \title{Create a theme suitable for an inset ggplot}
 \usage{
 inset_theme(
   blank = inset_blanks(axes = axes),
-  axes,
+  axes = c("", "x", "y", "xy"),
   margin = if (axes == "") 0 else 8
 )
+
+inset_blanks(..., axes = c("", "x", "y", "xy"))
 }
 \arguments{
 \item{blank}{Character vector of theme elements to blank. See \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
@@ -17,13 +20,17 @@ inset_theme(
 \code{"xy"}.}
 
 \item{margin}{Margin around the plot. See \code{plot.margin} in \code{\link[ggplot2:theme]{ggplot2::theme()}}.}
+
+\item{...}{Character vector of extra elements to blank.}
 }
 \value{
-A ggplot theme object
+\code{inset_theme()} returns a ggplot theme object. \code{inset_blanks()}
+returns a character vector of theme element names.
 }
 \description{
 Use \code{inset_theme()} to add a suitable theme to a manually-created inset
-plot.
+plot. Use \code{inset_blanks()} to customize the default list of elements to
+blank in the inset.
 }
 \examples{
 library(ggplot2)
@@ -32,6 +39,7 @@ ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
 from <- list(2.5, 3.5, 6, 7)
 to <- list(4, 6, 5, 7)
 
-inset <- ggp + geom_density2d() + inset_theme(axes = "")
+blanks <- inset_blanks("panel.grid")
+inset <- ggp + geom_density2d() + inset_theme(axes = "", blank = blanks)
 ggp + geom_magnify(from = from, to = to, plot = inset)
 }
