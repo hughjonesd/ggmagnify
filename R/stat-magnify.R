@@ -107,20 +107,17 @@ find_bounds.logical <- function (from, shape, data) {
 }
 
 
-find_bounds.numeric <- function (from, shape, data) {
+find_bounds.grob <- function (from, shape, data) {
+  from <- allcoords(from, bind = TRUE)
+  list(xmin = min(from[, "x"]), ymin = min(from[, "y"]),
+       xmax = max(from[, "x"]), ymax = max(from[, "y"]))
+}
+
+
+find_bounds.default <- function (from, shape, data) {
   if (is.null(names(from))) {
     names(from) <- c("xmin", "xmax", "ymin", "ymax")
   }
 
   as.list(from)
-}
-
-
-find_bounds.list <- find_bounds.numeric
-
-
-find_bounds.grob <- function (from, shape, data) {
-  from <- allcoords(from, bind = TRUE)
-  list(xmin = min(from[, "x"]), ymin = min(from[, "y"]),
-       xmax = max(from[, "x"]), ymax = max(from[, "y"]))
 }

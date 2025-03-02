@@ -158,7 +158,6 @@ in_bbox <- function(pts, p1, p2) {
 
 
 calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
-  # using mean allows Dates and maybe other things
   xmin <- data$xmin
   xmax <- data$xmax
   ymin <- data$ymin
@@ -193,6 +192,7 @@ calculate_proj_df_rect <- function(proj, data, corners, coord, panel_params) {
     to_ymax <- to_ymax - to_corn_adj
   }
 
+  # using mean allows Dates and maybe other things
   x <- mean(c(xmin, xmax))
   y <- mean(c(ymin, ymax))
   to_x <- mean(c(to_xmin, to_xmax))
