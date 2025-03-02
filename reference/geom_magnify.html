@@ -222,6 +222,9 @@ bold):</p><ul><li><p><strong>from</strong></p></li>
 These specify the bottom left and top right corners of the target area to
 magnify, and the area for the magnified inset. The lists can optionally be
 named: <code>list(xmin = 1, xmax = 2, ymin = 3, ymax = 4)</code>.</p>
+<p><strong>Note</strong>: it is correct to use a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> for <code>from</code> and <code>to</code>, because x and
+y scales may be different types, e.g. if x is a <a href="https://rdrr.io/r/base/Dates.html" class="external-link">Date</a>. However,
+if x and y are both the same type, you may safely use <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> instead of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <p><strong>Note</strong>: very early versions of ggmagnify used a
 different order of coordinates: <code>list(xmin, ymin, xmax, ymax)</code>.</p>
 <p>Alternatively, <code>from</code> can be:</p><ul><li><p>A data frame of points with two columns for <code>x</code> and <code>y</code>, or a <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::grob()</a></code>
