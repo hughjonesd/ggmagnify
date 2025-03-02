@@ -14,7 +14,7 @@ Encoding: UTF-8
 Language: en
 Roxygen: list(markdown = TRUE, roclets = c("collate", "rd", "namespace", 
               "doctest::dt_roclet"), packages = "doctest") 
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Depends:
     R (>= 4.1.0)
 Imports:

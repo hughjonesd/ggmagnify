@@ -147,6 +147,10 @@ These specify the bottom left and top right corners of the target area to
 magnify, and the area for the magnified inset. The lists can optionally be
 named: \code{list(xmin = 1, xmax = 2, ymin = 3, ymax = 4)}.
 
+\strong{Note}: it is correct to use a \code{list()} for \code{from} and \code{to}, because x and
+y scales may be different types, e.g. if x is a \link{Date}. However,
+if x and y are both the same type, you may safely use \code{c()} instead of \code{list()}.
+
 \strong{Note}: very early versions of ggmagnify used a
 different order of coordinates: \code{list(xmin, ymin, xmax, ymax)}.
 

@@ -9,8 +9,8 @@ test_that("Doctest: grob_where", {
   if (requireNamespace("sf", quietly = TRUE) && requireNamespace("maps", quietly = TRUE)) {
     usa <- sf::st_as_sf(maps::map("state", fill = TRUE, plot = FALSE))
     expect_snapshot(texas <- grob_where(ID == "texas", usa, crs = sf::st_crs(4326)))
-    ggplot(usa) + coord_sf(crs = sf::st_crs(4326)) + geom_sf() + geom_magnify(from = texas,
-      to = c(-90, -70, 25, 35), colour = "red", aspect = "fixed", expand = 0)
+    ggplot(usa) + coord_sf(crs = sf::st_crs(4326)) + geom_sf() + geom_magnify(from = texas, to = c(-90, -70, 25,
+      35), colour = "red", aspect = "fixed", expand = 0)
   }
 })
 

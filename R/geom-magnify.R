@@ -81,6 +81,10 @@ NULL
 #' magnify, and the area for the magnified inset. The lists can optionally be
 #' named: `list(xmin = 1, xmax = 2, ymin = 3, ymax = 4)`.
 #'
+#' **Note**: it is correct to use a `list()` for `from` and `to`, because x and
+#' y scales may be different types, e.g. if x is a [Date]. However,
+#' if x and y are both the same type, you may safely use `c()` instead of `list()`.
+#'
 #' **Note**: very early versions of ggmagnify used a
 #' different order of coordinates: `list(xmin, ymin, xmax, ymax)`.
 #'
