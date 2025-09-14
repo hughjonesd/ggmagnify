@@ -10,7 +10,7 @@ to <- c(2.4, 3.2, 4.3, 5.7)
 
 
 test_that("reversed coords", {
-  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2)) +
+  ggp_rev_x <- ggp2 + coord_cartesian(xlim = c(6, 2), reverse = "x") +
     geom_magnify(from = from, to = to)
 
   expect_no_error(
@@ -18,7 +18,7 @@ test_that("reversed coords", {
   )
 
   ggp_rev_y <- ggp2 +
-    coord_cartesian(ylim = c(8, 4)) +
+    coord_cartesian(ylim = c(8, 4), reverse = "y") +
     geom_magnify(from = from, to = to)
 
   expect_no_error(
@@ -45,7 +45,7 @@ test_that("coord_fixed", {
 test_that("coord_trans", {
   # 60% of the time, it works all the time!
   expect_no_error(
-    ggp2 + coord_trans(x = "log10", y = "log10") +
+    ggp2 + coord_transform(x = "log10", y = "log10") +
       geom_magnify(from = from - c(0.5, 0.5, 0, 0), to = to + c(1, 1, 0, 0))
   )
 })
