@@ -15,7 +15,7 @@ c(xmin, xmax, ymin, ymax)."><meta property="og:image" content="https://hughjones
 
     <a class="navbar-brand me-2" href="../index.html">ggmagnify</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -248,9 +248,9 @@ areas in one panel, use multiple calls to <code>geom_magnify()</code>.)</p>
 <p>If <code>shape = "ellipse"</code> an elliptical area is magnified. This may not include
 all points within the target area given by <code>from</code>.</p>
 <p>If <code>shape = "outline"</code> then a convex hull will be drawn around points in
-the target area. This only works if you are using <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point()</a></code> or some other
-geom with aesthetics <code>x</code> and <code>y</code>. If you are plotting a map, then
-<code>"outline"</code> magnifies exactly the map features selected by <code>from</code>.</p>
+the target area. This only works if you are using <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">ggplot2::geom_point()</a></code> or some other
+geom with aesthetics <code>x</code> and <code>y</code>; or with maps constructed by e.g. <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::geom_sf()</a></code>.
+In this case <code>"outline"</code> magnifies exactly the map features selected by <code>from</code>.</p>
 </div>
 
 <div class="section">
@@ -297,7 +297,7 @@ ggplot2 for now.</p></li>
 
 
 <p><code>geom_magnify_tile()</code> is a version of <code>geom_magnify()</code> which uses different
-aesthetics. Set <code>x</code>, <code>width</code>, <code>y</code>, <code>height</code> and <code>to_x</code>, <code>to_width</code> <code>to_y</code>,
+aesthetics. Set <code>x</code>, <code>width</code>, <code>y</code>, <code>height</code> and <code>to_x</code>, <code>to_width</code>, <code>to_y</code>,
 <code>to_height</code> to specify the target and inset location.</p>
 </div>
 
