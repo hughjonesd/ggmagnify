@@ -178,9 +178,9 @@ If \code{shape = "ellipse"} an elliptical area is magnified. This may not includ
 all points within the target area given by \code{from}.
 
 If \code{shape = "outline"} then a convex hull will be drawn around points in
-the target area. This only works if you are using \code{\link[=geom_point]{geom_point()}} or some other
-geom with aesthetics \code{x} and \code{y}. If you are plotting a map, then
-\code{"outline"} magnifies exactly the map features selected by \code{from}.
+the target area. This only works if you are using \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} or some other
+geom with aesthetics \code{x} and \code{y}; or with maps constructed by e.g. \code{\link[ggplot2:ggsf]{ggplot2::geom_sf()}}.
+In this case \code{"outline"} magnifies exactly the map features selected by \code{from}.
 }
 
 \subsection{Projection lines}{
@@ -227,7 +227,7 @@ ggplot2 for now.
 \subsection{\code{geom_magnify_tile()}}{
 
 \code{geom_magnify_tile()} is a version of \code{geom_magnify()} which uses different
-aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x}, \code{to_width} \code{to_y},
+aesthetics. Set \code{x}, \code{width}, \code{y}, \code{height} and \code{to_x}, \code{to_width}, \code{to_y},
 \code{to_height} to specify the target and inset location.
 }
 }

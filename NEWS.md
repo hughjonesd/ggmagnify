@@ -1,4 +1,6 @@
-# ggmagnify (development version)
+# ggmagnify 0.4.2
+
+* Tiny fix for ggplot2 4.0.0.
 
 # ggmagnify 0.4.1
 

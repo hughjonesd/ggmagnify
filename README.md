@@ -25,7 +25,7 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release (currently ggmagnify 0.4.0).
+This will install the latest github release (currently ggmagnify 0.4.1).
 
 Or install the development version from [GitHub](https://github.com/)
 with:
@@ -157,7 +157,8 @@ starwars_plot +
                                   x_offset = 2, y_offset = 5),
                alpha = 0.8, colour = "yellow", linewidth = 0.6, 
                shape = "outline", expand = 0.2)
-#> Warning: Removed 1 rows containing missing values (`geom_point()`).
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-outline-1.png" width="100%" />
@@ -320,7 +321,9 @@ ggpi +
 
 <img src="man/figures/README-example-order-2.png" width="100%" />
 
-For complex modifications to the inset, set `plot` explicitly:
+For complex modifications to the inset, use the `plot` argument to set
+the plot explicitly. Use `inset_theme()` to customize theme defaults
+appropriately for an inset plot.
 
 ``` r
 
@@ -332,7 +335,8 @@ booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
 booms_inset <- booms + 
   geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7, 
              size = 2, shape = "circle filled") + 
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE) +
+  inset_theme()
 
 shadow.args <- list(
   colour = alpha("grey80", 0.8),
@@ -486,7 +490,8 @@ ggp +
                expand = FALSE, colour = "white") +
   labs(title = "Normal data", 
        subtitle = "The distribution gets more uniform as you zoom in")
-#> Warning: Removed 570 rows containing missing values (`geom_point()`).
+#> Warning: Removed 570 rows containing missing values or values outside the scale range
+#> (`geom_point()`).
 ```
 
 <img src="man/figures/README-example-and-so-ad-infinitum-1.png" width="100%" />

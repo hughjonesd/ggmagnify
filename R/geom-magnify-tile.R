@@ -6,7 +6,7 @@
 #' ## `geom_magnify_tile()`
 #'
 #' `geom_magnify_tile()` is a version of `geom_magnify()` which uses different
-#' aesthetics. Set `x`, `width`, `y`, `height` and `to_x`, `to_width` `to_y`,
+#' aesthetics. Set `x`, `width`, `y`, `height` and `to_x`, `to_width`, `to_y`,
 #' `to_height` to specify the target and inset location.
 #'
 #' @export

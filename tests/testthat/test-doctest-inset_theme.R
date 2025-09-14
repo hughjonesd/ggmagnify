@@ -6,7 +6,8 @@ test_that("Doctest: inset_theme", {
   # Source file: R/inset-theme.R
   # Source line: 16
   library(ggplot2)
-  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) + geom_point() + xlim(c(2, 6))
+  ggp <- ggplot(iris, aes(Sepal.Width, Sepal.Length, colour = Species)) +
+    geom_point() + xlim(c(2, 6))
   from <- list(2.5, 3.5, 6, 7)
   to <- list(4, 6, 5, 7)
   blanks <- inset_blanks("panel.grid")

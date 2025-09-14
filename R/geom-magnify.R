@@ -111,9 +111,9 @@ NULL
 #' all points within the target area given by `from`.
 #'
 #' If `shape = "outline"` then a convex hull will be drawn around points in
-#' the target area. This only works if you are using [geom_point()] or some other
-#' geom with aesthetics `x` and `y`. If you are plotting a map, then
-#' `"outline"` magnifies exactly the map features selected by `from`.
+#' the target area. This only works if you are using [ggplot2::geom_point()] or some other
+#' geom with aesthetics `x` and `y`; or with maps constructed by e.g. [ggplot2::geom_sf()].
+#' In this case `"outline"` magnifies exactly the map features selected by `from`.
 #'
 #' ## Projection lines
 #'
@@ -245,7 +245,7 @@ geom_magnify <- function (mapping = NULL,
 
 
 #' @export
-ggplot_add.GeomMagnifyLayer <- function(object, plot, object_name) {
+ggplot_add.GeomMagnifyLayer <- function(object, plot, ...) {
   object$geom$plot <- plot
   NextMethod()
 }

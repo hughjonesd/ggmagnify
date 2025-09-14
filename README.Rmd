@@ -82,7 +82,7 @@ ggp + geom_magnify(from = from, to = to)
 
 ```{r example-shadow}
 
-loadNamespace("ggfx")
+# install.packages("ggfx")
 
 ggp + geom_magnify(from = from, to = to, 
                    shadow = TRUE)
@@ -90,7 +90,7 @@ ggp + geom_magnify(from = from, to = to,
 
 ## Rounded corners
 
-New in version 0.3.0, use `corners` to give a proportional radius for rounded
+Use `corners` to give a proportional radius for rounded
 corners.
 
 ```{r example-corners}
@@ -134,7 +134,7 @@ ggpi +
 ```
 
 
-## Magnify an arbitrary region (experimental)
+## Magnify an arbitrary region
 
 
 Use `shape = "outline"` to magnify the convex hull of a set of points:
@@ -170,7 +170,7 @@ starwars_plot +
 ```
 
 
-Use a grob or data frame to magnify any shape:
+Use a [grid grob object](https://stat.ethz.ch/R-manual/R-devel/library/grid/html/grid.grob.html) or data frame to magnify any shape:
 
 ```{r example-grob}
 
@@ -183,7 +183,7 @@ ggpi + geom_magnify(from = hex,
 ```
 
 
-## Maps (experimental)
+## Maps
 
 With maps, `shape = "outline"` magnifies just the selected map polygons:
 
@@ -299,7 +299,9 @@ ggpi +
 
 ```
 
-For complex modifications to the inset, set `plot` explicitly:
+For complex modifications to the inset, use the `plot` argument to
+set the plot explicitly. Use `inset_theme()`
+to customize theme defaults appropriately for an inset plot.
 
 ```{r example-advanced-2}
 
@@ -311,7 +313,8 @@ booms <- ggplot(faithfuld, aes(waiting, eruptions)) +
 booms_inset <- booms + 
   geom_point(data = faithful, color = "red", fill = "white", alpha = 0.7, 
              size = 2, shape = "circle filled") + 
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE) +
+  inset_theme()
 
 shadow.args <- list(
   colour = alpha("grey80", 0.8),
