@@ -25,7 +25,7 @@ install.packages("ggmagnify", repos = c("https://hughjonesd.r-universe.dev",
                  "https://cloud.r-project.org"))
 ```
 
-This will install the latest github release (currently ggmagnify 0.4.1).
+This will install the latest github release (currently ggmagnify 0.4.2).
 
 Or install the development version from [GitHub](https://github.com/)
 with:
@@ -66,8 +66,7 @@ ggp + geom_magnify(from = from, to = to)
 
 ``` r
 
-loadNamespace("ggfx")
-#> <environment: namespace:ggfx>
+# install.packages("ggfx")
 
 ggp + geom_magnify(from = from, to = to, 
                    shadow = TRUE)
@@ -77,8 +76,7 @@ ggp + geom_magnify(from = from, to = to,
 
 ## Rounded corners
 
-New in version 0.3.0, use `corners` to give a proportional radius for
-rounded corners.
+Use `corners` to give a proportional radius for rounded corners.
 
 ``` r
 ggp + geom_magnify(from = from, to = to, 
@@ -126,7 +124,7 @@ ggpi +
 
 <img src="man/figures/README-example-faceting-1.png" width="100%" />
 
-## Magnify an arbitrary region (experimental)
+## Magnify an arbitrary region
 
 Use `shape = "outline"` to magnify the convex hull of a set of points:
 
@@ -163,7 +161,9 @@ starwars_plot +
 
 <img src="man/figures/README-example-outline-1.png" width="100%" />
 
-Use a grob or data frame to magnify any shape:
+Use a [grid grob
+object](https://stat.ethz.ch/R-manual/R-devel/library/grid/html/grid.grob.html)
+or data frame to magnify any shape:
 
 ``` r
 
@@ -176,7 +176,7 @@ ggpi + geom_magnify(from = hex,
 
 <img src="man/figures/README-example-grob-1.png" width="100%" />
 
-## Maps (experimental)
+## Maps
 
 With maps, `shape = "outline"` magnifies just the selected map polygons:
 
