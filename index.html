@@ -60,7 +60,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggmagnify"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://hughjonesd.r-universe.dev"</span>, </span>
 <span>                 <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>This will install the latest github release (currently ggmagnify 0.4.1).</p>
+<p>This will install the latest github release (currently ggmagnify 0.4.2).</p>
 <p>Or install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
@@ -91,8 +91,7 @@
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">loadNamespace</a></span><span class="op">(</span><span class="st">"ggfx"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;environment: namespace:ggfx&gt;</span></span>
+<span><span class="co"># install.packages("ggfx")</span></span>
 <span></span>
 <span><span class="va">ggp</span> <span class="op">+</span> <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">from</span>, to <span class="op">=</span> <span class="va">to</span>, </span>
 <span>                   shadow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -101,7 +100,7 @@
 <div class="section level2">
 <h2 id="rounded-corners">Rounded corners<a class="anchor" aria-label="anchor" href="#rounded-corners"></a>
 </h2>
-<p>New in version 0.3.0, use <code>corners</code> to give a proportional radius for rounded corners.</p>
+<p>Use <code>corners</code> to give a proportional radius for rounded corners.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ggp</span> <span class="op">+</span> <span class="fu"><a href="reference/geom_magnify.html">geom_magnify</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">from</span>, to <span class="op">=</span> <span class="va">to</span>, </span>
 <span>                   corners <span class="op">=</span> <span class="fl">0.1</span>, shadow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -142,7 +141,7 @@
 <p><img src="reference/figures/README-example-faceting-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="magnify-an-arbitrary-region-experimental">Magnify an arbitrary region (experimental)<a class="anchor" aria-label="anchor" href="#magnify-an-arbitrary-region-experimental"></a>
+<h2 id="magnify-an-arbitrary-region">Magnify an arbitrary region<a class="anchor" aria-label="anchor" href="#magnify-an-arbitrary-region"></a>
 </h2>
 <p>Use <code>shape = "outline"</code> to magnify the convex hull of a set of points:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -175,7 +174,7 @@
 <span><span class="co">#&gt; Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-outline-1.png" width="100%"></p>
-<p>Use a grob or data frame to magnify any shape:</p>
+<p>Use a <a href="https://stat.ethz.ch/R-manual/R-devel/library/grid/html/grid.grob.html" class="external-link">grid grob object</a> or data frame to magnify any shape:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, length <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
@@ -186,7 +185,7 @@
 <p><img src="reference/figures/README-example-grob-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="maps-experimental">Maps (experimental)<a class="anchor" aria-label="anchor" href="#maps-experimental"></a>
+<h2 id="maps">Maps<a class="anchor" aria-label="anchor" href="#maps"></a>
 </h2>
 <p>With maps, <code>shape = "outline"</code> magnifies just the selected map polygons:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
