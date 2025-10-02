@@ -28,7 +28,7 @@ constructor <- function (x) {
 
 
 plot_clone <- function (plot) {
-    p <- plot
+    p <- rlang::duplicate(plot, shallow = FALSE)
     p$scales <- plot$scales$clone()
     p
 }

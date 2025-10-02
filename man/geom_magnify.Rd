@@ -199,6 +199,12 @@ cleaner.
 }
 }
 
+\subsection{Layer workflow}{
+Each call to \code{geom_magnify()} caches a clone of the current plot without
+other magnification layers so that every inset renders from the unmagnified
+base. Add scales, themes and geoms before adding magnification layers, or pass a
+standalone ggplot via the \code{plot} argument to override the cached plot.}
+
 \subsection{Limitations}{
 \itemize{
 \item \code{geom_magnify()} uses masks. This requires R version 4.1.0 or higher, and
@@ -256,6 +262,12 @@ ggp +
 ggp +
   geom_magnify(from = from, to = to) +
   scale_color_brewer()
+
+# Each `geom_magnify()` layer caches a clone of the current plot without any
+# other magnification layers. This ensures every inset is rendered from the
+# unmagnified base, so add all theming, scales and geoms before calling
+# `geom_magnify()`. To bypass the cached plot, provide a separate ggplot via
+# the `plot =` argument.
 
 # For more examples see https://github.com/hughjonesd/ggmagnify
 }

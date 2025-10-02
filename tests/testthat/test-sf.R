@@ -130,3 +130,44 @@ test_that("multiple", {
   )
 })
 
+
+test_that("geom_magnify viewports derive from the base plot", {
+  to1 <- c(-125, -105, 20, 30)
+  to2 <- c(-95, -75, 30, 45)
+
+  inset_plot <- ggpm +
+    geom_magnify(from = c(-115, -105, 30, 40), to = to1, expand = 0) +
+    geom_magnify(from = c(-90, -80, 35, 45), to = to2, expand = 0)
+
+  gt <- ggplotGrob(inset_plot)
+  panel <- gt$grobs[[which(gt$layout$name == "panel")]]
+  mg_children <- panel$childrenOrder[grepl("ggmagnify", panel$childrenOrder)]
+
+  expect_length(mg_children, 2L)
+
+  inset_viewports <- lapply(mg_children, function(nm) {
+    vp <- panel$children[[nm]]$children[["layout"]]$vp
+    c(
+      x = grid::convertX(vp$x, "native", valueOnly = TRUE),
+      y = grid::convertY(vp$y, "native", valueOnly = TRUE),
+      width = grid::convertWidth(vp$width, "native", valueOnly = TRUE),
+      height = grid::convertHeight(vp$height, "native", valueOnly = TRUE)
+    )
+  })
+
+  base_build <- ggplot_build(ggpm)
+  panel_params <- base_build$layout$panel_params[[1]]
+  coord <- base_build$layout$coord
+
+  expected_viewports <- lapply(list(to1, to2), function(to) {
+    limits <- data.frame(x = c(to[1], to[2]), y = c(to[3], to[4]))
+    limits_t <- coord$transform(limits, panel_params)
+    x_rng <- range(limits_t$x, na.rm = TRUE)
+    y_rng <- range(limits_t$y, na.rm = TRUE)
+    c(x = mean(x_rng), y = mean(y_rng),
+      width = diff(x_rng), height = diff(y_rng))
+  })
+
+  expect_equal(inset_viewports, expected_viewports, tolerance = 1e-6)
+})
+
