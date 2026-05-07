@@ -5,3 +5,4 @@
 .DS_Store
 tests/testthat/Rplots.pdf
 docs
+.positai
