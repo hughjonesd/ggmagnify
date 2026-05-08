@@ -187,6 +187,12 @@ NULL
 #'   geom_magnify(from = from, to = to) +
 #'   scale_color_brewer()
 #'
+#' Each `geom_magnify()` layer caches a clone of the current plot without any
+#' other magnification layers. This ensures every inset is rendered from the
+#' unmagnified base, so add all theming, scales and geoms before calling
+#' `geom_magnify()`. To bypass the cached plot, provide a separate ggplot via
+#' the `plot =` argument.
+#'
 #' # For more examples see https://github.com/hughjonesd/ggmagnify
 #'
 geom_magnify <- function (mapping = NULL,
@@ -246,7 +252,10 @@ geom_magnify <- function (mapping = NULL,
 
 #' @export
 ggplot_add.GeomMagnifyLayer <- function(object, plot, ...) {
-  object$geom$plot <- plot
+  base_plot <- plot_clone(plot)
+  base_plot$layers <- Filter(function(layer) ! inherits(layer, "GeomMagnifyLayer"),
+                             plot$layers)
+  object$geom$plot <- base_plot
   NextMethod()
 }
 
@@ -323,8 +332,14 @@ GeomMagnify <- ggproto("GeomMagnify", Geom,
     # == create the magnified plot =======================================
 
     if (is.null(plot)) {
-      plot <- self$plot
+      base_plot <- self$plot
+      if (is.null(base_plot)) {
+        cli::cli_abort("`geom_magnify()` could not locate the base plot. Did you add it to a ggplot object?")
+      }
+      plot <- plot_clone(base_plot)
       plot <- plot + inset_theme(axes = axes)
+    } else {
+      plot <- plot_clone(plot)
     }
     plot_gtable <- create_plot_gtable(plot, data = d1,
                                       recompute = recompute,
